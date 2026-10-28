@@ -46,7 +46,13 @@
       "стартапы",
       "airdrop",
       "testnet",
-      "Web3"
+      "Web3",
+      "free PR",
+      "free advertising",
+      "crypto promotion",
+      "airdrop referral exchange",
+      "channel catalogue",
+      "Telegram channel cross-promotion"
     ]
   },
   "networks": [
@@ -124,6 +130,18 @@
       "setup_status": "needs_verification",
       "evidence_url": "https://t.me/VzaimniePodpiskiBot",
       "notes": "Public description advertises free promotion via mutual subscriptions and requests admin access to the channel. Check quality and exact exchange mechanics before enabling."
+    },
+    {
+      "id": "rockets-pr-bot",
+      "name": "ROCKET | PROMOTION",
+      "url": "https://t.me/rockets_pr_bot",
+      "kind": "free_cross_promotion_bot_candidate",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_workflow_not_verified",
+      "evidence_url": "https://t.me/rockets_pr_bot",
+      "notes": "Bot description explicitly offers free mutual promotion for Telegram channels and groups. Its exact mechanics, eligibility, publication rights and whether posts are automated were not verified; not connected."
     }
   ],
   "communities": [
@@ -942,6 +960,408 @@
       "automation_status": "discovered_but_stale",
       "evidence_url": "https://t.me/s/katalogkanalow?before=869",
       "notes": "Low priority because recent activity is not confirmed. The bot-based submission workflow must be tested before use."
+    },
+    {
+      "id": "mediaspampr",
+      "name": "Пиар Чат / PR Chat / Free Advertising",
+      "url": "https://t.me/mediaspampr",
+      "kind": "public_self_promotion_group",
+      "language": "ru, uk, en",
+      "audience_topics": [
+        "free advertising",
+        "PR",
+        "mutual promotion"
+      ],
+      "publicly_stated_permission": "Public description labels the group as free PR chat, advertising and audience growth.",
+      "observed_members": 3215,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/mediaspampr",
+      "notes": "Free promotion is stated publicly; current bot posting permissions and exact rules are not verified."
+    },
+    {
+      "id": "reklama-groupe",
+      "name": "Bepul Reklama | Free advertising | Бесплатная реклама",
+      "url": "https://t.me/reklama_groupe",
+      "kind": "public_self_promotion_group",
+      "language": "uz, ru, en",
+      "audience_topics": [
+        "free advertising",
+        "channels",
+        "bots",
+        "groups"
+      ],
+      "publicly_stated_permission": "Description explicitly invites free promotion of channels, bots and group advertisements in Uzbek, Russian and English.",
+      "observed_members": 38,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/reklama_groupe",
+      "notes": "Very small. Posting permission is advertised, but automated publishing still requires checking group permissions."
+    },
+    {
+      "id": "free-advertising-groups",
+      "name": "Free Advertising Group",
+      "url": "https://t.me/Free_Advertising_groups",
+      "kind": "public_self_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "free advertising",
+        "general"
+      ],
+      "publicly_stated_permission": "Description says free advertising with no stated limit.",
+      "observed_members": 377,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/Free_Advertising_groups",
+      "notes": "Broad, likely low-intent traffic. Verify whether crypto/finance content is allowed and bot posting is accepted."
+    },
+    {
+      "id": "free-promotion-airdrop-links",
+      "name": "Free Promotion Group | Crypto Promotion | Referral Links",
+      "url": "https://t.me/free_promotion_airdrop_links",
+      "kind": "crypto_referral_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "crypto",
+        "airdrops",
+        "referral links",
+        "exchange promotion"
+      ],
+      "publicly_stated_permission": "Public description explicitly names crypto promotion and referral-link promotion; current posting rules not shown.",
+      "observed_members": 492,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/free_promotion_airdrop_links",
+      "notes": "Crypto-specific fit. Review moderation, spam risks and whether a news-channel promo is accepted before use."
+    },
+    {
+      "id": "vzaivpiar",
+      "name": "ВЗАИМНЫЙ ПИАР",
+      "url": "https://t.me/vzaivpiar",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion"
+      ],
+      "publicly_stated_permission": "Public description identifies the group as a mutual-promotion group.",
+      "observed_members": 3902,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaivpiar",
+      "notes": "Check current rules, free posting terms and whether unattended bot posting is permitted."
+    },
+    {
+      "id": "vp-pr",
+      "name": "ВЗАИМНЫЙ ПИАР Telegram",
+      "url": "https://t.me/vp_pr",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "cross-promotion",
+        "Telegram growth"
+      ],
+      "publicly_stated_permission": "Description says the group is for mutual promotion and Telegram growth and contains offers to cross-promote.",
+      "observed_members": 1348,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vp_pr",
+      "notes": "Free swap mechanics and bot permissions are not confirmed."
+    },
+    {
+      "id": "piar-chata",
+      "name": "Пиар Чат Взаимный пиар",
+      "url": "https://t.me/piar_chata",
+      "kind": "promotion_group_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "channel and chat promotion"
+      ],
+      "publicly_stated_permission": "Description says mutual PR for chats and channels; paid pinned-post prices are also mentioned.",
+      "observed_members": 4277,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/piar_chata",
+      "notes": "Exclude paid pinned posts. Free ordinary exchange must be confirmed before use."
+    },
+    {
+      "id": "vzaimno-2",
+      "name": "Взаимные подписки / взаимный пиар / реакции",
+      "url": "https://t.me/vzaimno_2",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "mutual promotion",
+        "reactions"
+      ],
+      "publicly_stated_permission": "Description identifies mutual subscriptions, promotion and reactions, and links a price list for advertising.",
+      "observed_members": 119,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaimno_2",
+      "notes": "Free and paid paths may differ. Verify the free path and group rules."
+    },
+    {
+      "id": "piarchat00",
+      "name": "Пиар Чат | взаимный пиар | реклама | продвижение",
+      "url": "https://t.me/piarchat00",
+      "kind": "promotion_group_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "channel advertising",
+        "growth"
+      ],
+      "publicly_stated_permission": "Description identifies mutual PR and promotion of chats/channels, with a separate advertising contact.",
+      "observed_members": 6272,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/piarchat00",
+      "notes": "The existence of an ad contact does not confirm free automated posting."
+    },
+    {
+      "id": "prchatq",
+      "name": "ПИАР ЧАТ | ВЗ | ОБЩЕНИЕ | GRAM",
+      "url": "https://t.me/prchatq",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "mutual subscriptions"
+      ],
+      "publicly_stated_permission": "Description explicitly lists mutual promotion and mutual subscriptions.",
+      "observed_members": 137,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/prchatq",
+      "notes": "Small group; rules, free terms and bot posting permissions need verification."
+    },
+    {
+      "id": "vzaimnyepodpi",
+      "name": "Взаимный пиар",
+      "url": "https://t.me/vzaimnyepodpi",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "mutual promotion",
+        "reactions"
+      ],
+      "publicly_stated_permission": "Description identifies Russian-language mutual subscriptions and mutual promotion, and says the chat follows Telegram rules.",
+      "observed_members": 6570,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaimnyepodpi",
+      "notes": "Potentially relevant reach; check pinned rules and whether promo can be automated."
+    },
+    {
+      "id": "vzaimno-piarc",
+      "name": "Взаимные подписки, взаимный пиар",
+      "url": "https://t.me/vzaimno_piarc",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "mutual promotion",
+        "mutual likes"
+      ],
+      "publicly_stated_permission": "Description names mutual subscriptions, promotion and likes, and says the chat follows Telegram rules.",
+      "observed_members": 1973,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaimno_piarc",
+      "notes": "Free placement and bot permissions not confirmed."
+    },
+    {
+      "id": "addyourreferral",
+      "name": "Referral Exchange (Airdrops)",
+      "url": "https://t.me/addyourreferral",
+      "kind": "crypto_referral_exchange_group",
+      "language": "en",
+      "audience_topics": [
+        "airdrops",
+        "crypto referrals"
+      ],
+      "publicly_stated_permission": "Description asks users to exchange/join legitimate crypto-aidrop referral links and bans abusive posts.",
+      "observed_members": 968,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/addyourreferral",
+      "notes": "Use only for relevant legitimate referral opportunities, not generic channel spam. Verify that channel promotion is allowed."
+    },
+    {
+      "id": "pr-freeee",
+      "name": "Бесплатная Реклама",
+      "url": "https://t.me/pr_freeee",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free advertising",
+        "PR",
+        "channels",
+        "projects",
+        "services"
+      ],
+      "publicly_stated_permission": "Description invites promotion of channels, groups, chats, projects, websites and services and claims few/no restrictions.",
+      "observed_members": 16399,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/pr_freeee",
+      "notes": "Large but broad. Verify moderation quality, rules and anti-spam posture before automation."
+    },
+    {
+      "id": "p1rchats",
+      "name": "Взаимопиар реклама",
+      "url": "https://t.me/P1Rchats",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free advertising",
+        "cross-promotion",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "Description labels it a free-advertising chat and points to mutual-promotion and channel-catalogue resources.",
+      "observed_members": 10473,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/P1Rchats",
+      "notes": "Appears related to a broader PR network; check whether bot publishing and repeated posts are accepted."
+    },
+    {
+      "id": "besplatnyipiar",
+      "name": "Бесплатный Пиар",
+      "url": "https://t.me/besplatnyipiar",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free PR",
+        "channel promotion"
+      ],
+      "publicly_stated_permission": "Description invites users to promote freely and separates paid pinned placements.",
+      "observed_members": 7572,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/besplatnyipiar",
+      "notes": "Use ordinary free posting only; exclude pinned placements and verify bot permissions."
+    },
+    {
+      "id": "freereklchat",
+      "name": "Бесплатная реклама",
+      "url": "https://t.me/freereklchat",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free advertising",
+        "PR"
+      ],
+      "publicly_stated_permission": "Description identifies it as a free-advertising PR chat and links an admin for queries.",
+      "observed_members": 989,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/freereklchat",
+      "notes": "Free promotion is indicated; verify rules and whether finance/crypto posts are accepted."
+    },
+    {
+      "id": "vzaim-tgr",
+      "name": "Взаимная реклама",
+      "url": "https://t.me/vzaimTGR",
+      "kind": "free_promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "free advertising",
+        "mutual promotion"
+      ],
+      "publicly_stated_permission": "Listed by an existing cross-promotion chat as a destination for free advertising; the channel's own current conditions were not inspected.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/prbirza1",
+      "notes": "Related channel; verify active submission route and free posting terms."
+    },
+    {
+      "id": "spamp1r",
+      "name": "Бесплатные просмотры / взаимный пиар",
+      "url": "https://t.me/spamp1r",
+      "kind": "promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "post views"
+      ],
+      "publicly_stated_permission": "Listed by existing PR chats as a mutual-promotion/free-views resource; independent details not checked.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/prbirza1",
+      "notes": "Verify that this is genuine cross-promotion rather than artificial-view manipulation before use."
+    },
+    {
+      "id": "catalogtgr",
+      "name": "Каталог каналов TGR",
+      "url": "https://t.me/catalogTGR",
+      "kind": "promotion_catalog_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel catalogue",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "Listed by PR chats as a catalogue of channels; submission requirements and current activity were not checked.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/P1Rchats",
+      "notes": "Check for free listing and active bot submission."
+    },
+    {
+      "id": "birza1-catalog",
+      "name": "Каталог каналов Биржа",
+      "url": "https://t.me/birza1",
+      "kind": "promotion_catalog_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel catalogue",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "Linked from PR chats as their channel catalogue; its current free submission terms were not independently verified.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/prbirza1",
+      "notes": "Treat as a discovery candidate only until current free listing workflow is verified."
+    },
+    {
+      "id": "catalogpiar",
+      "name": "Бесплатный пиар",
+      "url": "https://t.me/catalogPiaR",
+      "kind": "promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "free PR",
+        "channel discovery"
+      ],
+      "publicly_stated_permission": "Linked from @prchatik as a free-PR resource; individual current posting and submission rules were not inspected.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/prchatik",
+      "notes": "Verify live activity and whether channel owners can submit for free."
+    },
+    {
+      "id": "catalogpiarr",
+      "name": "Взаимный пиар",
+      "url": "https://t.me/catalogpiarr",
+      "kind": "cross_promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion"
+      ],
+      "publicly_stated_permission": "Linked from @prchatik as a mutual-promotion resource; individual conditions not checked.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/prchatik",
+      "notes": "Verify current activity and any partner-eligibility criteria."
     }
   ],
   "directories": [
