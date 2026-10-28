@@ -1,0 +1,34 @@
+name: Free Distribution
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/submit_directory.py"
+      - ".github/workflows/free-distribution.yml"
+  schedule:
+    - cron: "17 9 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: free-distribution
+  cancel-in-progress: false
+
+jobs:
+  submit-public-directory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Submit and verify public Telegram directory listing
+        env:
+          DISTRIBUTION_TELEGRAM_HANDLE: cryptoping_ru
+        run: python scripts/submit_directory.py
