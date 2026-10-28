@@ -7,4 +7,4 @@ CHAT_ID = "@your_channel"
 
 # Optional Telegram user IDs allowed to use /growthlink and /growthreport.
 # Channel/group administrators are also checked through Telegram's getChatMember API.
-GROWTH_ADMIN_IDS = {659223890}
+GROWTH_ADMIN_IDS = set()
