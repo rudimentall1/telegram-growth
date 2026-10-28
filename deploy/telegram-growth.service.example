@@ -1,0 +1,17 @@
+[Unit]
+Description=Telegram Growth Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=telegram-growth
+Group=telegram-growth
+WorkingDirectory=/opt/telegram-growth
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/telegram-growth/venv/bin/python /opt/telegram-growth/group_bot.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
