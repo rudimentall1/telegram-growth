@@ -143,7 +143,20 @@ def result_text(result: dict[str, Any]) -> str:
     for item in result.get("content", []):
         if isinstance(item, dict) and item.get("text"):
             parts.append(str(item["text"]))
+    structured = result.get("structuredContent")
+    if structured is not None:
+        parts.append(json.dumps(structured, ensure_ascii=False))
     return "\n".join(parts)
+
+
+def resource_is_listed(result: dict[str, Any]) -> bool:
+    if is_tool_error(result):
+        return False
+    value = result_text(result).casefold()
+    negative = ("not found", "does not exist", "unknown handle", "не найден", "не существует")
+    if any(marker in value for marker in negative):
+        return False
+    return HANDLE.casefold() in value and ("t.me/" in value or '"handle"' in value or "username" in value)
 
 
 def main() -> int:
@@ -151,7 +164,7 @@ def main() -> int:
     try:
         client.initialize()
         current = client.call_tool("get_resource", {"handle": HANDLE})
-        if not is_tool_error(current):
+        if resource_is_listed(current):
             print(f"DISCOVERABLE: https://t.me/{HANDLE} is already in TGFind.")
             return 0
 
@@ -164,7 +177,7 @@ def main() -> int:
         # Verify via the directory's own lookup rather than trusting a submit
         # acknowledgement alone.
         verified = client.call_tool("get_resource", {"handle": HANDLE})
-        if not is_tool_error(verified):
+        if resource_is_listed(verified):
             print(f"VERIFIED: https://t.me/{HANDLE} is discoverable in TGFind.")
             return 0
 
