@@ -15,6 +15,33 @@
       "posting in channels/groups whose rules do not allow promotion",
       "fake subscribers or engagement",
       "claiming a placement or subscriber increase before it is verified"
+    ],
+    "target_topic_clusters": [
+      "crypto and Web3",
+      "airdrops, testnets and node operators",
+      "personal finance and financial education",
+      "investing and trading",
+      "online business and side-income communities",
+      "AI tools and AI agents",
+      "IT, software and startup communities",
+      "marketing, creator and channel-growth communities"
+    ],
+    "discovery_keywords": [
+      "взаимопиар",
+      "бесплатная реклама",
+      "самореклама разрешена",
+      "взаимные подписки",
+      "партнёрские публикации",
+      "финансы",
+      "инвестиции",
+      "трейдинг",
+      "бизнес",
+      "AI",
+      "IT",
+      "стартапы",
+      "airdrop",
+      "testnet",
+      "Web3"
     ]
   },
   "networks": [
@@ -101,7 +128,10 @@
       "url": "https://t.me/ifreepr",
       "kind": "public_self_promotion_group",
       "language": "ru",
-      "audience_topics": ["channel promotion", "general"],
+      "audience_topics": [
+        "channel promotion",
+        "general"
+      ],
       "publicly_stated_permission": "Group description explicitly says it is for free advertising of channels, groups and bots.",
       "observed_members": 4682,
       "checked_at": "2026-10-28",
@@ -114,7 +144,10 @@
       "url": "https://t.me/prchatik",
       "kind": "public_promotion_group",
       "language": "ru",
-      "audience_topics": ["cross-promotion", "general"],
+      "audience_topics": [
+        "cross-promotion",
+        "general"
+      ],
       "publicly_stated_permission": "Description directs users to free PR, mutual PR and free advertising communities.",
       "observed_members": 7197,
       "checked_at": "2026-10-28",
@@ -127,7 +160,10 @@
       "url": "https://t.me/prbirza1",
       "kind": "public_promotion_group",
       "language": "ru",
-      "audience_topics": ["cross-promotion", "general"],
+      "audience_topics": [
+        "cross-promotion",
+        "general"
+      ],
       "publicly_stated_permission": "Description labels the community as free PR and mutual promotion.",
       "observed_members": 4876,
       "checked_at": "2026-10-28",
@@ -140,7 +176,11 @@
       "url": "https://t.me/p1rchat",
       "kind": "public_self_promotion_group",
       "language": "ru",
-      "audience_topics": ["cross-promotion", "general", "referrals"],
+      "audience_topics": [
+        "cross-promotion",
+        "general",
+        "referrals"
+      ],
       "publicly_stated_permission": "Description explicitly invites people to publish promotional posts.",
       "observed_members": 9760,
       "checked_at": "2026-10-28",
@@ -153,7 +193,10 @@
       "url": "https://t.me/TGvzaim",
       "kind": "mutual_subscription_group",
       "language": "ru",
-      "audience_topics": ["mutual subscriptions", "channel promotion"],
+      "audience_topics": [
+        "mutual subscriptions",
+        "channel promotion"
+      ],
       "publicly_stated_permission": "Description says free promotion of channels and groups.",
       "observed_members": 1637,
       "checked_at": "2026-10-28",
@@ -166,7 +209,10 @@
       "url": "https://t.me/vzaim_pr",
       "kind": "mutual_subscription_group",
       "language": "ru",
-      "audience_topics": ["mutual subscriptions", "channel promotion"],
+      "audience_topics": [
+        "mutual subscriptions",
+        "channel promotion"
+      ],
       "publicly_stated_permission": "Description says the group is for promotion, mutual subscriptions and advertising; rules prohibit spam.",
       "observed_members": 44,
       "checked_at": "2026-10-28",
@@ -179,7 +225,11 @@
       "url": "https://t.me/reklamabesplatnoz",
       "kind": "public_self_promotion_group",
       "language": "ru",
-      "audience_topics": ["free advertising", "cross-promotion", "general"],
+      "audience_topics": [
+        "free advertising",
+        "cross-promotion",
+        "general"
+      ],
       "publicly_stated_permission": "Description offers free advertising for projects, websites, Telegram resources, products and services.",
       "observed_members": 597,
       "checked_at": "2026-10-28",
@@ -192,7 +242,10 @@
       "url": "https://t.me/vzaimopiar_chat",
       "kind": "mutual_subscription_group",
       "language": "ru",
-      "audience_topics": ["mutual subscriptions", "cross-promotion"],
+      "audience_topics": [
+        "mutual subscriptions",
+        "cross-promotion"
+      ],
       "publicly_stated_permission": "Description says the chat is for mutual subscriptions and cross-promotion; rules are linked in the group description.",
       "observed_members": 170,
       "checked_at": "2026-10-28",
@@ -205,7 +258,11 @@
       "url": "https://t.me/pr_uzbekistan_pro",
       "kind": "public_self_promotion_group",
       "language": "ru, uz",
-      "audience_topics": ["free promotion", "general", "services"],
+      "audience_topics": [
+        "free promotion",
+        "general",
+        "services"
+      ],
       "publicly_stated_permission": "Description says free PR for channel and group owners, with advertising allowed in the discussion channel.",
       "observed_members": 98,
       "checked_at": "2026-10-28",
@@ -218,12 +275,34 @@
       "url": "https://t.me/Infobusinessrussia",
       "kind": "adjacent_audience_community",
       "language": "ru",
-      "audience_topics": ["business", "online business", "partnerships", "cross-promotion"],
+      "audience_topics": [
+        "business",
+        "online business",
+        "partnerships",
+        "cross-promotion"
+      ],
       "publicly_stated_permission": "Public description includes cross-promotion and partner search; read current rules before posting.",
       "observed_members": 3228,
       "checked_at": "2026-10-28",
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://t.me/Infobusinessrussia"
+    },
+    {
+      "id": "katalogtelegramkanalov",
+      "name": "Каталог телеграм каналов",
+      "url": "https://t.me/katalogtelegramkanalov",
+      "kind": "comment_based_mutual_promotion",
+      "language": "ru",
+      "audience_topics": [
+        "cross-promotion",
+        "multi-category channel directory"
+      ],
+      "publicly_stated_permission": "A published post explicitly invites channel owners to comment with topic, linked channel name, reach and subscriber count to arrange free mutual promotion.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_submission_rules_published_post",
+      "evidence_url": "https://t.me/s/katalogtelegramkanalov?before=27",
+      "notes": "Promotion is solicited in a specific thread/post; do not comment on unrelated posts. Any automated reply must stay within that thread and observe its instructions."
     }
   ],
   "directories": [
