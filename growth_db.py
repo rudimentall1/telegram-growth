@@ -7,7 +7,6 @@ DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 def connect():
-    # Ensure the data directory exists if tests/deployments override DB_PATH.
     Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(DB_PATH, timeout=10)
     db.execute("PRAGMA busy_timeout=10000")
@@ -71,37 +70,43 @@ def record_join(user_id, invite_link):
 
 
 def record_member(update_id, user_id, invite_link, joined):
-    """Record one membership transition, idempotently by Telegram update_id.
+    """Record membership transitions, idempotently by Telegram update_id.
 
-    A join uses only the invite link provided on that join event. Missing or unknown
-    links are attributed to 'unattributed' and clear the previous current attribution.
-    A leave is attributed to the member's currently stored invite source.
+    A join is attributed only to the invite link included in that event. Missing or
+    unknown links become 'unattributed' and clear prior current attribution. A leave
+    uses the currently stored attribution. Duplicate update IDs do not mutate state.
     """
     with connect() as db:
+        # Check idempotency before touching membership state, not only the event row.
+        already_processed = db.execute(
+            "SELECT 1 FROM growth_events WHERE update_id = ?", (update_id,)
+        ).fetchone()
+        if already_processed:
+            return
+
         current = db.execute(
             "SELECT invite_link, is_member FROM growth_members WHERE user_id = ?",
             (user_id,),
         ).fetchone()
 
         selected_link = None
-        source = "unattributed"
+        join_source = "unattributed"
         if invite_link:
             row = db.execute(
                 "SELECT source FROM growth_links WHERE invite_link = ?", (invite_link,)
             ).fetchone()
             if row:
                 selected_link = invite_link
-                source = row[0]
+                join_source = row[0]
 
         if joined:
-            # Ignore duplicate state transitions with a different update ID as well.
-            # Telegram can retry an update, and stale join updates should not inflate counts.
+            # Ignore duplicate/stale joins while the user is already a member.
             if current and current[1] == 1:
                 return
             db.execute(
-                "INSERT OR IGNORE INTO growth_events(update_id,user_id,source,event_type) "
+                "INSERT INTO growth_events(update_id,user_id,source,event_type) "
                 "VALUES(?,?,?,'join')",
-                (update_id, user_id, source),
+                (update_id, user_id, join_source),
             )
             db.execute(
                 "INSERT INTO growth_members(user_id,invite_link,is_member,updated_at) "
@@ -116,7 +121,7 @@ def record_member(update_id, user_id, invite_link, joined):
                     (user_id, selected_link),
                 )
         else:
-            # A leave for an unknown/already inactive member is stale or incomplete.
+            # Ignore stale/incomplete leave events for users not currently active.
             if not current or current[1] == 0:
                 return
             previous_link = current[0]
@@ -125,7 +130,7 @@ def record_member(update_id, user_id, invite_link, joined):
             ).fetchone() if previous_link else None
             leave_source = row[0] if row else "unattributed"
             db.execute(
-                "INSERT OR IGNORE INTO growth_events(update_id,user_id,source,event_type) "
+                "INSERT INTO growth_events(update_id,user_id,source,event_type) "
                 "VALUES(?,?,?,'leave')",
                 (update_id, user_id, leave_source),
             )
