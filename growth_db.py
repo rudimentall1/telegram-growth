@@ -49,6 +49,11 @@ def connect():
             processed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    # One-time-safe migration: existing event IDs must also be treated as processed.
+    db.execute("""
+        INSERT OR IGNORE INTO growth_processed_updates(update_id)
+        SELECT update_id FROM growth_events
+    """)
     return db
 
 
