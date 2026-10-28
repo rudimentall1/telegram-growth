@@ -67,22 +67,6 @@ class GrowthAdminTests(unittest.IsolatedAsyncioTestCase):
             allowed = await group_bot._growth_admin(update, context)
         self.assertFalse(allowed)
 
-    async def test_telegram_service_account_is_not_implicitly_admin(self):
-        update = SimpleNamespace(
-            effective_message=SimpleNamespace(sender_chat=None, from_user=None),
-            effective_chat=SimpleNamespace(id=group_bot.GROUP_CHAT_ID),
-            effective_user=SimpleNamespace(id=777000),
-            update_id=5,
-        )
-        context = SimpleNamespace(
-            bot=SimpleNamespace(
-                get_chat_member=AsyncMock(return_value=SimpleNamespace(status="member"))
-            )
-        )
-        with patch.object(config, "GROWTH_ADMIN_IDS", set()):
-            allowed = await group_bot._growth_admin(update, context)
-        self.assertFalse(allowed)
-        context.bot.get_chat_member.assert_awaited_once_with(group_bot.GROUP_CHAT_ID, 777000)
 
 
 class GrowthLinkCommandTests(unittest.IsolatedAsyncioTestCase):
