@@ -66,6 +66,16 @@ class GrowthDbTests(unittest.TestCase):
         self.assertEqual(growth_db.report(), [("campaign_a", 1, 1, 0)])
         self.assertEqual(growth_db.active_count(), 0)
 
+    def test_ignored_duplicate_join_cannot_reactivate_after_leave(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        # Duplicate transition while already active is ignored but marked processed.
+        growth_db.record_member(2, 101, "https://t.me/+campaignB", True)
+        growth_db.record_member(3, 101, None, False)
+        # A replay of that previously ignored update must not reactivate the member.
+        growth_db.record_member(2, 101, "https://t.me/+campaignB", True)
+        self.assertEqual(growth_db.report(), [("campaign_a", 1, 1, 0)])
+        self.assertEqual(growth_db.active_count(), 0)
+
     def test_unknown_invite_is_unattributed(self):
         growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
         growth_db.record_member(2, 101, None, False)
