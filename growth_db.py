@@ -49,11 +49,24 @@ def connect():
             processed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    # One-time-safe migration: existing event IDs must also be treated as processed.
     db.execute("""
-        INSERT OR IGNORE INTO growth_processed_updates(update_id)
-        SELECT update_id FROM growth_events
+        CREATE TABLE IF NOT EXISTS growth_schema_migrations (
+            version INTEGER PRIMARY KEY,
+            applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
     """)
+    # Run the legacy-event backfill once, not on every database connection.
+    migrated = db.execute(
+        "SELECT 1 FROM growth_schema_migrations WHERE version = 1"
+    ).fetchone()
+    if not migrated:
+        db.execute("""
+            INSERT OR IGNORE INTO growth_processed_updates(update_id)
+            SELECT update_id FROM growth_events
+        """)
+        db.execute(
+            "INSERT INTO growth_schema_migrations(version) VALUES (1)"
+        )
     return db
 
 
