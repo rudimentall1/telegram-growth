@@ -142,6 +142,32 @@
       "setup_status": "discovered_workflow_not_verified",
       "evidence_url": "https://t.me/rockets_pr_bot",
       "notes": "Bot description explicitly offers free mutual promotion for Telegram channels and groups. Its exact mechanics, eligibility, publication rights and whether posts are automated were not verified; not connected."
+    },
+    {
+      "id": "telegrad-cross-promotion",
+      "name": "TelegrAd / Telegrad.Link",
+      "url": "https://telegrad.link/en",
+      "kind": "free_opt_in_cross_promotion",
+      "money_required": false,
+      "automated_publishing": true,
+      "how_it_works": "Bot and MiniApp provide scheduled multi-channel keypads, topic-based partner discovery and reciprocal post swaps. Bot checks that agreed posts remain live.",
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://telegrad.link/en",
+      "notes": "Free to start. One-time setup requires adding @telegradlinkbot as a channel/group admin with posting rights and registering the channel. Check free-plan limits and channel eligibility before assuming repeated reach."
+    },
+    {
+      "id": "tex-media-view-exchange",
+      "name": "Tex.media Traffic Exchange",
+      "url": "https://tex.media/",
+      "kind": "free_automated_view_exchange",
+      "money_required": false,
+      "automated_publishing": true,
+      "how_it_works": "Channel owners connect a channel, set placement parameters and exchange accumulated views for placements in other channels; posts are moderated and analytics are advertised.",
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://tex.media/",
+      "notes": "Supplementary exposure route, not guaranteed subscriber acquisition. View exchange can bring lower-intent traffic than a topical post swap; test separately and measure joins/retention."
     }
   ],
   "communities": [
@@ -1362,6 +1388,97 @@
       "automation_status": "needs_verification",
       "evidence_url": "https://t.me/prchatik",
       "notes": "Verify current activity and any partner-eligibility criteria."
+    },
+    {
+      "id": "prprprchat",
+      "name": "ПИАР | ВЗАИМНАЯ ПОДПИСКА",
+      "url": "https://t.me/prprprchat",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "PR",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "Public description identifies it as a PR and mutual-subscription chat and invites contacting the admin.",
+      "observed_members": 6403,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/prprprchat",
+      "notes": "Free posting and bot permissions not confirmed."
+    },
+    {
+      "id": "p1rchatik",
+      "name": "Взаимопиар чат",
+      "url": "https://t.me/P1Rchatik",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free advertising",
+        "cross-promotion",
+        "channel catalogue"
+      ],
+      "publicly_stated_permission": "Description tells users to publish posts, points to a free-advertising route and a channel catalogue.",
+      "observed_members": 4979,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/P1Rchatik",
+      "notes": "Belongs to a cluster of related PR chats; avoid duplicate posts across that cluster and check current rules."
+    },
+    {
+      "id": "freepr2",
+      "name": "FREE PR",
+      "url": "https://t.me/FREEPR2",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free PR",
+        "project promotion",
+        "advertising"
+      ],
+      "publicly_stated_permission": "Telegram group directory describes it as a group for promotion and advertising of projects.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/s/chat_tg/3306",
+      "notes": "Public directory listing only; confirm current activity and bot posting permissions."
+    },
+    {
+      "id": "departmentpr",
+      "name": "PR Департамент",
+      "url": "https://t.me/DepartmentPR",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel advertising",
+        "group advertising",
+        "project promotion"
+      ],
+      "publicly_stated_permission": "Telegram group directory labels it as a group for advertising Telegram groups and channels.",
+      "observed_members": null,
+      "checked_at": "2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/s/chat_tg/221",
+      "notes": "Verify current group state, free posting eligibility and automation rules."
+    },
+    {
+      "id": "cryptopartycrew",
+      "name": "CRYPTO PARTY",
+      "url": "https://t.me/CryptoPartyCrew",
+      "kind": "crypto_partner_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "crypto",
+        "airdrops",
+        "Web3",
+        "testnets"
+      ],
+      "publicly_stated_permission": "Channel description lists advertising/collaboration contacts and separate contacts labelled 'manager (без оплаты)'; it does not promise free posts or automated publishing.",
+      "observed_members": 15658,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_partner_contact_not_connected",
+      "evidence_url": "https://t.me/CryptoPartyCrew",
+      "notes": "Relevant crypto audience. Treat as a partnership lead, not a free or authorized placement; terms would need to be clarified before any post."
     }
   ],
   "directories": [
