@@ -59,6 +59,13 @@ class GrowthDbTests(unittest.TestCase):
         self.assertEqual(growth_db.report(), [("campaign_a", 1, 0, 1)])
         self.assertEqual(growth_db.active_count(), 1)
 
+    def test_replayed_old_join_cannot_reactivate_member_after_leave(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        growth_db.record_member(2, 101, None, False)
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        self.assertEqual(growth_db.report(), [("campaign_a", 1, 1, 0)])
+        self.assertEqual(growth_db.active_count(), 0)
+
     def test_unknown_invite_is_unattributed(self):
         growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
         growth_db.record_member(2, 101, None, False)
