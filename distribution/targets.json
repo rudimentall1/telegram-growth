@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "checked_at": "2026-10-28",
+  "policy": {
+    "paid_placements": false,
+    "allowed_methods_only": true,
+    "prioritize": [
+      "free opt-in cross-promotion networks",
+      "public Telegram groups that explicitly allow self-promotion",
+      "free channel directories",
+      "adjacent audiences: finance, investing, business, marketing, AI, IT, airdrops, testnets and Web3"
+    ],
+    "prohibited": [
+      "unsolicited messages to users",
+      "posting in channels/groups whose rules do not allow promotion",
+      "fake subscribers or engagement",
+      "claiming a placement or subscriber increase before it is verified"
+    ]
+  },
+  "networks": [
+    {
+      "id": "onflow-cross-promotion",
+      "name": "Onflow Ads Cross-Promotion",
+      "url": "https://onflowads.com/telegram/cross-promotion",
+      "kind": "free_opt_in_cross_promotion",
+      "money_required": false,
+      "automated_publishing": true,
+      "how_it_works": "Opt-in partner directory/open board; the platform bot publishes both approved promotional posts, checks them, and removes them when the run ends.",
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://docs.onflowads.com/cross-promo",
+      "notes": "Free plan advertises a limited monthly cross-promotion allowance. Requires the platform bot to be an admin of our own public channel and an account on the platform. Partner and post approvals are part of its workflow."
+    },
+    {
+      "id": "adpact-cross-promotion",
+      "name": "Adpact Cross-Promotion",
+      "url": "https://adpact.app/guides/telegram-cross-promotion/",
+      "kind": "free_points_based_cross_promotion",
+      "money_required": false,
+      "automated_publishing": true,
+      "how_it_works": "Opt-in partner discovery; posts are published and checked by the platform bot. Exchanges consume/earn in-app points.",
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://adpact.app/guides/telegram-cross-promotion/",
+      "notes": "Both owners review/accept posts. No ad purchase required, but points and platform eligibility rules apply."
+    },
+    {
+      "id": "trigram-cross-promotion",
+      "name": "Trigram Cross-Promotion",
+      "url": "https://trigram.site/",
+      "kind": "free_opt_in_cross_promotion",
+      "money_required": false,
+      "automated_publishing": true,
+      "how_it_works": "The service matches channel owners for post swaps, publishes through its bot, and checks that both posts remain live for the agreed period.",
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://trigram.site/",
+      "notes": "The public catalog also contains paid placements; only the cross-promotion path is in scope."
+    },
+    {
+      "id": "crosspromer",
+      "name": "CrossPromer",
+      "url": "https://t.me/crosspromer_bot",
+      "kind": "candidate_cross_promotion_bot",
+      "money_required": null,
+      "automated_publishing": null,
+      "own_channel_authorization_required": null,
+      "setup_status": "needs_verification",
+      "evidence_url": "https://t.me/crosspromer_bot",
+      "notes": "Described publicly as a platform for finding partners for joint free ad campaigns. Free eligibility and current workflow must be confirmed before use."
+    },
+    {
+      "id": "erzy-cross-promotion",
+      "name": "Erzy Cross Promotion",
+      "url": "https://t.me/ErzyNetWebBot",
+      "kind": "candidate_cross_promotion_bot",
+      "money_required": null,
+      "automated_publishing": null,
+      "own_channel_authorization_required": null,
+      "setup_status": "needs_verification",
+      "evidence_url": "https://t.me/ErzyNetWebBot",
+      "notes": "Public bot description says it helps channel admins run cross-promotions. Free terms and current activity need confirmation."
+    },
+    {
+      "id": "mutual-subscriptions-bot",
+      "name": "Взаимные подписки",
+      "url": "https://t.me/VzaimniePodpiskiBot",
+      "kind": "mutual_subscription_exchange",
+      "money_required": null,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "needs_verification",
+      "evidence_url": "https://t.me/VzaimniePodpiskiBot",
+      "notes": "Public description advertises free promotion via mutual subscriptions and requests admin access to the channel. Check quality and exact exchange mechanics before enabling."
+    }
+  ],
+  "communities": [
+    {
+      "id": "ifreepr",
+      "name": "Free пиар чат",
+      "url": "https://t.me/ifreepr",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": ["channel promotion", "general"],
+      "publicly_stated_permission": "Group description explicitly says it is for free advertising of channels, groups and bots.",
+      "observed_members": 4682,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/ifreepr"
+    },
+    {
+      "id": "prchatik",
+      "name": "Взаимопиар реклама",
+      "url": "https://t.me/prchatik",
+      "kind": "public_promotion_group",
+      "language": "ru",
+      "audience_topics": ["cross-promotion", "general"],
+      "publicly_stated_permission": "Description directs users to free PR, mutual PR and free advertising communities.",
+      "observed_members": 7197,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/prchatik"
+    },
+    {
+      "id": "prbirza1",
+      "name": "Взаимопиар Free PR chat",
+      "url": "https://t.me/prbirza1",
+      "kind": "public_promotion_group",
+      "language": "ru",
+      "audience_topics": ["cross-promotion", "general"],
+      "publicly_stated_permission": "Description labels the community as free PR and mutual promotion.",
+      "observed_members": 4876,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/prbirza1"
+    },
+    {
+      "id": "p1rchat",
+      "name": "ВзаимоПиар, Бесплатный пиар",
+      "url": "https://t.me/p1rchat",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": ["cross-promotion", "general", "referrals"],
+      "publicly_stated_permission": "Description explicitly invites people to publish promotional posts.",
+      "observed_members": 9760,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/p1rchat"
+    },
+    {
+      "id": "tg-vzaim",
+      "name": "Взаимные подписки #ВП",
+      "url": "https://t.me/TGvzaim",
+      "kind": "mutual_subscription_group",
+      "language": "ru",
+      "audience_topics": ["mutual subscriptions", "channel promotion"],
+      "publicly_stated_permission": "Description says free promotion of channels and groups.",
+      "observed_members": 1637,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/TGvzaim"
+    },
+    {
+      "id": "vzaim-pr",
+      "name": "ВП, Пиар, Реклама",
+      "url": "https://t.me/vzaim_pr",
+      "kind": "mutual_subscription_group",
+      "language": "ru",
+      "audience_topics": ["mutual subscriptions", "channel promotion"],
+      "publicly_stated_permission": "Description says the group is for promotion, mutual subscriptions and advertising; rules prohibit spam.",
+      "observed_members": 44,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/vzaim_pr"
+    },
+    {
+      "id": "reklamabesplatnoz",
+      "name": "Бесплатная реклама | Взаимопиар",
+      "url": "https://t.me/reklamabesplatnoz",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": ["free advertising", "cross-promotion", "general"],
+      "publicly_stated_permission": "Description offers free advertising for projects, websites, Telegram resources, products and services.",
+      "observed_members": 597,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/reklamabesplatnoz"
+    },
+    {
+      "id": "vzaimopiar-chat",
+      "name": "Взаимная подписка, взаимопиар, взаимка",
+      "url": "https://t.me/vzaimopiar_chat",
+      "kind": "mutual_subscription_group",
+      "language": "ru",
+      "audience_topics": ["mutual subscriptions", "cross-promotion"],
+      "publicly_stated_permission": "Description says the chat is for mutual subscriptions and cross-promotion; rules are linked in the group description.",
+      "observed_members": 170,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/vzaimopiar_chat"
+    },
+    {
+      "id": "pr-uzbekistan-free",
+      "name": "PR Uzbekistan Free",
+      "url": "https://t.me/pr_uzbekistan_pro",
+      "kind": "public_self_promotion_group",
+      "language": "ru, uz",
+      "audience_topics": ["free promotion", "general", "services"],
+      "publicly_stated_permission": "Description says free PR for channel and group owners, with advertising allowed in the discussion channel.",
+      "observed_members": 98,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/pr_uzbekistan_pro"
+    },
+    {
+      "id": "infobusinessrussia",
+      "name": "Чат про онлайн-бизнес + Вакансии | Взаимопиар | Поиск партнеров",
+      "url": "https://t.me/Infobusinessrussia",
+      "kind": "adjacent_audience_community",
+      "language": "ru",
+      "audience_topics": ["business", "online business", "partnerships", "cross-promotion"],
+      "publicly_stated_permission": "Public description includes cross-promotion and partner search; read current rules before posting.",
+      "observed_members": 3228,
+      "checked_at": "2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/Infobusinessrussia"
+    }
+  ],
+  "directories": [
+    {
+      "id": "search-t-me",
+      "name": "search-t.me",
+      "url": "https://search-t.me/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "not_checked_in_this_run",
+      "evidence_url": "https://search-t.me/"
+    },
+    {
+      "id": "list-tg",
+      "name": "list.tg",
+      "url": "https://list.tg/docs/faq",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "manual_review_by_directory",
+      "evidence_url": "https://list.tg/docs/faq"
+    },
+    {
+      "id": "tghot",
+      "name": "TGHOT",
+      "url": "https://tghot.ru/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "eligibility_not_checked",
+      "evidence_url": "https://tghot.ru/"
+    }
+  ],
+  "execution_notes": {
+    "critical_limitation": "Finding a channel whose rules permit promotion is not the same as being authorized to post there. A publisher must already be a member with permission, or an exchange platform must have its bot connected to both channels.",
+    "current_live_status": "Targets discovered only. No third-party group has been joined, no promo post has been published, and no subscriber increase is claimed.",
+    "next_automation_step": "Connect an authorized Telegram publishing identity once, then process eligible targets sequentially with rate limits, duplicate suppression, rules checks and per-target conversion tracking."
+  }
+}
