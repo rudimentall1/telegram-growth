@@ -303,6 +303,177 @@
       "automation_status": "discovered_submission_rules_published_post",
       "evidence_url": "https://t.me/s/katalogtelegramkanalov?before=27",
       "notes": "Promotion is solicited in a specific thread/post; do not comment on unrelated posts. Any automated reply must stay within that thread and observe its instructions."
+    },
+    {
+      "id": "chatik-piarvz",
+      "name": "Взаимные подписки • реакции • ВП",
+      "url": "https://t.me/chatik_piarvz",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "The public description identifies the community as mutual subscriptions, reactions and cross-promotion. It also says the first move to offer advertising is not accepted; the exact rules for a free channel post are not clear.",
+      "observed_members": 187184,
+      "observed_online": 4561,
+      "evidence_freshness": "crawled 2026-10-27",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/chatik_piarvz",
+      "notes": "Do not assume free autonomous posting; likely requires reciprocal action or following group protocol."
+    },
+    {
+      "id": "vzaimnaya7",
+      "name": "Взаимные подписки | взаимная реакция",
+      "url": "https://t.me/vzaimnaya7",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "promotion"
+      ],
+      "publicly_stated_permission": "Public description advertises mutual subscriptions and reactions, and provides separate contacts for advertising and prices/reviews.",
+      "observed_members": 67113,
+      "observed_online": 856,
+      "evidence_freshness": "crawled 2026-10-07",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaimnaya7",
+      "notes": "Free posting conditions are not confirmed; advertising contact is listed, so do not treat as a free placement until checked."
+    },
+    {
+      "id": "cryptoadmins-vp",
+      "name": "Криптоадмины - Реклама/ВП/Подборки",
+      "url": "https://t.me/cryptoadminsVP",
+      "kind": "crypto_admin_cross_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "crypto",
+        "channel admins",
+        "advertising offers",
+        "cross-promotion",
+        "channel roundups"
+      ],
+      "publicly_stated_permission": "The public group description explicitly allows advertising offers, cross-promotion proposals, channel discussions and curated lists; it prohibits flooding and spam.",
+      "observed_members": 7111,
+      "observed_online": 167,
+      "evidence_freshness": "crawled 2026-08-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/cryptoadminsVP",
+      "notes": "Best topical fit among these nine, but read in-chat rules and confirm whether free posting is allowed before sending."
+    },
+    {
+      "id": "avto-dubai-arenda",
+      "name": "Avto_Dubai_Arenda",
+      "url": "https://t.me/Avto_Dubai_Arenda",
+      "kind": "adjacent_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "cars",
+        "Dubai",
+        "vehicle rental"
+      ],
+      "publicly_stated_permission": "Could not verify the public description during this check. The handle suggests a vehicle-rental audience, but that is not evidence of permission to advertise.",
+      "observed_members": null,
+      "evidence_freshness": "not retrievable 2026-10-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/Avto_Dubai_Arenda",
+      "notes": "Adjacent audience only; use only if crypto/finance content is relevant and current rules explicitly allow promotion."
+    },
+    {
+      "id": "vzpodpiskachati",
+      "name": "Взаимный пиар | реклама тгк",
+      "url": "https://t.me/vzpodpiskachati",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "cross-promotion",
+        "Telegram channel promotion",
+        "mutual subscriptions",
+        "reactions"
+      ],
+      "publicly_stated_permission": "Public description names mutual promotion and Telegram-channel advertising; a separate contact and price/review channel are provided.",
+      "observed_members": 17542,
+      "observed_online": 784,
+      "evidence_freshness": "crawled 2026-09-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzpodpiskachati",
+      "notes": "Free conditions are not explicit in the public description; do not classify as a confirmed free placement yet."
+    },
+    {
+      "id": "vzpiarchatx",
+      "name": "Взаимные подписки 🩸 взаимные реакции",
+      "url": "https://t.me/vzpiarchatx",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "Public description identifies mutual subscriptions and reactions and links an advertising/reviews price list.",
+      "observed_members": 38273,
+      "observed_online": 7919,
+      "evidence_freshness": "crawled 2026-09-28",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzpiarchatx",
+      "notes": "Free promotional posts and bot-based autonomous publishing are not confirmed."
+    },
+    {
+      "id": "vzchatpiar-vz",
+      "name": "vzchatpiar_vz",
+      "url": "https://t.me/vzchatpiar_vz",
+      "kind": "promotion_group_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "potential cross-promotion"
+      ],
+      "publicly_stated_permission": "Could not retrieve the public Telegram description in this check; permission and topic remain unverified.",
+      "observed_members": null,
+      "evidence_freshness": "not retrievable 2026-10-28",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/vzchatpiar_vz",
+      "notes": "Keep in discovery inventory, but do not post until the group description and current rules are checked."
+    },
+    {
+      "id": "chatd-piar",
+      "name": "Просмотры репосты каналов",
+      "url": "https://t.me/chatd_piar",
+      "kind": "channel_views_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "channel promotion",
+        "reposts",
+        "views",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "Public description uses the labels promotion chat and channel repost views, but does not clearly establish whether free posts are allowed or how the exchange works.",
+      "observed_members": 35939,
+      "observed_online": 2219,
+      "evidence_freshness": "crawled 2026-10-21",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/chatd_piar",
+      "notes": "Verify that its mechanism is genuine cross-promotion and not artificial view/subscriber manipulation before use."
+    },
+    {
+      "id": "piar-chatiku",
+      "name": "Взаимные подписки 💞 реакции",
+      "url": "https://t.me/piar_chatiku",
+      "kind": "mutual_subscription_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "chat and dating"
+      ],
+      "publicly_stated_permission": "Public description identifies mutual subscriptions and reactions, calls it a chat for communication and dating, and lists advertising contacts.",
+      "observed_members": 132261,
+      "observed_online": 3984,
+      "evidence_freshness": "crawled 2026-10-07",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/piar_chatiku",
+      "notes": "Large but general audience; no evidence yet that free crypto/finance promo or automated posting is allowed."
     }
   ],
   "directories": [
