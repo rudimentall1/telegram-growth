@@ -91,6 +91,47 @@ class GrowthDbTests(unittest.TestCase):
         self.assertEqual(growth_db.report(), [("campaign_a", 1, 0, 1)])
         self.assertEqual(growth_db.active_count(), 1)
 
+    def test_legacy_event_ids_are_backfilled_before_replay(self):
+        legacy_db_path = Path(self.temp.name) / "legacy.db"
+        growth_db.DB_PATH = legacy_db_path
+        import sqlite3
+        with sqlite3.connect(legacy_db_path) as db:
+            db.execute("""
+                CREATE TABLE growth_events (
+                    update_id INTEGER PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    source TEXT NOT NULL,
+                    event_type TEXT NOT NULL CHECK(event_type IN ('join','leave')),
+                    event_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            db.execute(
+                "INSERT INTO growth_events(update_id,user_id,source,event_type) "
+                "VALUES(77,101,'campaign_a','join')"
+            )
+            db.execute("""
+                CREATE TABLE growth_members (
+                    user_id INTEGER PRIMARY KEY,
+                    invite_link TEXT,
+                    is_member INTEGER NOT NULL DEFAULT 1,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            db.execute(
+                "INSERT INTO growth_members(user_id,invite_link,is_member) "
+                "VALUES(101,'https://t.me/+campaignA',1)"
+            )
+
+        # First connect creates new schema tables and migrates the old event ID.
+        with growth_db.connect() as db:
+            self.assertIsNotNone(db.execute(
+                "SELECT 1 FROM growth_processed_updates WHERE update_id=77"
+            ).fetchone())
+        # Replayed legacy update must not alter active membership or event totals.
+        growth_db.record_member(77, 101, "https://t.me/+campaignA", True)
+        self.assertEqual(growth_db.active_count(), 1)
+        self.assertEqual(growth_db.report(), [("campaign_a", 1, 0, 1)])
+
     def test_leave_for_unknown_member_is_ignored(self):
         growth_db.record_member(9, 909, None, False)
         self.assertEqual(growth_db.report(), [])
