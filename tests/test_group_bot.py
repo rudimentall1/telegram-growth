@@ -53,6 +53,54 @@ class GrowthAdminTests(unittest.IsolatedAsyncioTestCase):
             allowed = await group_bot._growth_admin(update, context)
         self.assertTrue(allowed)
 
+    async def test_api_error_fails_closed(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(sender_chat=None, from_user=None),
+            effective_chat=SimpleNamespace(id=123),
+            effective_user=SimpleNamespace(id=456),
+            update_id=4,
+        )
+        context = SimpleNamespace(
+            bot=SimpleNamespace(get_chat_member=AsyncMock(side_effect=RuntimeError("API unavailable")))
+        )
+        with patch.object(config, "GROWTH_ADMIN_IDS", set()):
+            allowed = await group_bot._growth_admin(update, context)
+        self.assertFalse(allowed)
+
+
+class GrowthLinkCommandTests(unittest.IsolatedAsyncioTestCase):
+    async def test_unauthorized_user_cannot_create_invite_link(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=AsyncMock()),
+            effective_user=SimpleNamespace(id=456),
+        )
+        context = SimpleNamespace(
+            args=["campaign"],
+            bot=SimpleNamespace(create_chat_invite_link=AsyncMock()),
+        )
+        with patch.object(group_bot, "_growth_admin", new=AsyncMock(return_value=False)):
+            await group_bot.growth_link(update, context)
+        context.bot.create_chat_invite_link.assert_not_awaited()
+        update.effective_message.reply_text.assert_awaited_once_with(
+            "Команда доступна только администраторам группы."
+        )
+
+    async def test_invalid_source_is_rejected_before_api_call(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=AsyncMock()),
+            effective_user=SimpleNamespace(id=456),
+        )
+        context = SimpleNamespace(
+            args=["bad source"],
+            bot=SimpleNamespace(create_chat_invite_link=AsyncMock()),
+        )
+        with patch.object(group_bot, "_growth_admin", new=AsyncMock(return_value=True)):
+            await group_bot.growth_link(update, context)
+        context.bot.create_chat_invite_link.assert_not_awaited()
+        update.effective_message.reply_text.assert_awaited_once_with(
+            "Источник: 1–32 символа, только латиница, цифры, _ и -."
+        )
+
 
 class ChannelMembershipHandlerTests(unittest.IsolatedAsyncioTestCase):
     async def test_join_event_is_recorded_with_invite_link(self):
