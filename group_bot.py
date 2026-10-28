@@ -11,6 +11,7 @@ from telegram.ext import (
     filters,
 )
 
+import config
 from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
 
@@ -126,8 +127,8 @@ async def _growth_admin(update, context):
         return True
 
     for candidate in candidates:
-        if candidate is not None and getattr(candidate, "id", None) == 659223890:
-            logging.info("growth auth allowed: owner user_id=%s chat_id=%s", candidate.id, chat_id)
+        if candidate is not None and getattr(candidate, "id", None) in getattr(config, "GROWTH_ADMIN_IDS", set()):
+            logging.info("growth auth allowed: configured admin user_id=%s chat_id=%s", candidate.id, chat_id)
             return True
 
     user = next((candidate for candidate in candidates if candidate is not None), None)
