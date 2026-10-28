@@ -118,10 +118,6 @@ async def _growth_admin(update, context):
         getattr(message, "from_user", None) if message else None,
     ]
 
-    user = getattr(update, "effective_user", None)
-    if chat_id == GROUP_CHAT_ID and getattr(user, "id", None) == 777000:
-        logging.info("growth auth allowed: group identity user_id=777000 chat_id=%s", chat_id)
-        return True
     if sender_chat_id == GROUP_CHAT_ID:
         logging.info("growth auth allowed: anonymous group admin chat_id=%s", chat_id)
         return True
