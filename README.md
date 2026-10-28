@@ -57,3 +57,19 @@ Posting in another channel requires its owner's permission or authorized
 publishing access. Paid placement requires an authorized advertising account
 and a budget. The current repository does not contain verified credentials for
 those routes, so they are not represented as active.
+
+
+## Free distribution target registry
+
+The free target inventory is maintained in `distribution/targets.json`. It separates
+verified public self-promotion communities from opt-in cross-promotion networks and
+free directories. Each entry records the public permission evidence, the required
+publishing authorization, and whether it has actually been connected. Targets marked
+`discovered_not_joined` or `discovered_not_connected` are research results, not live
+distribution. Paid options are excluded.
+
+Priority networks include free cross-promotion on Onflow Ads, Adpact and Trigram.
+Public self-promotion candidates include `@ifreepr`, `@prchatik`, `@prbirza1`,
+`@p1rchat`, `@TGvzaim` and related communities. The inventory also tracks
+free directories and adjacent business audiences; these are not treated as
+automatic placements unless their current rules and publishing permissions allow it.
