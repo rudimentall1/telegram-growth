@@ -43,6 +43,12 @@ def connect():
             event_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS growth_processed_updates (
+            update_id INTEGER PRIMARY KEY,
+            processed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     return db
 
 
@@ -77,12 +83,17 @@ def record_member(update_id, user_id, invite_link, joined):
     uses the currently stored attribution. Duplicate update IDs do not mutate state.
     """
     with connect() as db:
-        # Check idempotency before touching membership state, not only the event row.
+        # Track every received update, including ignored state transitions. Otherwise
+        # an ignored duplicate join could be replayed after a later leave and reactivate
+        # the member incorrectly.
         already_processed = db.execute(
-            "SELECT 1 FROM growth_events WHERE update_id = ?", (update_id,)
+            "SELECT 1 FROM growth_processed_updates WHERE update_id = ?", (update_id,)
         ).fetchone()
         if already_processed:
             return
+        db.execute(
+            "INSERT INTO growth_processed_updates(update_id) VALUES (?)", (update_id,)
+        )
 
         current = db.execute(
             "SELECT invite_link, is_member FROM growth_members WHERE user_id = ?",
