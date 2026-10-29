@@ -53,6 +53,7 @@ def init_db() -> None:
                 home_invite_link TEXT,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 approved_at TEXT,
+                approved_by INTEGER,
                 last_promo_at TEXT,
                 last_error TEXT
             )
@@ -229,10 +230,10 @@ def approve_channel(channel_id: int, approved_by: int) -> bool:
         cursor = db.execute(
             """
             UPDATE crosspromo_channels
-            SET status='active', approved_at=CURRENT_TIMESTAMP, last_error=NULL
+            SET status='active', approved_at=CURRENT_TIMESTAMP, approved_by=?, last_error=NULL
             WHERE id=? AND status='pending'
             """,
-            (channel_id,),
+            (approved_by, channel_id),
         )
         return cursor.rowcount > 0
 
@@ -701,10 +702,10 @@ async def run_cross_promotion(context: ContextTypes.DEFAULT_TYPE) -> None:
             continue
 
         text = (
-            f"🤝 Взаимное продвижение каналов\\n\\n"
-            f"📣 {promoted['title']}\\n"
-            f"👥 Подписчиков: {int(promoted['member_count'])}\\n"
-            f"🔗 {destination}\\n\\n"
+            f"🤝 Взаимное продвижение каналов\n\n"
+            f"📣 {promoted['title']}\n"
+            f"👥 Подписчиков: {int(promoted['member_count'])}\n"
+            f"🔗 {destination}\n\n"
             "Публикация размещена в рамках согласованной сети взаимного продвижения."
         )
         try:
