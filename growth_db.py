@@ -55,6 +55,21 @@ def connect():
             applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS promotion_targets (
+            chat_id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            username TEXT,
+            invite_link TEXT NOT NULL,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            authorized_by INTEGER,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_post_at TEXT,
+            last_message_id INTEGER,
+            last_error TEXT
+        )
+    """)
     # Run the legacy-event backfill once, not on every database connection.
     migrated = db.execute(
         "SELECT 1 FROM growth_schema_migrations WHERE version = 1"
@@ -253,3 +268,97 @@ def source_report(days=None):
             key=lambda row: (-row[1]["net"], -row[1]["active"], row[0]),
         )
     ]
+
+
+def enable_promotion_target(chat_id, title, username, invite_link, authorized_by):
+    """Enable scheduled promotion only after an administrator opts the chat in."""
+    with connect() as db:
+        db.execute("""
+            INSERT INTO promotion_targets(
+                chat_id, title, username, invite_link, enabled, authorized_by
+            ) VALUES (?, ?, ?, ?, 1, ?)
+            ON CONFLICT(chat_id) DO UPDATE SET
+                title=excluded.title,
+                username=excluded.username,
+                invite_link=excluded.invite_link,
+                enabled=1,
+                authorized_by=excluded.authorized_by,
+                updated_at=CURRENT_TIMESTAMP,
+                last_error=NULL
+        """, (chat_id, title, username, invite_link, authorized_by))
+
+
+def disable_promotion_target(chat_id, error=None):
+    """Disable scheduled promotion for a chat. Returns whether it was enabled."""
+    with connect() as db:
+        cursor = db.execute("""
+            UPDATE promotion_targets
+            SET enabled=0,
+                updated_at=CURRENT_TIMESTAMP,
+                last_error=COALESCE(?, last_error)
+            WHERE chat_id=? AND enabled=1
+        """, (error, chat_id))
+        return cursor.rowcount > 0
+
+
+def list_promotion_targets(enabled_only=True):
+    with connect() as db:
+        if enabled_only:
+            rows = db.execute("""
+                SELECT chat_id, title, username, last_post_at, last_error
+                FROM promotion_targets
+                WHERE enabled=1
+                ORDER BY title COLLATE NOCASE
+            """).fetchall()
+        else:
+            rows = db.execute("""
+                SELECT chat_id, title, username, enabled, last_post_at, last_error
+                FROM promotion_targets
+                ORDER BY title COLLATE NOCASE
+            """).fetchall()
+        return rows
+
+
+def due_promotion_targets(interval_hours=72):
+    """Return opted-in chats whose cooldown has elapsed."""
+    try:
+        interval_hours = int(interval_hours)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("interval_hours must be between 1 and 720") from exc
+    if not 1 <= interval_hours <= 720:
+        raise ValueError("interval_hours must be between 1 and 720")
+    with connect() as db:
+        return db.execute("""
+            SELECT chat_id, title, username, invite_link
+            FROM promotion_targets
+            WHERE enabled=1
+              AND (
+                    last_post_at IS NULL
+                    OR last_post_at <= datetime('now', ?)
+                  )
+            ORDER BY COALESCE(last_post_at, created_at), title COLLATE NOCASE
+        """, (f"-{interval_hours} hours",)).fetchall()
+
+
+def mark_promotion_sent(chat_id, message_id):
+    with connect() as db:
+        db.execute("""
+            UPDATE promotion_targets
+            SET last_post_at=CURRENT_TIMESTAMP,
+                last_message_id=?,
+                last_error=NULL,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE chat_id=? AND enabled=1
+        """, (message_id, chat_id))
+
+
+def mark_promotion_failed(chat_id, error, disable=False):
+    message = str(error).replace("\\n", " ")[:500]
+    with connect() as db:
+        db.execute("""
+            UPDATE promotion_targets
+            SET last_error=?,
+                enabled=CASE WHEN ? THEN 0 ELSE enabled END,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE chat_id=?
+        """, (message, int(bool(disable)), chat_id))
