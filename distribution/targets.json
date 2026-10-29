@@ -2537,6 +2537,147 @@
       "automation_status": "discovered_schedule_rules_need_review",
       "evidence_url": "https://t.me/PR_chat_by_engovatova",
       "notes": "Could be scheduled by an authorized publisher for permitted days, but current rule and bot-authored messages must be checked before use."
+    },
+    {
+      "id": "birzha-reklamy4",
+      "name": "Админы телеграм | Взаимопиар и реклама",
+      "url": "https://t.me/birzha_reklamy4",
+      "kind": "telegram_admin_mutual_promo_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel admins",
+        "mutual promotion",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "ChatCrawler describes an admin group for buying/selling ads and channels, mutual promotion, and promotion services.",
+      "observed_members": 15395,
+      "observed_recent_growth": "+44",
+      "observed_messages_30d": 110000,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Use only if the group has a free mutual-promotion route. Paid ad inventory is explicitly out of scope; verify pinned rules and whether bot-authored posts are permitted."
+    },
+    {
+      "id": "byrzha-reklamy2",
+      "name": "Телеграм админы | Реклама ТГ",
+      "url": "https://t.me/byrzha_reklamy2",
+      "kind": "telegram_admin_promo_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram admins",
+        "channel promotion",
+        "mutual promotion",
+        "vacancies"
+      ],
+      "publicly_stated_permission": "ChatCrawler describes a Telegram admins group for promotion, advertising and channel-related vacancies.",
+      "observed_members": 13824,
+      "observed_recent_growth": "+55",
+      "observed_messages_30d": 92740,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Paid marketplace posts are excluded; include only posts clearly classed as free mutual promotion after reviewing the rules."
+    },
+    {
+      "id": "birzha-reklamy5",
+      "name": "Реклама ТГ | Админы телеграм",
+      "url": "https://t.me/birzha_reklamy5",
+      "kind": "telegram_admin_mutual_promo_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel admins",
+        "mutual promotion",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "ChatCrawler lists it as an advertising exchange and mutual-promotion group for Telegram channel admins.",
+      "observed_members": 13699,
+      "observed_recent_growth": "+61",
+      "observed_messages_30d": 99222,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "No money to be spent. Check whether free reciprocal posts are permitted; do not use its paid ad-trading facilities."
+    },
+    {
+      "id": "byrzha-reklami2",
+      "name": "Реклама ТГ | Админы Telegram",
+      "url": "https://t.me/byrzha_reklami2",
+      "kind": "telegram_admin_mutual_promo_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel admins",
+        "mutual promotion",
+        "marketing services"
+      ],
+      "publicly_stated_permission": "ChatCrawler describes an advertising, mutual-promotion and channel-promotion services group.",
+      "observed_members": 13371,
+      "observed_recent_growth": "+39",
+      "observed_messages_30d": 102000,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Free route not confirmed; only keep as a candidate for no-cash mutual promotion. Ignore all buy/sell ad offers."
+    },
+    {
+      "id": "birzha-reklamy23",
+      "name": "Админы телеграм | Реклама ТГ",
+      "url": "https://t.me/birzha_reklamy23",
+      "kind": "telegram_admin_mutual_promo_group",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel admins",
+        "mutual promotion",
+        "advertising services"
+      ],
+      "publicly_stated_permission": "ChatCrawler lists a Telegram channel-administrator group for advertising, promotion services and mutual promotion.",
+      "observed_members": 12738,
+      "observed_recent_growth": "+27",
+      "observed_messages_30d": 91582,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Potential free swap community, not a confirmed free placement. Paid channel and ad sale routes remain excluded."
+    },
+    {
+      "id": "nftconfessionn",
+      "name": "NFT CONFESSION",
+      "url": "https://t.me/NFTconfessionn",
+      "kind": "nft_project_cross_promo_channel",
+      "language": "ru",
+      "audience_topics": [
+        "NFT",
+        "project promotion",
+        "community cross-promotion"
+      ],
+      "publicly_stated_permission": "Public directory describes it as a confession community where users publish posts and promote NFT-related projects.",
+      "observed_members": 2567,
+      "observed_recent_growth": "-5",
+      "observed_messages_30d": 1879,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/promo_exchange?lang=ru",
+      "notes": "Potential Web3-adjacent audience, but audience quality, posting format and free submission procedure need checking."
+    },
+    {
+      "id": "cooking-cf",
+      "name": "набор в адм / готовка кф",
+      "url": "https://t.me/Cooking_cf",
+      "kind": "mutual_promo_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "community discovery",
+        "mutual promotion",
+        "confession channels"
+      ],
+      "publicly_stated_permission": "Public catalogue describes it as a confession channel and a search point for mutual promotion among various communities.",
+      "observed_members": 2923,
+      "observed_recent_growth": "+3",
+      "observed_messages_30d": 218,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
+      "notes": "Broad cross-community source. Confirm free post submission and topic acceptance before considering it for crypto/finance news."
     }
   ],
   "directories": [
