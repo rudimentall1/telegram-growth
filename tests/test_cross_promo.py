@@ -80,6 +80,7 @@ class CrossPromoTests(unittest.TestCase):
             -1000000000002, "Partner", "partner_channel", 27, 42
         )
         cross_promo.mark_delivery(-1000000000001, -1000000000002, 555)
+        cross_promo.mark_delivery(-1000000000002, -1000000000001, 556)
         home = cross_promo.get_channel(-1000000000001)
         self.assertIsNotNone(home["last_promo_at"])
         self.assertEqual(
@@ -89,7 +90,8 @@ class CrossPromoTests(unittest.TestCase):
         with growth_db.connect() as db:
             row = db.execute(
                 "SELECT target_chat_id, promoted_chat_id, message_id "
-                "FROM crosspromo_deliveries"
+                "FROM crosspromo_deliveries WHERE target_chat_id=?",
+                (-1000000000001,),
             ).fetchone()
         self.assertEqual(row, (-1000000000001, -1000000000002, 555))
         self.assertGreater(partner_id, 0)
