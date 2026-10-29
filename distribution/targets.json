@@ -1990,6 +1990,46 @@
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://t.me/freeprtalk",
       "notes": "Useful general-purpose candidate. Follow the no-spam rule and verify whether scheduled/bot-authored promo is accepted."
+    },
+    {
+      "id": "p-rgroup3",
+      "name": "PR Group-3",
+      "url": "https://t.me/P_RGroup3",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free PR",
+        "services advertising",
+        "jobs",
+        "online income"
+      ],
+      "publicly_stated_permission": "Public Telegram catalogue explicitly describes it as a group for free PR, advertising services, vacancies and online-income topics.",
+      "observed_members": 3220,
+      "observed_messages_30d": 5895,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/pr_branding/groups?lang=ru",
+      "notes": "Free PR is stated publicly. Verify current pinned rules and whether bot-authored posts are accepted before scheduling."
+    },
+    {
+      "id": "nelpiar",
+      "name": "ПИАР ЧАТ",
+      "url": "https://t.me/nelpiar",
+      "kind": "mutual_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "service advertising",
+        "collaboration"
+      ],
+      "publicly_stated_permission": "Public catalogue describes it as a PR chat for mutual promotion, advertising services and cooperation discovery.",
+      "observed_members": 794,
+      "observed_recent_growth": "+4 members",
+      "observed_messages_30d": 15972,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/pr_branding/groups?lang=ru",
+      "notes": "Mutual promotion is a fit, but free terms and automated posting rules must be confirmed."
     }
   ],
   "directories": [
