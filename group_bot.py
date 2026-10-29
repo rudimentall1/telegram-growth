@@ -18,6 +18,10 @@ from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
 
 logging.basicConfig(level=logging.INFO)
+# httpx logs full Telegram Bot API request URLs at INFO level; those URLs contain
+# the bot token. Never write them to the system journal.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 WELCOME_TEXT = (
     "👋 Добро пожаловать, {name}!\n\n"
