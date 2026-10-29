@@ -2750,6 +2750,26 @@
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
       "notes": "Broad cross-community source. Confirm free post submission and topic acceptance before considering it for crypto/finance news."
+    },
+    {
+      "id": "free-promotion-any-link",
+      "name": "Free Promotion Group - Share Any Link",
+      "url": "https://t.me/joinchat/kCYPbJggDndiODQ5",
+      "kind": "free_self_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "Telegram channel promotion",
+        "YouTube",
+        "social media",
+        "cross-platform promotion"
+      ],
+      "publicly_stated_permission": "Public Telegram preview explicitly invites users to promote Telegram channels/groups and links from several social platforms by sharing links.",
+      "observed_members": 1105,
+      "observed_online": 8,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/joinchat/kCYPbJggDndiODQ5",
+      "notes": "Invitation-only group; description has a weak moderation disclaimer. Low priority until active moderation, anti-scam rules and bot-posting permissions are checked."
     }
   ],
   "directories": [
@@ -2949,6 +2969,66 @@
       "submission_status": "free submission route found; not submitted",
       "evidence_url": "https://televerse.click/",
       "notes": "Site advertises free submission with review. Paid premium badges/analytics are excluded."
+    },
+    {
+      "id": "telegramdir",
+      "name": "TelegramDir",
+      "url": "https://telegramdir.com/",
+      "kind": "free_moderated_directory_submission",
+      "money_required": false,
+      "submission_status": "free submit flow available; not submitted",
+      "evidence_url": "https://telegramdir.com/",
+      "notes": "Public channel/group/bot submission is free and manually reviewed. General directory; paid listings are not used."
+    },
+    {
+      "id": "telegramradar",
+      "name": "TelegramRadar",
+      "url": "https://www.telegramradar.com/en",
+      "kind": "free_moderated_directory_submission",
+      "money_required": false,
+      "submission_status": "free submission flow available; not submitted",
+      "evidence_url": "https://www.telegramradar.com/en",
+      "notes": "Free directory listing for Telegram channels/groups/bots, with optional premium visibility excluded. Review is required before listing."
+    },
+    {
+      "id": "tgsearch-org",
+      "name": "TGSearch",
+      "url": "https://tgsearch.org/add",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "support-request submission; eligibility not checked",
+      "evidence_url": "https://tgsearch.org/add",
+      "notes": "Free submission is sent to support and added during a later database refresh; only channels/groups with more than 200 subscribers and current content are accepted. No paid acceleration is offered."
+    },
+    {
+      "id": "tgselect",
+      "name": "TGSelect",
+      "url": "https://tgresou.com/submit",
+      "kind": "free_google_index_directory_submission",
+      "money_required": false,
+      "submission_status": "free form found; not submitted",
+      "evidence_url": "https://tgresou.com/submit",
+      "notes": "Free directory submission and Google indexing are advertised. Ownership verification through a bot may be required; do not use any paid add-ons."
+    },
+    {
+      "id": "opentg-index",
+      "name": "OpenTG",
+      "url": "https://opentg.ai/",
+      "kind": "passive_public_post_index",
+      "money_required": false,
+      "submission_status": "public-channel indexing advertised; @cryptoping_ru indexing not verified",
+      "evidence_url": "https://opentg.ai/",
+      "notes": "Search engine creates public web pages for public Telegram posts; posts over 200 characters are indexed. Public channels may be indexed automatically, while adding @opentg_collector_bot can explicitly connect a channel. This improves web discoverability rather than guaranteeing subscribers."
+    },
+    {
+      "id": "telegramsearchengine",
+      "name": "Telegram Search Engine",
+      "url": "https://telegramsearchengine.com/directory",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "free submit path advertised; not submitted",
+      "evidence_url": "https://telegramsearchengine.com/directory?category=bots",
+      "notes": "Public directory advertises free channel submission and automated verification. Validate current form and quality before submission; no paid upgrade is in scope."
     }
   ],
   "execution_notes": {
