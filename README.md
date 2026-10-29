@@ -50,6 +50,54 @@ python -m py_compile group_bot.py growth_db.py
 Пока это исходный проект и тестовый каркас, не готовый установщик для существующего сервера. Не запускайте deployment поверх действующего бота до проверки резервной копии, конфигурации и поведения systemd.
 
 
+## Opt-in reciprocal channel cross-promotion
+
+The bot now includes a cross-promotion network integrated into the existing
+`python-telegram-bot` process and the same SQLite database. It does not start
+a second poller or require an unrelated third-party bot to enter
+`@cryptoping_ru`.
+
+### How it works
+
+- A channel owner adds our existing bot `@crypto_source_farm_bot` to their
+  **own public channel**, granting only the post permission required for the
+  exchange, then sends `/crosspromo_add @channel` to the bot.
+- The bot verifies the sender is that channel's administrator and checks the
+  bot has permission to publish. New channels enter a pending queue.
+- A CryptoPing RU group administrator reviews and approves or rejects each
+  submission. Approved channels receive at most one reciprocal promo post per
+  `CROSSPROMO_INTERVAL_HOURS` (default 72 hours).
+- The scheduler rotates partners, prefers channels with a comparable audience,
+  and avoids repeating a partner in the same target channel within seven days
+  when alternatives exist. CryptoPing RU uses a tracked invite link per partner
+  when Telegram permits creating it; otherwise the public link is used.
+- `/crosspromopause` pauses CryptoPing RU's participation. `/crosspromoresume`
+  resumes it. No paid placement or unsolicited posting is used.
+
+### Commands
+
+- `/crosspromo` — help and requirements.
+- `/crosspromo_add @channel` — submit a channel you administer.
+- `/crosspromopending` — review queue (CryptoPing RU administrators).
+- `/crosspromoapprove ID` / `/crosspromoreject ID` — moderate a submission.
+- `/crosspromolist` — list currently active partners.
+- `/crosspromopause` / `/crosspromoresume` — pause or resume our channel.
+
+### Important limits
+
+This creates the exchange mechanism; it does not manufacture an audience.
+Until at least one other channel owner joins and is approved, there is nobody
+to exchange posts with and the scheduler sends nothing. Results depend on real
+partner channels and their audiences. A partner can stop participation by
+removing the bot; delivery failures disable that target until its owner resolves
+permissions and registers again. Minimum channel size is configurable and
+defaults to 10 so small channels such as `@cryptoping_ru` are not excluded.
+
+The implementation adapts the cross-promotion workflow described by the
+MIT-licensed [channel-promo-bot](https://github.com/qilaidev/channel-promo-bot)
+to this repository's existing `python-telegram-bot` application and SQLite
+database; the upstream aiogram application is not launched as a second process.
+
 ## Automatic distribution
 
 The GitHub Actions workflow `.github/workflows/free-distribution.yml` runs
