@@ -2393,6 +2393,100 @@
       "automation_status": "discovered_partnership_lead_not_connected",
       "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
       "notes": "Potential source for trusted admin partnerships; no evidence that unsolicited channel promo is allowed."
+    },
+    {
+      "id": "prchat-cis",
+      "name": "Взаимный Пиар | СНГ",
+      "url": "https://t.me/PRchat",
+      "kind": "mutual_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "Russian-speaking Telegram channels"
+      ],
+      "publicly_stated_permission": "Public page describes it as a group for mutual PR of Russian-language Telegram channels; it directs users to pinned rules and #правила.",
+      "observed_members": 3282,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/PRchat",
+      "notes": "Explicit mutual-promotion purpose; check pinned rules before posting. Do not use paid ad-service links listed in the description."
+    },
+    {
+      "id": "piar-mega-news",
+      "name": "Взаимная подписка | Пиарчат | PR GRAM",
+      "url": "https://t.me/+LvNAlDLr1QM0MWMy",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru,en",
+      "audience_topics": [
+        "mutual subscriptions",
+        "channel promotion",
+        "PR bots",
+        "NFT",
+        "channel admins"
+      ],
+      "publicly_stated_permission": "Public Telegram preview says promotion is free, users are not obliged to subscribe to advertiser channels, and PR bots are allowed without flooding.",
+      "observed_members": 14670,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/+LvNAlDLr1QM0MWMy",
+      "notes": "Strong candidate for bot-based posting. Join invite and full linked rules still need checking; do not flood, deduplicate posts and rate-limit strictly."
+    },
+    {
+      "id": "vzaimnay-podpiskatg",
+      "name": "Взаимная подписка | Общение",
+      "url": "https://t.me/vzaimnay_podpiskatg",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "free chat/group promotion",
+        "reactions"
+      ],
+      "publicly_stated_permission": "Public Telegram description says users can promote their chat/group for free and mentions separate paid ad contact; exact permission for channel-only posts needs checking.",
+      "observed_members": 8835,
+      "observed_online": 81,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/vzaimnay_podpiskatg",
+      "notes": "Treat only the free promotion route as in-scope. Verify whether channel posts are accepted, not just chat/group links."
+    },
+    {
+      "id": "free-promotion-club-invite",
+      "name": "Free Promotion club",
+      "url": "https://t.me/+77HmklknRjRiYzY1",
+      "kind": "free_self_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "free business promotion",
+        "Telegram channels",
+        "groups"
+      ],
+      "publicly_stated_permission": "Public Telegram preview says promotion for businesses, channels and groups is 100% free and limits group activity to promotions; no-spam rule.",
+      "observed_members": 458,
+      "observed_online": 15,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/+77HmklknRjRiYzY1",
+      "notes": "Invitation-only link, not a public username. Check joining and bot rules before adding the automated publisher."
+    },
+    {
+      "id": "free-promotion-link-share",
+      "name": "Free promotion Link share",
+      "url": "https://t.me/+Na4ok6eWS4g1Njll",
+      "kind": "free_self_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "free business promotion",
+        "Telegram channels",
+        "groups"
+      ],
+      "publicly_stated_permission": "Public Telegram preview says promotion for businesses, channels and groups is 100% free and limits group activity to promotions; no-spam rule.",
+      "observed_members": 762,
+      "observed_online": 23,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://t.me/+Na4ok6eWS4g1Njll",
+      "notes": "Different invite link and listed member count from the similarly named Free Promotion club. Possibly related/duplicated network; verify group identity on joining."
     }
   ],
   "directories": [
@@ -2512,6 +2606,36 @@
       "submission_status": "catalog discovery available; direct submission procedure not checked",
       "evidence_url": "https://tgstat.com/",
       "notes": "Discovery and analytics directory. Inclusion is not guaranteed and paid promotional services are not included."
+    },
+    {
+      "id": "teleseeker",
+      "name": "TeleSeeker",
+      "url": "https://teleseeker.com/submit",
+      "kind": "free_instant_directory_submission",
+      "money_required": false,
+      "submission_status": "open free submission page; submission not performed",
+      "evidence_url": "https://teleseeker.com/submit",
+      "notes": "Site says no account/login or ownership proof is required and valid public Telegram usernames are indexed after a live check. This is an instant public directory listing, not an ad post. Terms prohibit automated bulk submissions, so submit one owned channel only and do not automate mass submissions."
+    },
+    {
+      "id": "telenavo",
+      "name": "TeleNavo",
+      "url": "https://telenavo.com/es/submit",
+      "kind": "free_moderated_directory_submission",
+      "money_required": false,
+      "submission_status": "open free submission page; submission not performed",
+      "evidence_url": "https://telenavo.com/es/submit",
+      "notes": "Free listing, public channels/groups only, manually moderated. Terms prohibit automated mass submissions. Do not script form submissions or pretend placement is already active."
+    },
+    {
+      "id": "tgindexer",
+      "name": "TGIndexer",
+      "url": "https://tgindexer.com/add/",
+      "kind": "free_moderated_directory_submission",
+      "money_required": false,
+      "submission_status": "free Telegram-bot submission flow; submission not performed",
+      "evidence_url": "https://tgindexer.com/add/",
+      "notes": "Free submission via the directory's bot and manual moderation. It categorizes Telegram channels/groups/bots by city; there is no guarantee that @cryptoping_ru fits a currently open city."
     }
   ],
   "execution_notes": {
