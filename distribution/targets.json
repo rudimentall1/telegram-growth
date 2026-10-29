@@ -67,7 +67,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://docs.onflowads.com/cross-promo",
-      "notes": "Free plan advertises a limited monthly cross-promotion allowance. Requires the platform bot to be an admin of our own public channel and an account on the platform. Partner and post approvals are part of its workflow."
+      "notes": "Free plan advertises a limited monthly cross-promotion allowance. Requires the platform bot to be an admin of our own public channel and an account on the platform. Partner and post approvals are part of its workflow.",
+      "priority_tier": "A",
+      "free_cash_route_confirmed": true,
+      "recommendation": "first_wave",
+      "reason": "Official documentation confirms free, automated post swaps and a free plan allowance; post publishing and removal are handled by the bot.",
+      "required_one_time_setup": "Create platform account and add @OnflowAdsBot to @cryptoping_ru with only the post/delete rights required for cross-promotion.",
+      "verified_limits": "Official site states 5 new cross-promotions per month on Free."
     },
     {
       "id": "adpact-cross-promotion",
@@ -80,7 +86,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://adpact.app/guides/telegram-cross-promotion/",
-      "notes": "Both owners review/accept posts. No ad purchase required, but points and platform eligibility rules apply."
+      "notes": "Both owners review/accept posts. No ad purchase required, but points and platform eligibility rules apply.",
+      "priority_tier": "A",
+      "free_cash_route_confirmed": true,
+      "recommendation": "first_wave",
+      "reason": "Official site confirms no-cash post swaps, automatic bot publication and delivery checks; platform points are used instead of money.",
+      "required_one_time_setup": "Connect the public channel to Adpact and use only its cross-promotion flow; inspect current point cost before accepting a swap.",
+      "verified_limits": "No cash payment for the exchange, but accepted swaps consume in-app points."
     },
     {
       "id": "trigram-cross-promotion",
@@ -93,7 +105,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://trigram.site/",
-      "notes": "The public catalog also contains paid placements; only the cross-promotion path is in scope."
+      "notes": "The public catalog also contains paid placements; only the cross-promotion path is in scope.",
+      "priority_tier": "A",
+      "free_cash_route_confirmed": true,
+      "recommendation": "first_wave",
+      "reason": "Official site describes free channel-to-channel swaps, matched by subscriber range, language and topic, with bot publication and verification.",
+      "required_one_time_setup": "Connect the channel to Trigram and enable the free cross-promotion route; do not activate paid listing or ad-placement options.",
+      "verified_limits": "Official site says cross-promotion has no minimum subscriber count and no listing fee."
     },
     {
       "id": "crosspromer",
@@ -105,7 +123,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "needs_verification",
       "evidence_url": "https://t.me/crosspromer_bot",
-      "notes": "Described publicly as a platform for finding partners for joint free ad campaigns. Free eligibility and current workflow must be confirmed before use."
+      "notes": "Described publicly as a platform for finding partners for joint free ad campaigns. Free eligibility and current workflow must be confirmed before use.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "workflow_check",
+      "reason": "Public bot description explicitly advertises joint free campaigns; scheduling/publication details need live confirmation.",
+      "required_one_time_setup": "Check the bot workflow and permissions before connecting anything."
     },
     {
       "id": "erzy-cross-promotion",
@@ -117,7 +140,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "needs_verification",
       "evidence_url": "https://t.me/ErzyNetWebBot",
-      "notes": "Public bot description says it helps channel admins run cross-promotions. Free terms and current activity need confirmation."
+      "notes": "Public bot description says it helps channel admins run cross-promotions. Free terms and current activity need confirmation.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "terms_check",
+      "reason": "Public bot listings describe free cross-promotion; an app directory also mentions agreement-based compensation in some conditions, so terms should be reviewed first.",
+      "required_one_time_setup": "Review the current terms and any growth/compensation obligations before connecting."
     },
     {
       "id": "mutual-subscriptions-bot",
@@ -129,7 +157,12 @@
       "own_channel_authorization_required": true,
       "setup_status": "needs_verification",
       "evidence_url": "https://t.me/VzaimniePodpiskiBot",
-      "notes": "Public description advertises free promotion via mutual subscriptions and requests admin access to the channel. Check quality and exact exchange mechanics before enabling."
+      "notes": "Public description advertises free promotion via mutual subscriptions and requests admin access to the channel. Check quality and exact exchange mechanics before enabling.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": null,
+      "recommendation": "workflow_check",
+      "reason": "Public description claims free promotion, but the method may rely on reciprocal subscriptions rather than automatic channel post swaps.",
+      "required_one_time_setup": "Verify rules, channel eligibility and whether it delivers real channel mentions."
     },
     {
       "id": "rockets-pr-bot",
@@ -141,7 +174,12 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_workflow_not_verified",
       "evidence_url": "https://t.me/rockets_pr_bot",
-      "notes": "Bot description explicitly offers free mutual promotion for Telegram channels and groups. Its exact mechanics, eligibility, publication rights and whether posts are automated were not verified; not connected."
+      "notes": "Bot description explicitly offers free mutual promotion for Telegram channels and groups. Its exact mechanics, eligibility, publication rights and whether posts are automated were not verified; not connected.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "workflow_check",
+      "reason": "Public bot page says free mutual promotion, but automated publication and channel eligibility are not yet verified.",
+      "required_one_time_setup": "Test the bot's workflow without granting channel rights until permissions are understood."
     },
     {
       "id": "telegrad-cross-promotion",
@@ -154,7 +192,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://telegrad.link/en",
-      "notes": "Free to start. One-time setup requires adding @telegradlinkbot as a channel/group admin with posting rights and registering the channel. Check free-plan limits and channel eligibility before assuming repeated reach."
+      "notes": "Free to start. One-time setup requires adding @telegradlinkbot as a channel/group admin with posting rights and registering the channel. Check free-plan limits and channel eligibility before assuming repeated reach.",
+      "priority_tier": "A",
+      "free_cash_route_confirmed": true,
+      "recommendation": "first_wave",
+      "reason": "Official site states getting started is free; scheduled keypads and cross-promo posts are published automatically by the bot.",
+      "required_one_time_setup": "Connect @cryptoping_ru in the MiniApp and grant @telegradlinkbot only the publishing rights needed.",
+      "verified_limits": "Free start confirmed; exact ongoing free quota needs checking in the app."
     },
     {
       "id": "tex-media-view-exchange",
@@ -167,7 +211,12 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://tex.media/",
-      "notes": "Supplementary exposure route, not guaranteed subscriber acquisition. View exchange can bring lower-intent traffic than a topical post swap; test separately and measure joins/retention."
+      "notes": "Supplementary exposure route, not guaranteed subscriber acquisition. View exchange can bring lower-intent traffic than a topical post swap; test separately and measure joins/retention.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": true,
+      "recommendation": "quality_test_only",
+      "reason": "Free view exchange is advertised, but view-exchange traffic may be lower-intent; measure joins and retention separately.",
+      "required_one_time_setup": "Do not prioritize above genuine topic-matched post swaps."
     },
     {
       "id": "boostloop-free-exchange",
@@ -179,7 +228,12 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://www.findmini.app/boostloopbot/",
-      "notes": "Public listing describes free promotion using credits earned through short ads/tasks and verified joins. Not passive/fully autonomous by default: completing tasks earns credits. Do not automate fake engagement or bypass task rules; confirm channel eligibility and how credits can be earned without paid activity."
+      "notes": "Public listing describes free promotion using credits earned through short ads/tasks and verified joins. Not passive/fully autonomous by default: completing tasks earns credits. Do not automate fake engagement or bypass task rules; confirm channel eligibility and how credits can be earned without paid activity.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": true,
+      "recommendation": "not_passive",
+      "reason": "Credits are earned by watching ads or completing tasks; this does not meet the no-participation requirement by default.",
+      "required_one_time_setup": "Exclude unless it offers a fully passive free placement mechanism."
     },
     {
       "id": "autobots-promotions",
@@ -191,7 +245,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_eligibility_not_checked",
       "evidence_url": "https://minitelegram.com/en/apps/autobots_promotions_bot",
-      "notes": "Public MiniApp directory describes free promotion through internal PR channels/groups, including @Autobotspromotions and @Autobotspromotionss. Reported threshold is 500 subscribers. Current operation, channel eligibility and posting workflow must be tested."
+      "notes": "Public MiniApp directory describes free promotion through internal PR channels/groups, including @Autobotspromotions and @Autobotspromotionss. Reported threshold is 500 subscribers. Current operation, channel eligibility and posting workflow must be tested.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "eligibility_check",
+      "reason": "Public listings describe a free internal promo network, but eligibility and exact automation must be confirmed.",
+      "required_one_time_setup": "Start the bot and check channel eligibility.",
+      "verified_limits": "Third-party listings state a 500-subscriber minimum; this has not been checked against the live bot."
     },
     {
       "id": "pr4pr-free-catalog",
@@ -203,7 +263,12 @@
       "own_channel_authorization_required": false,
       "setup_status": "discovered_not_submitted",
       "evidence_url": "https://t.me/PR4PR_Bot",
-      "notes": "Public bot description says it adds a channel, group or bot to the free @pr4pr catalogue. This is a free listing route, not an automatic cross-promo post exchange."
+      "notes": "Public bot description says it adds a channel, group or bot to the free @pr4pr catalogue. This is a free listing route, not an automatic cross-promo post exchange.",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "free_directory_submission",
+      "reason": "Bot description explicitly offers free catalogue listing; useful for discovery but not a post-swap network.",
+      "required_one_time_setup": "Submit @cryptoping_ru through the bot and verify that the listing appears."
     },
     {
       "id": "insidead-free-exchange",
@@ -215,7 +280,12 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_free_plan_not_connected",
       "evidence_url": "https://www.insidead.ru/en",
-      "notes": "Site describes a free plan with limited credits and a traffic-exchange route. Paid ads exist but are excluded; use only free exchange mode. It may show third-party promotions in our own channel and has not been connected or tested."
+      "notes": "Site describes a free plan with limited credits and a traffic-exchange route. Paid ads exist but are excluded; use only free exchange mode. It may show third-party promotions in our own channel and has not been connected or tested.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": true,
+      "recommendation": "quality_test_only",
+      "reason": "Free exchange credits are advertised, but the route may place third-party promotions on our channel and must be assessed for brand fit.",
+      "required_one_time_setup": "Use exchange mode only and verify that paid features are not activated."
     },
     {
       "id": "free-promoter-bot",
@@ -227,7 +297,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "discovered_workflow_not_tested",
       "evidence_url": "https://telegramchannels.me/bots/free_promoter_bot",
-      "notes": "Public listing describes free promotion for YouTube and Telegram channels/groups. Exact mechanics, eligibility, whether it publishes into third-party channels, and any task/credit requirements are not yet verified."
+      "notes": "Public listing describes free promotion for YouTube and Telegram channels/groups. Exact mechanics, eligibility, whether it publishes into third-party channels, and any task/credit requirements are not yet verified.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": true,
+      "recommendation": "workflow_check",
+      "reason": "Public listing says free promotion, but it does not clearly explain whether it performs real placements or requires tasks/credits.",
+      "required_one_time_setup": "Inspect mechanism and quality safeguards first; do not assume it is passive."
     },
     {
       "id": "free-prom-bot",
@@ -239,7 +314,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "discovered_not_tested",
       "evidence_url": "https://t.me/free_prom_bot",
-      "notes": "Public bot landing page has only a short description. Free route and actual distribution mechanism need verification; not connected."
+      "notes": "Public bot landing page has only a short description. Free route and actual distribution mechanism need verification; not connected.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": null,
+      "recommendation": "workflow_check",
+      "reason": "Public description is too sparse to establish free eligibility or real publishing.",
+      "required_one_time_setup": "Do not connect until workflow is verified."
     },
     {
       "id": "crosspromotion-robot",
@@ -251,7 +331,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "discovered_workflow_not_verified",
       "evidence_url": "https://t.me/s/RagnarServers",
-      "notes": "A public channel post describes it as automatic cross-promotion for views/members. Cost model, quality protections, partner consent and permissions are unverified; no setup or post run has been completed."
+      "notes": "A public channel post describes it as automatic cross-promotion for views/members. Cost model, quality protections, partner consent and permissions are unverified; no setup or post run has been completed.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": null,
+      "recommendation": "cost_and_safety_check",
+      "reason": "A promotional post calls it automatic, but free terms, partners' opt-in, and quality controls are unverified.",
+      "required_one_time_setup": "Do not connect until operator, terms and permissions can be verified."
     },
     {
       "id": "cross-promoter-bot",
@@ -263,7 +348,12 @@
       "own_channel_authorization_required": null,
       "setup_status": "discovered_workflow_not_verified",
       "evidence_url": "https://t.me/Cross_PromoterBot",
-      "notes": "Bot landing page links to @CrossPromotion_Channels and @Auto_Cross_Promotion. Free terms and active automated publishing workflow need verification."
+      "notes": "Bot landing page links to @CrossPromotion_Channels and @Auto_Cross_Promotion. Free terms and active automated publishing workflow need verification.",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": null,
+      "recommendation": "workflow_check",
+      "reason": "It links to cross-promotion channels, but the cost model and publication rights are not verified.",
+      "required_one_time_setup": "Verify terms before use."
     }
   ],
   "communities": [
