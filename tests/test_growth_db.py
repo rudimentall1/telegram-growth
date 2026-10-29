@@ -164,5 +164,80 @@ class GrowthDbTests(unittest.TestCase):
                     growth_db.source_report(value)
 
 
+    def test_promotion_targets_are_opt_in_and_respect_cooldown(self):
+        self.assertEqual(growth_db.due_promotion_targets(72), [])
+
+        chat_id = -100123456789
+        growth_db.enable_promotion_target(
+            chat_id, "Opted-in group", "opted_in_group",
+            "https://t.me/+promoA", 42,
+        )
+        due = growth_db.due_promotion_targets(72)
+        self.assertEqual(
+            due,
+            [(chat_id, "Opted-in group", "opted_in_group", "https://t.me/+promoA")],
+        )
+
+        growth_db.mark_promotion_sent(chat_id, 987)
+        self.assertEqual(growth_db.due_promotion_targets(72), [])
+        with growth_db.connect() as db:
+            saved = db.execute(
+                "SELECT last_message_id FROM promotion_targets WHERE chat_id=?",
+                (chat_id,),
+            ).fetchone()
+        self.assertEqual(saved, (987,))
+
+        with growth_db.connect() as db:
+            db.execute(
+                "UPDATE promotion_targets SET last_post_at=datetime('now','-73 hours') "
+                "WHERE chat_id=?",
+                (chat_id,),
+            )
+        self.assertEqual(len(growth_db.due_promotion_targets(72)), 1)
+
+    def test_disabled_promotion_target_is_not_scheduled(self):
+        chat_id = -100123456780
+        growth_db.enable_promotion_target(
+            chat_id, "Opted-in group", "opted_in_group",
+            "https://t.me/+promoB", 42,
+        )
+        self.assertTrue(growth_db.disable_promotion_target(chat_id))
+        self.assertFalse(growth_db.disable_promotion_target(chat_id))
+        self.assertEqual(growth_db.due_promotion_targets(72), [])
+        self.assertEqual(growth_db.list_promotion_targets(enabled_only=True), [])
+
+    def test_reenabling_target_updates_link_but_preserves_last_post_timestamp(self):
+        chat_id = -100123456781
+        growth_db.enable_promotion_target(
+            chat_id, "Opted-in group", "opted_in_group",
+            "https://t.me/+promoC1", 42,
+        )
+        growth_db.mark_promotion_sent(chat_id, 123)
+        with growth_db.connect() as db:
+            before = db.execute(
+                "SELECT last_post_at FROM promotion_targets WHERE chat_id=?",
+                (chat_id,),
+            ).fetchone()[0]
+        growth_db.enable_promotion_target(
+            chat_id, "Renamed group", "renamed_group",
+            "https://t.me/+promoC2", 99,
+        )
+        with growth_db.connect() as db:
+            after = db.execute(
+                "SELECT title, username, invite_link, last_post_at, authorized_by "
+                "FROM promotion_targets WHERE chat_id=?",
+                (chat_id,),
+            ).fetchone()
+        self.assertEqual(after, (
+            "Renamed group", "renamed_group", "https://t.me/+promoC2", before, 99
+        ))
+
+    def test_promotion_interval_is_validated(self):
+        for interval in (0, -1, 721, "sometimes"):
+            with self.subTest(interval=interval):
+                with self.assertRaises(ValueError):
+                    growth_db.due_promotion_targets(interval)
+
+
 if __name__ == "__main__":
     unittest.main()
