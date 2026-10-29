@@ -71,7 +71,7 @@ to publish there. Targets marked `discovered_not_joined`,
 not live distribution. Paid options are excluded.
 
 The inventory currently contains 17 networks/bots for cross-promotion or free promotion,
-94 community/group/channel targets and 12 free-directory candidates (123 entries total).
+95 community/group/channel targets and 12 free-directory candidates (124 entries total).
 It includes the user-supplied targets `@chatik_piarvz`, `@vzaimnaya7`,
 `@cryptoadminsVP`, `@Avto_Dubai_Arenda`, `@vzpodpiskachati`, `@vzpiarchatx`,
 `@vzchatpiar_vz`, `@chatd_piar` and `@piar_chatiku`, plus public PR communities,
