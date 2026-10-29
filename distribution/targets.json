@@ -168,6 +168,54 @@
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://tex.media/",
       "notes": "Supplementary exposure route, not guaranteed subscriber acquisition. View exchange can bring lower-intent traffic than a topical post swap; test separately and measure joins/retention."
+    },
+    {
+      "id": "boostloop-free-exchange",
+      "name": "BoostLoop",
+      "url": "https://www.findmini.app/boostloopbot/",
+      "kind": "free_credit_based_promotion_exchange",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://www.findmini.app/boostloopbot/",
+      "notes": "Public listing describes free promotion using credits earned through short ads/tasks and verified joins. Not passive/fully autonomous by default: completing tasks earns credits. Do not automate fake engagement or bypass task rules; confirm channel eligibility and how credits can be earned without paid activity."
+    },
+    {
+      "id": "autobots-promotions",
+      "name": "Autobots Promotions",
+      "url": "https://t.me/Autobots_promotions_bot",
+      "kind": "free_internal_promotion_network",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_eligibility_not_checked",
+      "evidence_url": "https://minitelegram.com/en/apps/autobots_promotions_bot",
+      "notes": "Public MiniApp directory describes free promotion through internal PR channels/groups, including @Autobotspromotions and @Autobotspromotionss. Reported threshold is 500 subscribers. Current operation, channel eligibility and posting workflow must be tested."
+    },
+    {
+      "id": "pr4pr-free-catalog",
+      "name": "PR4PR Bot",
+      "url": "https://t.me/PR4PR_Bot",
+      "kind": "free_catalogue_submission_bot",
+      "money_required": false,
+      "automated_publishing": false,
+      "own_channel_authorization_required": false,
+      "setup_status": "discovered_not_submitted",
+      "evidence_url": "https://t.me/PR4PR_Bot",
+      "notes": "Public bot description says it adds a channel, group or bot to the free @pr4pr catalogue. This is a free listing route, not an automatic cross-promo post exchange."
+    },
+    {
+      "id": "insidead-free-exchange",
+      "name": "Inside — free traffic exchange",
+      "url": "https://www.insidead.ru/en",
+      "kind": "free_limited_credit_exchange",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_free_plan_not_connected",
+      "evidence_url": "https://www.insidead.ru/en",
+      "notes": "Site describes a free plan with limited credits and a traffic-exchange route. Paid ads exist but are excluded; use only free exchange mode. It may show third-party promotions in our own channel and has not been connected or tested."
     }
   ],
   "communities": [
@@ -1748,6 +1796,59 @@
       "automation_status": "discovered_partnership_lead_not_connected",
       "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
       "notes": "This is a lead-discovery source, not an advertising placement. Only use for legitimate partnership offers where replies are permitted."
+    },
+    {
+      "id": "piarv-large-vp",
+      "name": "Взаимные подписки / реакции / взаимная",
+      "url": "https://t.me/piarv",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "Telegram channel promotion"
+      ],
+      "publicly_stated_permission": "Public catalogue describes this as a chat for mutual subscriptions, reactions and promotion of Telegram channels.",
+      "observed_members": 122000,
+      "observed_messages_30d": 747000,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/chat/groups?lang=ru",
+      "notes": "Large public catalogue metrics, but high posting volume may bury posts quickly. Confirm free posting rules and whether bots/automated posts are allowed."
+    },
+    {
+      "id": "autobotspromotions-group",
+      "name": "Autobots Promotions",
+      "url": "https://t.me/Autobotspromotions",
+      "kind": "free_internal_promotion_network_group",
+      "language": "en",
+      "audience_topics": [
+        "channel promotion",
+        "free promotion network"
+      ],
+      "publicly_stated_permission": "Public MiniApp directory lists this group as part of the internal free promotion network run by Autobots_promotions_bot.",
+      "observed_members": null,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://minitelegram.com/en/apps/autobots_promotions_bot",
+      "notes": "Check current activity, eligibility and rules before connecting."
+    },
+    {
+      "id": "autobotspromotionss-group",
+      "name": "Autobots Promotionss",
+      "url": "https://t.me/Autobotspromotionss",
+      "kind": "free_internal_promotion_network_group",
+      "language": "en",
+      "audience_topics": [
+        "channel promotion",
+        "free promotion network"
+      ],
+      "publicly_stated_permission": "Public MiniApp directory lists this group as part of the internal free promotion network run by Autobots_promotions_bot.",
+      "observed_members": null,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_not_joined",
+      "evidence_url": "https://minitelegram.com/en/apps/autobots_promotions_bot",
+      "notes": "Check current activity, eligibility and rules before connecting."
     }
   ],
   "directories": [
