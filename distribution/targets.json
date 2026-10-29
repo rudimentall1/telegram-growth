@@ -2289,6 +2289,110 @@
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
       "notes": "Networking/partnership prospect only unless posting rules permit channel promotion."
+    },
+    {
+      "id": "infcf-mutual-pr",
+      "name": "INFO CONFESSION",
+      "url": "https://t.me/infcf",
+      "kind": "mutual_promotion_channel",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "Telegram info channels"
+      ],
+      "publicly_stated_permission": "Public ChatCrawler listing describes it as an info-confession channel for mutual subscriptions, reactions and member opinions.",
+      "observed_members": 7763,
+      "observed_recent_growth": "-10 members (catalogue snapshot)",
+      "observed_messages_30d": 2193,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
+      "notes": "Promotion-oriented channel, but exact submission mechanic and acceptance of crypto/finance news remain unverified."
+    },
+    {
+      "id": "findadminscff",
+      "name": "Find admins | Взаимопиар",
+      "url": "https://t.me/findadminscff",
+      "kind": "channel_admin_partnership_lead",
+      "language": "ru",
+      "audience_topics": [
+        "channel administrators",
+        "cross-promotion managers",
+        "thematic channel partnerships"
+      ],
+      "publicly_stated_permission": "Public listing describes announcements seeking Telegram channel admins, content posters and mutual-promotion managers for thematic channels.",
+      "observed_members": 738,
+      "observed_recent_growth": "+3 members",
+      "observed_messages_30d": 496,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partnership_lead_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Lead source for finding opt-in partner channels; not itself a verified free-placement inventory."
+    },
+    {
+      "id": "lab-promo",
+      "name": "Лаборатория продвижения",
+      "url": "https://t.me/lab_promo",
+      "kind": "channel_growth_partner_lead",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram growth",
+        "traffic acquisition",
+        "YouTube",
+        "social media marketing"
+      ],
+      "publicly_stated_permission": "Public listing describes an author blog about promotion and audience acquisition across Telegram, YouTube and social networks.",
+      "observed_members": 24738,
+      "observed_messages_30d": 15,
+      "observed_average_reach": 7777,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partnership_lead_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Strong topical fit as a potential cross-promo partner or source of additional methods. No free posting permission is established."
+    },
+    {
+      "id": "addinfo-telegram-guides",
+      "name": "1100 советов пользователю Telegram",
+      "url": "https://t.me/Addinfo",
+      "kind": "telegram_growth_partner_lead",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram tutorials",
+        "channel growth",
+        "channel management",
+        "bots"
+      ],
+      "publicly_stated_permission": "Public listing describes tutorials and cases about creating and running Telegram channels, groups and bots.",
+      "observed_members": 8204,
+      "observed_messages_30d": 10,
+      "observed_average_reach": 1279,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partnership_lead_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Relevant admin audience and possible opt-in collaboration; self-promotion permission is not confirmed."
+    },
+    {
+      "id": "idoras-admins",
+      "name": "Админские угодья",
+      "url": "https://t.me/idoras",
+      "kind": "channel_admin_partnership_lead",
+      "language": "ru",
+      "audience_topics": [
+        "Telegram channel admins",
+        "native ads",
+        "channel updates",
+        "advertising integrity"
+      ],
+      "publicly_stated_permission": "Public listing describes channel-administration tips, advertising updates and reviews of dishonest advertisers.",
+      "observed_members": 15436,
+      "observed_recent_growth": "+10 members",
+      "observed_messages_30d": 22,
+      "observed_average_reach": 1691,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partnership_lead_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Potential source for trusted admin partnerships; no evidence that unsolicited channel promo is allowed."
     }
   ],
   "directories": [
