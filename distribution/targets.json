@@ -1969,6 +1969,27 @@
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://t.me/joinchat/CRQLTaKkH3MxYmFl",
       "notes": "Small English-speaking group. Free promotion is advertised; current activity and bot-posting rules are not independently verified."
+    },
+    {
+      "id": "freeprtalk",
+      "name": "FREE PR - GROUP",
+      "url": "https://t.me/freeprtalk",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "free promotion",
+        "channels",
+        "groups",
+        "bots",
+        "projects"
+      ],
+      "publicly_stated_permission": "Public Telegram preview explicitly says free advertising for projects, bots, groups and channels; rules prohibit spam and flooding.",
+      "observed_members": 1749,
+      "observed_online": 23,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/freeprtalk",
+      "notes": "Useful general-purpose candidate. Follow the no-spam rule and verify whether scheduled/bot-authored promo is accepted."
     }
   ],
   "directories": [
