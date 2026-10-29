@@ -12,3 +12,4 @@ GROWTH_ADMIN_IDS = set()
 # Opt-in group promotion: one post per target per this many hours.
 # Each target group must have the bot added and an administrator must run /allowpromo.
 PROMOTION_INTERVAL_HOURS = 72
+PROMOTION_CHECK_INTERVAL_MINUTES = 5
