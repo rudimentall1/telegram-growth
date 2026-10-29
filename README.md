@@ -70,17 +70,17 @@ to publish there. Targets marked `discovered_not_joined`,
 `discovered_not_connected` or `discovered_rules_need_review` are research results,
 not live distribution. Paid options are excluded.
 
-The inventory currently contains 9 cross-promotion/view-exchange networks, 74
-community/group/channel targets and 10 free-directory targets (93 entries total).
+The inventory currently contains 17 networks/bots for cross-promotion or free promotion,
+94 community/group/channel targets and 12 free-directory candidates (123 entries total).
 It includes the user-supplied targets `@chatik_piarvz`, `@vzaimnaya7`,
 `@cryptoadminsVP`, `@Avto_Dubai_Arenda`, `@vzpodpiskachati`, `@vzpiarchatx`,
-`@vzchatpiar_vz`, `@chatd_piar` and `@piar_chatiku`, followed by additional public
-PR communities, referral-exchange groups, free automated cross-promotion platforms,
-view-exchange options and free catalogues. Their public evidence and individual
-permission status are recorded in the JSON registry. Many targets still require rule
-checks or may prohibit bots; no third-party posting is claimed to be active until
-access and an actual publication are verified. Only free listings and exchanges are
-tracked; paid directory upgrades are excluded.
+`@vzchatpiar_vz`, `@chatd_piar` and `@piar_chatiku`, plus public PR communities,
+referral-exchange groups, free automated cross-promotion services, free promoter bots,
+view-exchange options and directory submission candidates. Each record includes the
+available public evidence and setup status. Many targets require rule/eligibility checks
+or may prohibit bots; no third-party posting is claimed active until access and an
+actual publication are verified. Only free promotion routes are tracked; paid upgrades
+and paid placements are excluded.
 
 Priority networks include free cross-promotion on Onflow Ads, Adpact and Trigram.
 Public self-promotion candidates include `@ifreepr`, `@prchatik`, `@prbirza1`,
