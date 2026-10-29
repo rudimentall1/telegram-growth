@@ -67,13 +67,13 @@
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://docs.onflowads.com/cross-promo",
-      "notes": "Free plan advertises a limited monthly cross-promotion allowance. Requires the platform bot to be an admin of our own public channel and an account on the platform. Partner and post approvals are part of its workflow.",
+      "notes": "Free 1:1 swaps are automatically published by @OnflowAdsBot, checked during the agreed run, and removed at the end. Requires a free account and adding the bot as an administrator to our public channel. Paid extras are excluded.",
       "priority_tier": "A",
       "free_cash_route_confirmed": true,
       "recommendation": "first_wave",
       "reason": "Official documentation confirms free, automated post swaps and a free plan allowance; post publishing and removal are handled by the bot.",
       "required_one_time_setup": "Create platform account and add @OnflowAdsBot to @cryptoping_ru with only the post/delete rights required for cross-promotion.",
-      "verified_limits": "Official site states 5 new cross-promotions per month on Free."
+      "verified_limits": "Official guide says the Free plan allows 5 new cross-promotions per month; joining swaps started by others remains free."
     },
     {
       "id": "adpact-cross-promotion",
@@ -188,11 +188,11 @@
       "kind": "free_opt_in_cross_promotion",
       "money_required": false,
       "automated_publishing": true,
-      "how_it_works": "Bot and MiniApp provide scheduled multi-channel keypads, topic-based partner discovery and reciprocal post swaps. Bot checks that agreed posts remain live.",
+      "how_it_works": "Bot/MiniApp supports automatically scheduled multi-channel keypads and reciprocal post swaps. The bot publishes posts, checks results and tracks subscriber changes.",
       "own_channel_authorization_required": true,
       "setup_status": "discovered_not_connected",
       "evidence_url": "https://telegrad.link/en",
-      "notes": "Free to start. One-time setup requires adding @telegradlinkbot as a channel/group admin with posting rights and registering the channel. Check free-plan limits and channel eligibility before assuming repeated reach.",
+      "notes": "Free start and basic plan confirmed by official site. One-time setup requires adding @telegradlinkbot as a channel/group admin with posting rights and registering @cryptoping_ru. Free-plan limits and whether keypads have extra restrictions need checking in the live app.",
       "priority_tier": "A",
       "free_cash_route_confirmed": true,
       "recommendation": "first_wave",
@@ -384,6 +384,24 @@
       "free_cash_route_confirmed": true,
       "recommendation": "group_only",
       "notes": "Free 1:1 exchange with reciprocal partner groups is described; a paid non-reciprocal option is excluded. This grows groups rather than broadcast-channel subscribers directly. Use only if the project's linked discussion group is intended to grow, and verify the actual bot before granting admin rights."
+    },
+    {
+      "id": "onflow-subscriber-exchange",
+      "name": "Onflow Ads Subscriber Exchange",
+      "url": "https://onflowads.com/telegram/subscriber-exchange",
+      "kind": "free_automated_reciprocal_ad_exchange",
+      "money_required": false,
+      "automated_publishing": true,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://docs.onflowads.com/subscriber-exchange",
+      "priority_tier": "A",
+      "free_cash_route_confirmed": true,
+      "recommendation": "first_wave_after_brand_filter_setup",
+      "reason": "The official guide confirms an automatic reciprocal ad exchange: once our channel hosts other members' ads, our own ad can run across theirs. No money moves between channels; the platform posts and removes ads automatically.",
+      "required_one_time_setup": "Create a free account, connect @cryptoping_ru and select allowed categories/content before starting. Ads require a publishing bot in our channel.",
+      "verified_limits": "Free route is confirmed, but free-plan placement and hosting quotas vary by plan. The system is host-first; it is not fully free of ongoing inventory obligations.",
+      "notes": "This is more passive than one-to-one post swapping, but it introduces third-party ads into @cryptoping_ru. Start only with strict allow/deny filters and review of the ad categories; do not allow unrelated scams, adult material, fake engagement or irrelevant financial claims."
     }
   ],
   "communities": [
