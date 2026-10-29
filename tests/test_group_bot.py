@@ -150,6 +150,29 @@ class GrowthLinkCommandTests(unittest.IsolatedAsyncioTestCase):
         )
 
 
+    async def test_successful_growth_link_includes_ready_campaign_copy(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=AsyncMock()),
+            effective_user=SimpleNamespace(id=456),
+        )
+        invite = SimpleNamespace(invite_link="https://t.me/+campaignA")
+        context = SimpleNamespace(
+            args=["campaign_a"],
+            bot=SimpleNamespace(create_chat_invite_link=AsyncMock(return_value=invite)),
+        )
+        with (
+            patch.object(group_bot, "_growth_admin", new=AsyncMock(return_value=True)),
+            patch.object(group_bot.growth_db, "save_link") as save_link,
+        ):
+            await group_bot.growth_link(update, context)
+
+        save_link.assert_called_once_with("https://t.me/+campaignA", "campaign_a", 456)
+        response = update.effective_message.reply_text.await_args.args[0]
+        self.assertIn("Отслеживаемая ссылка: https://t.me/+campaignA", response)
+        self.assertIn("Готовый текст для размещения", response)
+        self.assertIn("Подписаться: https://t.me/+campaignA", response)
+
+
 class ChannelMembershipHandlerTests(unittest.IsolatedAsyncioTestCase):
     async def test_join_event_is_recorded_with_invite_link(self):
         member = SimpleNamespace(id=789, is_bot=False)
