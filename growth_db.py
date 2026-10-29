@@ -188,3 +188,68 @@ def active_count():
         return db.execute(
             "SELECT COUNT(*) FROM growth_members WHERE is_member=1"
         ).fetchone()[0]
+
+def source_report(days=None):
+    """Return event totals and currently active known members per source.
+
+    If days is provided, joins/leaves are limited to that event window while the
+    active count reflects current database state. Active counts are not a complete
+    Telegram channel member count; they only cover members observed by this bot.
+    """
+    if days is not None:
+        try:
+            days = int(days)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("days must be an integer between 1 and 3650") from exc
+        if not 1 <= days <= 3650:
+            raise ValueError("days must be an integer between 1 and 3650")
+
+    with connect() as db:
+        if days is None:
+            event_rows = db.execute("""
+                SELECT source,
+                       SUM(CASE WHEN event_type='join' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN event_type='leave' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN event_type='join' THEN 1 ELSE -1 END)
+                FROM growth_events
+                GROUP BY source
+            """).fetchall()
+        else:
+            event_rows = db.execute("""
+                SELECT source,
+                       SUM(CASE WHEN event_type='join' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN event_type='leave' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN event_type='join' THEN 1 ELSE -1 END)
+                FROM growth_events
+                WHERE event_at >= datetime('now', ?)
+                GROUP BY source
+            """, (f"-{days} days",)).fetchall()
+
+        active_rows = db.execute("""
+            SELECT COALESCE(l.source, 'unattributed') AS source, COUNT(*) AS active
+            FROM growth_members AS m
+            LEFT JOIN growth_links AS l ON l.invite_link = m.invite_link
+            WHERE m.is_member = 1
+            GROUP BY COALESCE(l.source, 'unattributed')
+        """).fetchall()
+
+    totals = {}
+    for source, joins, leaves, net in event_rows:
+        totals[source] = {
+            "joins": int(joins or 0),
+            "leaves": int(leaves or 0),
+            "net": int(net or 0),
+            "active": 0,
+        }
+
+    for source, active in active_rows:
+        totals.setdefault(source, {"joins": 0, "leaves": 0, "net": 0, "active": 0})
+        totals[source]["active"] = int(active or 0)
+
+    return [
+        (source, item["joins"], item["leaves"], item["net"], item["active"])
+        for source, item in sorted(
+            totals.items(),
+            key=lambda row: (-row[1]["net"], -row[1]["active"], row[0]),
+        )
+    ]
