@@ -354,6 +354,36 @@
       "recommendation": "workflow_check",
       "reason": "It links to cross-promotion channels, but the cost model and publication rights are not verified.",
       "required_one_time_setup": "Verify terms before use."
+    },
+    {
+      "id": "linkmychannel-free-swap",
+      "name": "LinkMyChannel",
+      "url": "https://linkmy.channel/",
+      "kind": "free_opt_in_cross_promotion_marketplace",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://linkmy.channel/",
+      "priority_tier": "B",
+      "free_cash_route_confirmed": true,
+      "recommendation": "limited_free_exchange",
+      "notes": "Free tier supports up to 2 channels, unlimited incoming offers and 15 outgoing offers total, including mutual exchanges. Free tier and mutual swaps are confirmed; this is not fully passive because partner proposals need to be sent/accepted and the lifetime outbound-offer allowance is limited. Paid plans are excluded."
+    },
+    {
+      "id": "memberswapbot-group-exchange",
+      "name": "Member Swap Bot",
+      "url": "https://t.me/MemberSwapBot",
+      "kind": "free_automated_group_cross_promotion",
+      "money_required": false,
+      "automated_publishing": true,
+      "own_channel_authorization_required": true,
+      "setup_status": "discovered_not_connected",
+      "evidence_url": "https://telegramdir.com/bot/MemberSwapBot",
+      "priority_tier": "C",
+      "free_cash_route_confirmed": true,
+      "recommendation": "group_only",
+      "notes": "Free 1:1 exchange with reciprocal partner groups is described; a paid non-reciprocal option is excluded. This grows groups rather than broadcast-channel subscribers directly. Use only if the project's linked discussion group is intended to grow, and verify the actual bot before granting admin rights."
     }
   ],
   "communities": [
@@ -2487,6 +2517,26 @@
       "automation_status": "discovered_not_joined",
       "evidence_url": "https://t.me/+Na4ok6eWS4g1Njll",
       "notes": "Different invite link and listed member count from the similarly named Free Promotion club. Possibly related/duplicated network; verify group identity on joining."
+    },
+    {
+      "id": "pr-chat-engovatova",
+      "name": "Взаимный пиар и нетворкинг чат",
+      "url": "https://t.me/PR_chat_by_engovatova",
+      "kind": "scheduled_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "networking",
+        "self-promotion",
+        "professional services",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "Public group description says self-promotion, services and links are allowed on Monday, Wednesday and Friday; admin contact is listed separately.",
+      "observed_members": 515,
+      "observed_online": 23,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_schedule_rules_need_review",
+      "evidence_url": "https://t.me/PR_chat_by_engovatova",
+      "notes": "Could be scheduled by an authorized publisher for permitted days, but current rule and bot-authored messages must be checked before use."
     }
   ],
   "directories": [
@@ -2636,6 +2686,56 @@
       "submission_status": "free Telegram-bot submission flow; submission not performed",
       "evidence_url": "https://tgindexer.com/add/",
       "notes": "Free submission via the directory's bot and manual moderation. It categorizes Telegram channels/groups/bots by city; there is no guarantee that @cryptoping_ru fits a currently open city."
+    },
+    {
+      "id": "telegramgroups-co",
+      "name": "TelegramGroups.co",
+      "url": "https://telegramgroups.co/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "open free submission route found; not submitted",
+      "evidence_url": "https://telegramgroups.co/",
+      "notes": "Site states free public channel/group listing and automated review. Paid boosted placements exist but are excluded."
+    },
+    {
+      "id": "tgcamp",
+      "name": "TGCamp",
+      "url": "https://tgcamp.com/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "free submission route found; not submitted",
+      "evidence_url": "https://tgcamp.com/",
+      "notes": "Free to browse and list, with daily public-statistics updates. Eligibility and whether the channel has already been listed still need checking."
+    },
+    {
+      "id": "tgmania",
+      "name": "TGMania",
+      "url": "https://tgmania.com/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "free submission route found; not submitted",
+      "evidence_url": "https://tgmania.com/",
+      "notes": "Site states the catalogue is free and submissions are reviewed in 24-48 hours. Any paid enhancement is excluded."
+    },
+    {
+      "id": "tgstatvip",
+      "name": "Tgstatvip",
+      "url": "https://tgstatvip.com/",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "free listing route found; not submitted",
+      "evidence_url": "https://tgstatvip.com/",
+      "notes": "Site claims free public stats/listing and a no-login add-channel flow. Verify domain legitimacy and avoid any paid promotion features."
+    },
+    {
+      "id": "televerse",
+      "name": "TeleVerse",
+      "url": "https://televerse.click/",
+      "kind": "free_moderated_directory_submission",
+      "money_required": false,
+      "submission_status": "free submission route found; not submitted",
+      "evidence_url": "https://televerse.click/",
+      "notes": "Site advertises free submission with review. Paid premium badges/analytics are excluded."
     }
   ],
   "execution_notes": {
