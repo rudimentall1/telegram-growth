@@ -138,5 +138,31 @@ class GrowthDbTests(unittest.TestCase):
         self.assertEqual(growth_db.active_count(), 0)
 
 
+    def test_source_report_includes_active_members_by_source(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        growth_db.record_member(2, 202, "https://t.me/+campaignB", True)
+        growth_db.record_member(3, 202, None, False)
+
+        report = {row[0]: row[1:] for row in growth_db.source_report()}
+        self.assertEqual(report["campaign_a"], (1, 0, 1, 1))
+        self.assertEqual(report["campaign_b"], (1, 1, 0, 0))
+
+    def test_source_report_period_filters_events_but_keeps_current_active_count(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        with growth_db.connect() as db:
+            db.execute(
+                "UPDATE growth_events SET event_at='2020-01-01 00:00:00' WHERE update_id=1"
+            )
+
+        report = {row[0]: row[1:] for row in growth_db.source_report(days=7)}
+        self.assertEqual(report["campaign_a"], (0, 0, 0, 1))
+
+    def test_source_report_rejects_invalid_period(self):
+        for value in (0, -1, 3651, "last week"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    growth_db.source_report(value)
+
+
 if __name__ == "__main__":
     unittest.main()
