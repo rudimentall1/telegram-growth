@@ -50,6 +50,23 @@ class GrowthAdminTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(allowed)
         context.bot.get_chat_member.assert_not_awaited()
 
+
+    async def test_anonymous_group_identity_is_denied_outside_target_group(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(
+                sender_chat=SimpleNamespace(id=group_bot.GROUP_CHAT_ID),
+                from_user=None,
+            ),
+            effective_chat=SimpleNamespace(id=123),
+            effective_user=None,
+            update_id=7,
+        )
+        context = SimpleNamespace(bot=SimpleNamespace(get_chat_member=AsyncMock()))
+        with patch.object(config, "GROWTH_ADMIN_IDS", set()):
+            allowed = await group_bot._growth_admin(update, context)
+        self.assertFalse(allowed)
+        context.bot.get_chat_member.assert_not_awaited()
+
     async def test_regular_member_is_denied(self):
         update = SimpleNamespace(
             effective_message=SimpleNamespace(sender_chat=None, from_user=None),
@@ -166,6 +183,42 @@ class ChannelMembershipHandlerTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(group_bot.growth_db, "record_member") as record:
             await group_bot.track_channel_member(update, context)
         record.assert_not_called()
+
+
+class GrowthReportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_report_accepts_period_and_shows_source_active_counts(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=AsyncMock()),
+            effective_user=SimpleNamespace(id=456),
+        )
+        context = SimpleNamespace(args=["7d"])
+        rows = [("campaign_a", 2, 1, 1, 3), ("unattributed", 1, 1, 0, 1)]
+
+        with (
+            patch.object(group_bot, "_growth_admin", new=AsyncMock(return_value=True)),
+            patch.object(group_bot.growth_db, "source_report", return_value=rows) as report,
+        ):
+            await group_bot.growth_report(update, context)
+
+        report.assert_called_once_with(7)
+        text = update.effective_message.reply_text.await_args.args[0]
+        self.assertIn("Период: последние 7 дн.", text)
+        self.assertIn("Активны сейчас в базе: 4", text)
+        self.assertIn("campaign_a: +2 вступл., −1 отписок, баланс 1, активны сейчас 3", text)
+        self.assertIn("не полное число подписчиков канала", text)
+
+    async def test_report_rejects_unsupported_period(self):
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=AsyncMock()),
+            effective_user=SimpleNamespace(id=456),
+        )
+        context = SimpleNamespace(args=["0d"])
+        with patch.object(group_bot, "_growth_admin", new=AsyncMock(return_value=True)):
+            await group_bot.growth_report(update, context)
+        self.assertIn(
+            "Укажи период",
+            update.effective_message.reply_text.await_args.args[0],
+        )
 
 
 if __name__ == "__main__":
