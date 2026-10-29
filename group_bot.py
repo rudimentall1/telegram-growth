@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import re
 
 from telegram import Update
+from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import (
     ApplicationBuilder,
     ChatMemberHandler,
@@ -281,14 +283,190 @@ async def track_channel_member(update: Update, context: ContextTypes.DEFAULT_TYP
         logging.exception("Failed to record channel membership event update_id=%s", update.update_id)
 
 
+
+async def _current_chat_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Only the current group owner/admin can opt that group into scheduled promo."""
+    chat = update.effective_chat
+    message = update.effective_message
+    if chat is None or chat.type not in ("group", "supergroup"):
+        return False
+
+    sender_chat = getattr(message, "sender_chat", None) if message else None
+    if sender_chat is not None and getattr(sender_chat, "id", None) == chat.id:
+        # Telegram represents an anonymous group admin as the group itself.
+        return True
+
+    user = update.effective_user
+    if user is None:
+        return False
+    try:
+        member = await context.bot.get_chat_member(chat.id, user.id)
+        return member.status in ("administrator", "creator")
+    except Exception:
+        logging.exception(
+            "Unable to verify current-chat administrator user_id=%s chat_id=%s",
+            user.id, chat.id,
+        )
+        return False
+
+
+async def allow_promotion(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    message = update.effective_message
+    if chat is None or message is None or chat.type not in ("group", "supergroup"):
+        if message:
+            await message.reply_text("Команду /allowpromo можно включить только внутри группы.")
+        return
+    if not await _current_chat_admin(update, context):
+        await message.reply_text("Включить автопубликации может только администратор этой группы.")
+        return
+
+    source = f"promo_{abs(chat.id)}"
+    authorized_by = getattr(update.effective_user, "id", None)
+    try:
+        invite = await context.bot.create_chat_invite_link(
+            chat_id=CHAT_ID, name=source, creates_join_request=False
+        )
+        growth_db.save_link(invite.invite_link, source, authorized_by)
+        growth_db.enable_promotion_target(
+            chat_id=chat.id,
+            title=chat.title or chat.username or str(chat.id),
+            username=chat.username,
+            invite_link=invite.invite_link,
+            authorized_by=authorized_by,
+        )
+        interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
+        await message.reply_text(
+            "Автопромо включено по запросу администратора этой группы.\n"
+            f"@cryptoping_ru будет публиковаться не чаще одного раза в {interval_hours} ч.\n"
+            "Ссылка для этой группы отслеживается отдельно.\n"
+            "Отключить: /disablepromo"
+        )
+        logging.info(
+            "promotion target enabled chat_id=%s title=%s authorized_by=%s",
+            chat.id, chat.title, authorized_by,
+        )
+    except Exception:
+        logging.exception("Failed to enable promotion target chat_id=%s", chat.id)
+        await message.reply_text(
+            "Не удалось включить автопромо. Проверь, что бот — администратор "
+            "канала @cryptoping_ru и может создавать invite-ссылки."
+        )
+
+
+async def disable_promotion(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    message = update.effective_message
+    if chat is None or message is None or chat.type not in ("group", "supergroup"):
+        if message:
+            await message.reply_text("Команду /disablepromo нужно вызвать внутри группы.")
+        return
+    if not await _current_chat_admin(update, context):
+        await message.reply_text("Отключить автопубликации может только администратор этой группы.")
+        return
+
+    disabled = growth_db.disable_promotion_target(chat.id)
+    if disabled:
+        await message.reply_text("Автопромо отключено. Новые публикации в эту группу отправляться не будут.")
+    else:
+        await message.reply_text("Для этой группы автопромо уже отключено или не было включено.")
+
+
+async def promotion_targets_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await _growth_admin(update, context):
+        await update.effective_message.reply_text("Команда доступна только администраторам группы.")
+        return
+    targets = growth_db.list_promotion_targets(enabled_only=True)
+    if not targets:
+        await update.effective_message.reply_text(
+            "Нет групп, включивших автопромо. Администратор целевой группы должен вызвать /allowpromo."
+        )
+        return
+
+    lines = ["Группы с включённым автопромо:", ""]
+    for chat_id, title, username, last_post_at, last_error in targets[:40]:
+        label = f"@{username}" if username else title
+        status = f"последняя публикация: {last_post_at}" if last_post_at else "ожидает первой публикации"
+        if last_error:
+            status += f"; ошибка: {last_error[:120]}"
+        lines.append(f"• {label} ({chat_id}) — {status}")
+    if len(targets) > 40:
+        lines.append(f"...и ещё {len(targets) - 40} групп.")
+    await update.effective_message.reply_text("\n".join(lines))
+
+
+def _promotion_text(invite_link):
+    return (
+        "🛰 CryptoPing RU — новости и возможности Web3.\n"
+        "Airdrop, тестнеты, ноды и NFT. Условия и риски проверяйте по официальным источникам.\n"
+        f"Подписаться: {invite_link}"
+    )
+
+
+async def publish_due_promotions(context: ContextTypes.DEFAULT_TYPE):
+    """Publish only to groups whose own administrators explicitly opted in."""
+    interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
+    try:
+        targets = growth_db.due_promotion_targets(interval_hours)
+    except Exception:
+        logging.exception("Unable to load scheduled promotion targets")
+        return
+
+    for chat_id, title, username, invite_link in targets:
+        try:
+            sent = await context.bot.send_message(
+                chat_id=chat_id,
+                text=_promotion_text(invite_link),
+                disable_web_page_preview=True,
+            )
+            growth_db.mark_promotion_sent(chat_id, sent.message_id)
+            logging.info(
+                "promotion sent chat_id=%s title=%s message_id=%s",
+                chat_id, title, sent.message_id,
+            )
+        except (Forbidden, BadRequest) as exc:
+            growth_db.mark_promotion_failed(chat_id, exc, disable=True)
+            logging.warning(
+                "promotion target disabled after Telegram rejected post chat_id=%s error=%s",
+                chat_id, exc,
+            )
+        except TelegramError as exc:
+            growth_db.mark_promotion_failed(chat_id, exc, disable=False)
+            logging.warning("temporary promotion send failure chat_id=%s error=%s", chat_id, exc)
+        except Exception as exc:
+            growth_db.mark_promotion_failed(chat_id, exc, disable=False)
+            logging.exception("Unexpected promotion send failure chat_id=%s", chat_id)
+        await asyncio.sleep(1.2)
+
+
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, on_new_member))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("growthlink", growth_link))
     app.add_handler(CommandHandler("growthreport", growth_report))
+    app.add_handler(CommandHandler("allowpromo", allow_promotion))
+    app.add_handler(CommandHandler("disablepromo", disable_promotion))
+    app.add_handler(CommandHandler("promotetargets", promotion_targets_report))
     app.add_handler(ChatMemberHandler(track_channel_member, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
+
+    interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
+    if not 1 <= interval_hours <= 720:
+        raise ValueError("PROMOTION_INTERVAL_HOURS must be between 1 and 720 hours")
+    if app.job_queue is None:
+        raise RuntimeError(
+            "JobQueue is unavailable. Install dependencies from requirements.txt "
+            "including the job-queue extra."
+        )
+    app.job_queue.run_repeating(
+        publish_due_promotions,
+        interval=3600,
+        first=30,
+        name="opt-in-promotion-scheduler",
+        job_kwargs={"max_instances": 1, "coalesce": True},
+    )
+    logging.info("Opt-in promotion scheduler enabled interval_hours=%s", interval_hours)
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
