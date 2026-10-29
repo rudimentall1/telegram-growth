@@ -2120,6 +2120,175 @@
       "automation_status": "discovered_rules_need_review",
       "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/pr_branding/groups?lang=ru",
       "notes": "Mutual promotion is a fit, but free terms and automated posting rules must be confirmed."
+    },
+    {
+      "id": "chat-piarj",
+      "name": "пиар чат / взаимно",
+      "url": "https://t.me/chat_piarj",
+      "kind": "public_self_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual PR",
+        "Telegram channel advertising",
+        "bots",
+        "promotion services"
+      ],
+      "publicly_stated_permission": "ChatCrawler's public category describes it as a group for mutual PR and advertising channels, bots and promotion services.",
+      "observed_members": 8128,
+      "observed_recent_growth": "+38 members",
+      "observed_messages_30d": 68010,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Good topic fit and explicit promotional purpose; check group rules and whether bot-authored scheduled messages are permitted."
+    },
+    {
+      "id": "instagram-bloggers-crosspromo",
+      "name": "реклама у блогеров",
+      "url": "https://t.me/instagram_bloggers",
+      "kind": "social_media_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "bloggers",
+        "mutual PR",
+        "social media promotion",
+        "collaboration"
+      ],
+      "publicly_stated_permission": "Public directory describes it as a group for blogger advertising, mutual PR and social-media promotion.",
+      "observed_members": 21151,
+      "observed_recent_growth": "+136 members",
+      "observed_messages_30d": 26746,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Adjacent audience; public listing includes advertising/collaboration but doesn't prove free placements. Use only if its own rules permit organic channel recommendations."
+    },
+    {
+      "id": "freelead-business",
+      "name": "ББИЗНЕС ЧАТ | ПРЕДПРИНИМАТЕЛИ",
+      "url": "https://t.me/freelead",
+      "kind": "business_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "business",
+        "startups",
+        "marketing",
+        "entrepreneurship"
+      ],
+      "publicly_stated_permission": "Public directory describes discussion of business, startups, marketing and exchanging experience; it does not explicitly confirm free self-promotion.",
+      "observed_members": 90288,
+      "observed_messages_30d": 2000,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Large adjacent audience, but not yet a confirmed ad target. Only use in designated promo threads if current rules allow it."
+    },
+    {
+      "id": "chat-kovalev",
+      "name": "Бизнес-чат Ковалев",
+      "url": "https://t.me/chat_kovalev",
+      "kind": "business_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "entrepreneurship",
+        "startups",
+        "partnerships",
+        "promotion of services"
+      ],
+      "publicly_stated_permission": "Public directory says the group covers entrepreneurship and startups, partner search, promoting services and exchanging experience.",
+      "observed_members": 11206,
+      "observed_recent_growth": "+82 members",
+      "observed_messages_30d": 848,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Potential audience for finance and business-related channel posts; promotion must be limited to permitted threads and frequency."
+    },
+    {
+      "id": "chatpetra-sineguba",
+      "name": "Бизнес-чат Украина",
+      "url": "https://t.me/chatpetra_sineguba",
+      "kind": "business_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "entrepreneurship",
+        "business",
+        "partner search",
+        "advertising",
+        "jobs"
+      ],
+      "publicly_stated_permission": "Public directory lists partner search, service advertising, job posts and business discussion.",
+      "observed_members": 7692,
+      "observed_recent_growth": "+110 members",
+      "observed_messages_30d": 70620,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "High activity; an ad may be buried quickly. Validate rules and Ukraine-language/context fit before any post."
+    },
+    {
+      "id": "freelancechat2",
+      "name": "Digital | ФРИЛАНС ЧАТ",
+      "url": "https://t.me/Freelancechat2",
+      "kind": "freelance_business_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "freelancing",
+        "remote work",
+        "promotion services",
+        "advertising",
+        "clients"
+      ],
+      "publicly_stated_permission": "Public directory describes vacancies, freelance services, promotion and advertising, and finding specialists.",
+      "observed_members": 8185,
+      "observed_recent_growth": "+128 members",
+      "observed_messages_30d": 73478,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/marketing/smm/groups?lang=ru",
+      "notes": "Potential for business/finance content distribution only where self-promotion is permitted; high message volume requires strict rate limits."
+    },
+    {
+      "id": "bisrocket",
+      "name": "Ракета Инфобизнеса | Вакансии | Фриланс | Работа",
+      "url": "https://t.me/bisrocket",
+      "kind": "online_business_audience_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "online business",
+        "advertising",
+        "freelance",
+        "remote work",
+        "jobs"
+      ],
+      "publicly_stated_permission": "Public directory describes job listings and resumes in online business, advertising and remote work.",
+      "observed_members": 9629,
+      "observed_recent_growth": "+102 members",
+      "observed_messages_30d": 9991,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Audience-adjacent, but free channel promos not established. Do not post unless the rules specify a promotion section."
+    },
+    {
+      "id": "smmspecialisty",
+      "name": "ТУСА СММщиков",
+      "url": "https://t.me/smmspecialisty",
+      "kind": "marketing_community_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "SMM",
+        "targeted advertising",
+        "design",
+        "marketing"
+      ],
+      "publicly_stated_permission": "Public directory identifies it as a group for SMM specialists, targeted advertising, design, vacancies and professional exchange.",
+      "observed_members": 12697,
+      "observed_messages_30d": 2980,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/smm/groups?lang=ru",
+      "notes": "Networking/partnership prospect only unless posting rules permit channel promotion."
     }
   ],
   "directories": [
