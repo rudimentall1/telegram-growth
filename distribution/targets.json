@@ -1951,6 +1951,24 @@
       "automation_status": "needs_verification",
       "evidence_url": "https://t.me/Cross_PromoterBot",
       "notes": "Candidate discovery channel only; do not assume posts are accepted without confirmation."
+    },
+    {
+      "id": "channel-sales-cross-promo",
+      "name": "Channel Sales And Cross Promotion",
+      "url": "https://t.me/joinchat/CRQLTaKkH3MxYmFl",
+      "kind": "public_cross_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "channel promotion",
+        "cross-promotion",
+        "free channel promotion"
+      ],
+      "publicly_stated_permission": "Public Telegram preview identifies the group as channel sales and cross-promotion and explicitly says free channel promotion.",
+      "observed_members": 178,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/joinchat/CRQLTaKkH3MxYmFl",
+      "notes": "Small English-speaking group. Free promotion is advertised; current activity and bot-posting rules are not independently verified."
     }
   ],
   "directories": [
