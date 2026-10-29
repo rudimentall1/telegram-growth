@@ -123,7 +123,7 @@ async def _growth_admin(update, context):
         logging.info("growth auth allowed: group identity user_id=777000 chat_id=%s", chat_id)
         return True
 
-    if sender_chat_id == GROUP_CHAT_ID:
+    if chat_id == GROUP_CHAT_ID and sender_chat_id == GROUP_CHAT_ID:
         logging.info("growth auth allowed: anonymous group admin chat_id=%s", chat_id)
         return True
 
@@ -165,7 +165,14 @@ async def growth_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=CHAT_ID, name=source, creates_join_request=False
         )
         growth_db.save_link(invite.invite_link, source, update.effective_user.id)
-        await update.effective_message.reply_text(f"Источник: {source}\nСсылка: {invite.invite_link}")
+        await update.effective_message.reply_text(
+            f"Источник: {source}\n"
+            f"Отслеживаемая ссылка: {invite.invite_link}\n\n"
+            "Готовый текст для размещения:\n"
+            "🛰 CryptoPing RU — крипто-активности и новости Web3.\n"
+            "Airdrop, тестнеты, ноды и NFT в одном канале.\n"
+            f"Подписаться: {invite.invite_link}"
+        )
     except Exception:
         logging.exception("Failed to create growth invite link")
         await update.effective_message.reply_text(
@@ -177,18 +184,54 @@ async def growth_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await _growth_admin(update, context):
         await update.effective_message.reply_text("Команда доступна только администраторам группы.")
         return
-    rows = growth_db.report()
-    lines = ["Отчёт CryptoPing RU", ""]
+    days = None
+    if context.args:
+        if len(context.args) != 1:
+            await update.effective_message.reply_text(
+                "Использование: /growthreport [7d|30d|all]"
+            )
+            return
+        period = context.args[0].strip().lower()
+        if period in {"all", "все", "всё"}:
+            days = None
+        else:
+            match = re.fullmatch(r"(\d{1,4})(?:d|д)?", period)
+            if not match or not 1 <= int(match.group(1)) <= 3650:
+                await update.effective_message.reply_text(
+                    "Укажи период: /growthreport 7d, /growthreport 30d или /growthreport all."
+                )
+                return
+            days = int(match.group(1))
+
+    rows = growth_db.source_report(days)
+    total_joins = sum(row[1] for row in rows)
+    total_leaves = sum(row[2] for row in rows)
+    total_net = sum(row[3] for row in rows)
+    total_active = sum(row[4] for row in rows)
+    period_label = f"последние {days} дн." if days is not None else "вся история"
+    lines = [
+        "Отчёт CryptoPing RU",
+        f"Период: {period_label}",
+        f"Вступления: {total_joins}",
+        f"Отписки: {total_leaves}",
+        f"Баланс событий: {total_net}",
+        f"Активны сейчас в базе: {total_active}",
+        "",
+    ]
     if rows:
-        for source, joins, leaves, net in rows:
-            lines.append(f"{source}: вступления {joins}, отписки {leaves}, баланс событий {net}")
+        for source, joins, leaves, net, active in rows:
+            lines.append(
+                f"{source}: +{joins} вступл., −{leaves} отписок, "
+                f"баланс {net}, активны сейчас {active}"
+            )
     else:
-        lines.append("Событий пока нет.")
-    lines.extend(["", f"Сейчас числятся участниками: {growth_db.active_count()}"])
-    lines.append(
-        "Примечание: Telegram не предоставляет число кликов по invite-ссылкам. "
-        "Баланс событий — не доказательство удержания конкретной кампании."
-    )
+        lines.append("За выбранный период событий и известных активных участников нет.")
+    lines.extend([
+        "",
+        "Активные — только участники, чьи изменения членства видел бот; это не полное "
+        "число подписчиков канала. Вступления без известной invite-ссылки идут в "
+        "источник unattributed. Telegram Bot API не показывает число кликов по ссылкам.",
+    ])
     await update.effective_message.reply_text("\n".join(lines))
 
 
