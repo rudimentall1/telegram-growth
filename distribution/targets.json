@@ -1479,6 +1479,275 @@
       "automation_status": "discovered_partner_contact_not_connected",
       "evidence_url": "https://t.me/CryptoPartyCrew",
       "notes": "Relevant crypto audience. Treat as a partnership lead, not a free or authorized placement; terms would need to be clarified before any post."
+    },
+    {
+      "id": "infoconfession1",
+      "name": "INFO CONFESSION",
+      "url": "https://t.me/INFOCONFESSION1",
+      "kind": "mutual_promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "reposts",
+        "reactions",
+        "channel discovery"
+      ],
+      "publicly_stated_permission": "A public channel catalogue describes it as a confession channel for mutual promotion, reaction exchanges, reposts and channel promotion.",
+      "observed_members": 14554,
+      "observed_recent_growth": "+17 subscribers (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
+      "notes": "Likely adjacent/general audience rather than finance-specific. Need verify how guest placements are submitted and whether a crypto news channel is accepted."
+    },
+    {
+      "id": "info-cfff",
+      "name": "info .♡ confession",
+      "url": "https://t.me/info_cfff",
+      "kind": "mutual_promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "reactions",
+        "subscriptions",
+        "info channels"
+      ],
+      "publicly_stated_permission": "Public directory description says it supports mutual PR, reactions, subscriptions and exchange of opinions for information-themed channels.",
+      "observed_members": 6441,
+      "observed_recent_growth": "+24 subscribers (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
+      "notes": "Need check content fit and submission rules; do not assume unrestricted automated publishing."
+    },
+    {
+      "id": "interactcf",
+      "name": "INTERACT CF",
+      "url": "https://t.me/interactcf",
+      "kind": "mutual_promotion_channel_candidate",
+      "language": "ru",
+      "audience_topics": [
+        "mutual promotion",
+        "mutual subscriptions",
+        "reactions"
+      ],
+      "publicly_stated_permission": "Public catalogue describes it as a channel for mutual PR, mutual subscriptions, reactions and cross-promotion.",
+      "observed_members": 2235,
+      "observed_recent_growth": "+8 subscribers (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Check post submission and content eligibility."
+    },
+    {
+      "id": "vp-hub-news",
+      "name": "ВП Хаб",
+      "url": "https://t.me/vp_hub_news",
+      "kind": "cross_promotion_tools_channel",
+      "language": "ru",
+      "audience_topics": [
+        "cross-promotion tools",
+        "mutual promotion bots",
+        "channel giveaways"
+      ],
+      "publicly_stated_permission": "Public catalogue description says it shares tools and bots for channel cross-promotion, subscription exchanges and interactive events.",
+      "observed_members": 662,
+      "observed_recent_growth": "+11 subscribers (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partner_tool_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Potential source of additional bots/network integrations; listing is not itself permission to publish an ad."
+    },
+    {
+      "id": "ratemyinfo",
+      "name": "ЗАЦЕНИ!",
+      "url": "https://t.me/ratemyinfo",
+      "kind": "mutual_subscription_promotion_channel",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "reviews"
+      ],
+      "publicly_stated_permission": "Public directory describes it as an exchange of mutual subscriptions, reactions and reviews for Telegram channels.",
+      "observed_members": 1409,
+      "observed_recent_growth": "-2 subscribers (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "Treat as organic cross-promotion discovery, not purchased or fake engagement; inspect the actual mechanics before using."
+    },
+    {
+      "id": "piarix-chat",
+      "name": "Взаимные подписки | взаимная PR",
+      "url": "https://t.me/piarix_chat",
+      "kind": "mutual_subscription_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "mutual subscriptions",
+        "reactions",
+        "channel promotion"
+      ],
+      "publicly_stated_permission": "Public directory describes it as a group for mutual subscriptions, reactions and Telegram channel promotion.",
+      "observed_members": 163000,
+      "observed_messages_30d": 233000,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/telegram/growth?lang=ru",
+      "notes": "Large group by public catalogue metrics. High message volume may mean promotional posts are quickly buried; check bot posting rules and expected mutual action."
+    },
+    {
+      "id": "advertising-piar",
+      "name": "Деньги в интернете. Chat",
+      "url": "https://t.me/advertising_piar",
+      "kind": "online_income_and_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "online income",
+        "finance",
+        "channel promotion",
+        "internet business"
+      ],
+      "publicly_stated_permission": "Public directory classifies the group under online-income schemes and describes it as a money/internet chat. The listing alone does not prove free self-promotion is allowed.",
+      "observed_members": 17412,
+      "observed_recent_growth": "+62 members (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Potential adjacent audience; inspect pinned rules for free channel mentions and avoid dubious earning schemes."
+    },
+    {
+      "id": "free-market-ru",
+      "name": "СВОБОДНЫЙ МАРКЕТИНГ",
+      "url": "https://t.me/FreeMarketRU",
+      "kind": "business_and_promotion_group",
+      "language": "ru",
+      "audience_topics": [
+        "business",
+        "remote work",
+        "channel promotion",
+        "online income"
+      ],
+      "publicly_stated_permission": "Public directory describes the group as a chat for remote work, promotional services for channels and online-income ideas.",
+      "observed_members": 15072,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Business-adjacent lead; free posting and bot permissions must be verified. Do not use if its policies allow only paid service offers."
+    },
+    {
+      "id": "infobizz1",
+      "name": "Чат Инфобизнес / Онлайн-школы / Продюсирование",
+      "url": "https://t.me/infobizz1",
+      "kind": "business_partnership_group",
+      "language": "ru",
+      "audience_topics": [
+        "online business",
+        "partnerships",
+        "jobs",
+        "channel promotion"
+      ],
+      "publicly_stated_permission": "Public directory describes a group for business services, vacancies, side jobs and promotion on Telegram.",
+      "observed_members": 14706,
+      "observed_recent_growth": "+90 members (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Potential adjacent audience for a practical crypto/finance news channel; inspect rules and avoid repeated posts."
+    },
+    {
+      "id": "w2-chat",
+      "name": "W2 | CHAT - АРБИТРАЖ",
+      "url": "https://t.me/W2_Chat",
+      "kind": "traffic_marketing_community",
+      "language": "ru",
+      "audience_topics": [
+        "traffic arbitrage",
+        "digital marketing",
+        "affiliate marketing"
+      ],
+      "publicly_stated_permission": "Public catalogue describes a community for discussing TikTok, Meta and Google ads, traffic arbitrage and marketing experience.",
+      "observed_members": 17912,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/groups?lang=ru",
+      "notes": "Do not assume external promotion is permitted. Use only if community rules allow educational/news channel recommendations."
+    },
+    {
+      "id": "facebook-arbitp2p",
+      "name": "Crypto | Traffic | Arbitration",
+      "url": "https://t.me/Facebook_ArbitP2P",
+      "kind": "traffic_marketing_community",
+      "language": "ru",
+      "audience_topics": [
+        "crypto traffic",
+        "affiliate marketing",
+        "arbitrage"
+      ],
+      "publicly_stated_permission": "Public catalogue describes a chat about traffic arbitrage, advertising account rental and affiliate marketing.",
+      "observed_members": 28588,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/marketing/groups?lang=ru",
+      "notes": "Relevant adjacent audience, but posting permission and promo policy must be checked."
+    },
+    {
+      "id": "freelance-in-telegram",
+      "name": "ФРИЛАНС ЧАТ",
+      "url": "https://t.me/freelance_in_telegram",
+      "kind": "freelance_business_community",
+      "language": "ru",
+      "audience_topics": [
+        "freelancing",
+        "business",
+        "clients",
+        "Telegram promotion"
+      ],
+      "publicly_stated_permission": "Public directory describes a community for finding clients and contractors, remote work and Telegram promotion.",
+      "observed_members": 15504,
+      "observed_recent_growth": "+52 members (catalogue snapshot)",
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/marketing/groups?lang=ru",
+      "notes": "Adjacent audience only; do not post unsolicited promo. Check allowed self-promotion threads and rate limits."
+    },
+    {
+      "id": "marscatglobal",
+      "name": "MarscatGlobal",
+      "url": "https://t.me/marscatglobal",
+      "kind": "crypto_web3_project_community",
+      "language": "en",
+      "audience_topics": [
+        "crypto",
+        "Web3",
+        "shill groups",
+        "project marketing"
+      ],
+      "publicly_stated_permission": "Public catalogue describes discussion and promotion services for crypto/Web3 projects and marketing. This does not by itself establish free posting permission.",
+      "observed_members": 36658,
+      "observed_messages_30d": 716,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://chatcrawler.link/ru/c/t/marketing/telegram_ads?lang=en",
+      "notes": "Potentially relevant English-speaking audience; verify rules, free posting terms and anti-spam requirements."
+    },
+    {
+      "id": "looking-for-admin",
+      "name": "Looking for Administrators Conference",
+      "url": "https://t.me/LOOKING_FOR_ADMINISTRATOR",
+      "kind": "channel_admin_partnership_leads",
+      "language": "ru",
+      "audience_topics": [
+        "channel administrators",
+        "content creators",
+        "cross-promotion managers"
+      ],
+      "publicly_stated_permission": "Public directory lists announcements seeking admins, content makers and mutual-promotion managers for Telegram channels.",
+      "observed_members": 4027,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_partnership_lead_not_connected",
+      "evidence_url": "https://chatcrawler.link/ru/c/telegram/growth?lang=ru",
+      "notes": "This is a lead-discovery source, not an advertising placement. Only use for legitimate partnership offers where replies are permitted."
     }
   ],
   "directories": [
@@ -1578,6 +1847,26 @@
       "submission_status": "free ownership verification path found; not submitted",
       "evidence_url": "https://maxrank.ru/",
       "notes": "Free listing after channel ownership verification; the site advertises analytics and ratings as well."
+    },
+    {
+      "id": "telegramchannels-me",
+      "name": "TelegramChannels.me",
+      "url": "https://telegramchannels.me/submit",
+      "kind": "free_directory_submission",
+      "money_required": false,
+      "submission_status": "submission path requires eligibility/availability check; not submitted",
+      "evidence_url": "https://telegramchannels.me/submit",
+      "notes": "Potential public channel discovery listing; confirm free listing conditions and moderation before submission."
+    },
+    {
+      "id": "tgstat-catalog",
+      "name": "TGStat channel catalog",
+      "url": "https://tgstat.com/",
+      "kind": "free_organic_catalog_listing",
+      "money_required": false,
+      "submission_status": "catalog discovery available; direct submission procedure not checked",
+      "evidence_url": "https://tgstat.com/",
+      "notes": "Discovery and analytics directory. Inclusion is not guaranteed and paid promotional services are not included."
     }
   ],
   "execution_notes": {
