@@ -216,6 +216,54 @@
       "setup_status": "discovered_free_plan_not_connected",
       "evidence_url": "https://www.insidead.ru/en",
       "notes": "Site describes a free plan with limited credits and a traffic-exchange route. Paid ads exist but are excluded; use only free exchange mode. It may show third-party promotions in our own channel and has not been connected or tested."
+    },
+    {
+      "id": "free-promoter-bot",
+      "name": "Free Promoter Bot",
+      "url": "https://t.me/free_promoter_bot",
+      "kind": "free_channel_promotion_bot",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": null,
+      "setup_status": "discovered_workflow_not_tested",
+      "evidence_url": "https://telegramchannels.me/bots/free_promoter_bot",
+      "notes": "Public listing describes free promotion for YouTube and Telegram channels/groups. Exact mechanics, eligibility, whether it publishes into third-party channels, and any task/credit requirements are not yet verified."
+    },
+    {
+      "id": "free-prom-bot",
+      "name": "Free promo bot",
+      "url": "https://t.me/free_prom_bot",
+      "kind": "free_promotion_bot_candidate",
+      "money_required": false,
+      "automated_publishing": null,
+      "own_channel_authorization_required": null,
+      "setup_status": "discovered_not_tested",
+      "evidence_url": "https://t.me/free_prom_bot",
+      "notes": "Public bot landing page has only a short description. Free route and actual distribution mechanism need verification; not connected."
+    },
+    {
+      "id": "crosspromotion-robot",
+      "name": "CrossPromotion Robot",
+      "url": "https://t.me/CrossPromotion_Robot",
+      "kind": "automatic_cross_promotion_bot_candidate",
+      "money_required": null,
+      "automated_publishing": true,
+      "own_channel_authorization_required": null,
+      "setup_status": "discovered_workflow_not_verified",
+      "evidence_url": "https://t.me/s/RagnarServers",
+      "notes": "A public channel post describes it as automatic cross-promotion for views/members. Cost model, quality protections, partner consent and permissions are unverified; no setup or post run has been completed."
+    },
+    {
+      "id": "cross-promoter-bot",
+      "name": "Cross Promotion Bot",
+      "url": "https://t.me/Cross_PromoterBot",
+      "kind": "cross_promotion_bot_candidate",
+      "money_required": null,
+      "automated_publishing": null,
+      "own_channel_authorization_required": null,
+      "setup_status": "discovered_workflow_not_verified",
+      "evidence_url": "https://t.me/Cross_PromoterBot",
+      "notes": "Bot landing page links to @CrossPromotion_Channels and @Auto_Cross_Promotion. Free terms and active automated publishing workflow need verification."
     }
   ],
   "communities": [
@@ -1849,6 +1897,60 @@
       "automation_status": "discovered_not_joined",
       "evidence_url": "https://minitelegram.com/en/apps/autobots_promotions_bot",
       "notes": "Check current activity, eligibility and rules before connecting."
+    },
+    {
+      "id": "promote-channel-free-1",
+      "name": "PROMOTE CHANNEL FOR FREE",
+      "url": "https://t.me/promote_channel_free_1",
+      "kind": "public_self_promotion_group",
+      "language": "en",
+      "audience_topics": [
+        "free promotion",
+        "YouTube",
+        "Telegram",
+        "social media",
+        "cross-promotion"
+      ],
+      "publicly_stated_permission": "Public group preview explicitly states YouTube, Telegram and social links can be sent and cross-promotion is allowed.",
+      "observed_members": 36,
+      "checked_at": "2026-10-29",
+      "automation_status": "discovered_rules_need_review",
+      "evidence_url": "https://t.me/promote_channel_free_1",
+      "notes": "Very small and its public page appears stale (indexed roughly 1.2 years ago). Links may be posted, but unattended bot posting and current activity are not confirmed."
+    },
+    {
+      "id": "crosspromotion-channels",
+      "name": "CrossPromotion Channels",
+      "url": "https://t.me/CrossPromotion_Channels",
+      "kind": "cross_promotion_channel_candidate",
+      "language": "en",
+      "audience_topics": [
+        "cross-promotion",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "Linked by @Cross_PromoterBot as its cross-promotion channel; independent rules and activity were not retrieved.",
+      "observed_members": null,
+      "checked_at": "2026-10-29",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/Cross_PromoterBot",
+      "notes": "Candidate discovery channel only; no permission or automatic placement verified."
+    },
+    {
+      "id": "auto-cross-promotion",
+      "name": "Auto Cross Promotion",
+      "url": "https://t.me/Auto_Cross_Promotion",
+      "kind": "cross_promotion_channel_candidate",
+      "language": "en",
+      "audience_topics": [
+        "cross-promotion",
+        "channel growth"
+      ],
+      "publicly_stated_permission": "Linked by @Cross_PromoterBot as a related cross-promotion channel; actual mechanics and rules not retrieved.",
+      "observed_members": null,
+      "checked_at": "2026-10-29",
+      "automation_status": "needs_verification",
+      "evidence_url": "https://t.me/Cross_PromoterBot",
+      "notes": "Candidate discovery channel only; do not assume posts are accepted without confirmation."
     }
   ],
   "directories": [
