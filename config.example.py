@@ -13,3 +13,7 @@ GROWTH_ADMIN_IDS = set()
 # Each target group must have the bot added and an administrator must run /allowpromo.
 PROMOTION_INTERVAL_HOURS = 72
 PROMOTION_CHECK_INTERVAL_MINUTES = 5
+
+# Opt-in reciprocal channel promotion; only registered/approved channels are used.
+CROSSPROMO_INTERVAL_HOURS = 72
+CROSSPROMO_MIN_MEMBERS = 10

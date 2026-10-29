@@ -21,6 +21,6 @@ jobs:
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
       - name: Compile Python modules
-        run: python -m py_compile group_bot.py growth_db.py
+        run: python -m py_compile group_bot.py growth_db.py cross_promo.py
       - name: Import bot with placeholder configuration
         run: python -c "import group_bot; print('group_bot import OK')"
