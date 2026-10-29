@@ -458,6 +458,9 @@ def main():
     interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
     if not 1 <= interval_hours <= 720:
         raise ValueError("PROMOTION_INTERVAL_HOURS must be between 1 and 720 hours")
+    check_interval_minutes = int(getattr(config, "PROMOTION_CHECK_INTERVAL_MINUTES", 5))
+    if not 1 <= check_interval_minutes <= 60:
+        raise ValueError("PROMOTION_CHECK_INTERVAL_MINUTES must be between 1 and 60 minutes")
     if app.job_queue is None:
         raise RuntimeError(
             "JobQueue is unavailable. Install dependencies from requirements.txt "
@@ -465,12 +468,15 @@ def main():
         )
     app.job_queue.run_repeating(
         publish_due_promotions,
-        interval=3600,
-        first=30,
+        interval=check_interval_minutes * 60,
+        first=10,
         name="opt-in-promotion-scheduler",
         job_kwargs={"max_instances": 1, "coalesce": True},
     )
-    logging.info("Opt-in promotion scheduler enabled interval_hours=%s", interval_hours)
+    logging.info(
+        "Opt-in promotion scheduler enabled interval_hours=%s check_interval_minutes=%s",
+        interval_hours, check_interval_minutes,
+    )
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
