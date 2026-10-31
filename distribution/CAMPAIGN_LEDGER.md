@@ -5,7 +5,7 @@ The campaign ledger is the evidence record for manual, permission-based organic 
 ## Status meanings
 
 - candidate: discovered only; no current permission is implied.
-- rules_checked: current rules reviewed and decision recorded; this is not posting approval.
+- rules_checked: current in-chat rules reviewed and decision recorded; this is not posting approval.
 - permission_confirmed: a human confirmed that this specific placement is allowed, with dated evidence and reviewer.
 - published: the authorized post exists and has a post URL, date, campaign source key and tracked invite link.
 - measured: post-publication observations are recorded. Views and Telegram join events are observations, not click counts.
@@ -15,8 +15,8 @@ Allowed permission decisions: approved_for_manual_post, not_allowed, needs_clari
 ## Operating sequence
 
 1. Create a ledger record with a unique record_id and the original target_id.
-2. Review current pinned rules and record rules_checked_at plus permission_decision.
-3. For an approved target, record the exact permission evidence URL, who confirmed it and the date. A public directory description or old discovery note is not proof of current permission.
+2. Review the current pinned/in-chat rules. Record rules_checked_at, a direct rules_evidence_url permalink, rules_checked_by and permission_decision. A public group preview or directory description is not evidence that the rules were checked.
+3. For an approved target, record the exact permission_evidence_url, who confirmed it and the date. A public directory description or old discovery note is not proof of current permission.
 4. Create a unique bot invite link with /growthlink wave1_targetkey before a permitted post. Record the returned link and source key.
 5. A human publishes the post. Record the public post URL and date. This workflow does not post to third-party communities.
 6. Record views at 24 hours and 7 days where visible, attributed joins and observed leaves. Add D7 retained only after the cohort matures and relevant membership events were observed.
