@@ -5,9 +5,9 @@
 
 ## Priority
 
-1. **Onflow Ads Cross-Promotion** — first platform to evaluate. Official guide describes free 1:1 post swaps. Free plan currently allows up to five campaigns started per calendar month; joining another owner's campaign is not capped. Requires an account, verified email, a public channel, and its bot connected as channel admin. Confirm the exact permission request in the product before granting anything.
-2. **Trigram Cross-Promotion** — second platform to evaluate. Official site describes free swaps matched by language, topic and subscriber range, with simultaneous bot publication and a one-day live period. Connect only through the cross-promotion path; do not enable paid listings or ad sales.
-3. **Adpact Cross-Promotion** — third platform to evaluate. No cash payment is required, but swaps consume in-app points. Points are not money and cannot be withdrawn. Review the exact point cost, partner and post terms in the Mini App before accepting; acceptance is not cancellable under the current guide.
+1. **Trigram Cross-Promotion** — candidate for a zero-cost test, not yet connected. The public site describes channel-to-channel swaps matched by language, topic and subscriber range. Before setup, verify inside the product that the Free route does not require a paid listing, subscription or upgrade, and review the exact bot permissions.
+2. **Adpact Cross-Promotion** — candidate only if its points can be earned without payment and the exact swap terms are acceptable. Swaps consume in-app points; points are not cash and cannot be withdrawn. Review the point cost, partner and post terms in the Mini App before accepting; acceptance may be non-cancellable.
+3. **Onflow Ads** — excluded from the zero-budget acquisition path. During the actual channel-listing flow for @cryptoping_ru, the platform displayed a charge of **$2 for 7 days**. Shared availability of Cross-Promotion and Subscriber Exchange does not make the required listing free. Do not pay or use it unless a genuinely free listing path is independently confirmed.
 
 Official references:
 - https://docs.onflowads.com/cross-promo
@@ -48,9 +48,15 @@ Telegram Bot API invite-link attribution measures observed joins, not clicks. If
 
 Run one controlled swap at a time. Compare attributed joins and retention with the partner's actual reach and the channel's baseline. Repeat only when the exchange produces relevant, retained subscribers without harming the channel's normal content performance.
 
+## Cost and permission correction
+
+The account setup and channel-listing flow for @cryptoping_ru displayed a **$2 / 7-day** listing charge. This is direct in-product evidence and overrides any earlier assumption that Onflow's channel discovery route is free. Onflow is excluded from the zero-budget plan. Do not create a paid listing, subscribe, top up, or connect a publishing bot for this route.
+
+Trigram and Adpact are not yet approved for execution: a public claim of free swaps is not enough. Confirm the actual Free-plan route, any listing fee or points requirement, and exact bot permissions in-product before connecting anything.
+
 ## Current status
 
-- Platforms researched from their public official documentation.
+- Platforms researched from their public official documentation and the Onflow listing price checked in the user's account.
 - No platform account has been connected in this workflow.
 - No bot has been added to @cryptoping_ru.
 - No campaign has been accepted or published.
