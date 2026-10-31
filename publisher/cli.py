@@ -124,6 +124,16 @@ def main(argv=None):
         print(f"Permission evidence: {target.get('permission_evidence') or 'not recorded'}")
         print(f"Reviewed at: {target.get('reviewed_at') or 'not reviewed'}")
         print(f"Notes: {target.get('notes') or 'none'}")
+        history = store.list_target_review_history(args.id)
+        print("Review history:")
+        if not history:
+            print("  no review decisions recorded")
+        for entry in history:
+            evidence = entry.get("permission_evidence") or "no evidence"
+            print(
+                f"  {entry['recorded_at']} | {entry['action']} | "
+                f"policy={entry['promotion_policy']} | evidence={evidence}"
+            )
     elif args.command == "list-targets":
         for target in store.list_targets():
             name = target.get("display_name") or target["handle"]
