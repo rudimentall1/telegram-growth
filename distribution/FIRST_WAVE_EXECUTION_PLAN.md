@@ -8,7 +8,7 @@
 
 - `distribution/targets.json` contains 23 promotion networks, 125 communities and 26 directory candidates.
 - The 125 community records are discovery evidence, not a permission grant. The current inventory marks 16 as `discovered_not_joined`, 81 as `discovered_rules_need_review`, 18 as `needs_verification`, and the remaining records as other unverified discovery states.
-- 116 community records have unknown evidence freshness. Do not describe the entire inventory as currently verified.
+- 9 of the 125 community records have no `checked_at` date; the other 116 are dated 2026-10-28 or 2026-10-29. A date on a discovery record does not establish that current in-chat rules or posting permission were verified.
 - The main README documents the existing `/growthlink` attribution command and the opt-in reciprocal cross-promotion network. The latter still needs real partner owners to join before it can generate exchanges.
 - The TGFind workflow is configured to submit and then look up `@cryptoping_ru`. A configured workflow is not proof of a successful listing; the Actions run and public lookup must be checked before claiming it is live.
 
