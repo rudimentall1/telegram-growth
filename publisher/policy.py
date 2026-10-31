@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 
 def evaluate_target(target, now=None, review_max_age_days=30, min_interval_days=7):
-    """Return (eligible, reason). Unknown or stale permission always fails closed."""
+    """Return (eligible, reason). Unknown, stale, or future permission fails closed."""
     now = now or datetime.now(timezone.utc)
 
     if target["status"] != "approved":
@@ -23,6 +23,8 @@ def evaluate_target(target, now=None, review_max_age_days=30, min_interval_days=
     except (TypeError, ValueError):
         return False, "review timestamp is invalid"
 
+    if reviewed > now:
+        return False, "review timestamp is in the future"
     if now - reviewed > timedelta(days=review_max_age_days):
         return False, "permission review is stale"
 
