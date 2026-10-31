@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -55,6 +56,33 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("added=1, duplicates=1, rejected=1", output.getvalue())
         self.assertEqual(len(self.store.list_targets()), 1)
 
+    def test_import_existing_distribution_catalog_preserves_metadata_and_pending_status(self):
+        catalog_path = Path(self.tmp.name) / "targets.json"
+        catalog_path.write_text(json.dumps({
+            "communities": [{
+                "id": "sample-pr",
+                "name": "Sample PR group",
+                "url": "https://t.me/sample_pr_group",
+                "kind": "public_self_promotion_group",
+                "language": "ru",
+                "audience_topics": ["promotion", "crypto"],
+                "publicly_stated_permission": "Description says free PR.",
+                "observed_members": 1234,
+                "checked_at": "2026-10-28",
+                "automation_status": "discovered_not_joined",
+                "evidence_url": "https://t.me/sample_pr_group"
+            }]
+        }), encoding="utf-8")
+        output = StringIO()
+        with redirect_stdout(output):
+            publisher_main(["--db", str(self.store.db_path), "import-catalog", "--json", str(catalog_path)])
+        self.assertIn("processed=1, rejected=0", output.getvalue())
+        targets = self.store.list_targets()
+        self.assertEqual(len(targets), 1)
+        self.assertEqual(targets[0]["display_name"], "Sample PR group")
+        self.assertEqual(targets[0]["source_status"], "discovered_not_joined")
+        self.assertEqual(targets[0]["status"], "pending")
+        self.assertEqual(targets[0]["promotion_policy"], "unknown")
     def test_new_target_is_pending_and_ineligible(self):
         target_id = self.store.add_target("group", "@example")
         target = self.store.get_target(target_id)
