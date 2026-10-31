@@ -81,6 +81,7 @@ a second poller or require an unrelated third-party bot to enter
 - `/crosspromopending` — review queue (CryptoPing RU administrators).
 - `/crosspromoapprove ID` / `/crosspromoreject ID` — moderate a submission.
 - `/crosspromolist` — list currently active partners.
+- `/crosspromoreport 30d` — report partner deliveries and invite-attributed joins, leaves and currently observed members.
 - `/crosspromopause` / `/crosspromoresume` — pause or resume our channel.
 
 ### Important limits
@@ -137,12 +138,18 @@ or may prohibit bots; no third-party posting is claimed active until access and 
 actual publication are verified. Only free promotion routes are tracked; paid upgrades
 and paid placements are excluded.
 
-Priority networks include free cross-promotion on Onflow Ads, Adpact and Trigram.
+Potential cross-promotion networks must pass a zero-cost check before use. Onflow Ads is excluded from the free acquisition path after the channel-listing flow displayed a $2 / 7-day charge; shared-flow availability does not make the listing free. Adpact and Trigram remain unconnected candidates until their exact Free-plan limits and required channel permissions are checked in-product.
 Public self-promotion candidates include `@ifreepr`, `@prchatik`, `@prbirza1`,
 `@p1rchat`, `@TGvzaim` and related communities. The inventory also tracks
 free directories and adjacent business audiences; these are not treated as
 automatic placements unless their current rules and publishing permissions allow it.
 
+
+## Partner performance reporting
+
+- `/crosspromoreport 30d` — shows how often each partner hosted or received a promotion and the joins/leaves observed through that partner's tracked invite link.
+- Partners without a known invite link are explicitly marked as unattributed; they are not reported as zero-conversion partners.
+- The report counts Telegram membership events, not link clicks or guaranteed unique reach.
 
 ## Acquisition cohort retention
 
