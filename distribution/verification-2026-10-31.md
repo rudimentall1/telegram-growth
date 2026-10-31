@@ -30,7 +30,7 @@
 
 ## First-party sources
 
-- Trigram: https://trigram.site/ru
+- Trigram: https://trigram.site/ru (official bot: https://t.me/trigram_ads_bot; Mini App: https://trigram.site/app; public channel catalogue: https://trigram.site/ru/channels)
 - Onflow Ads free plan: https://onflowads.com/telegram/pricing
 - Onflow Ads cross-promotion guide: https://docs.onflowads.com/cross-promo
 - Onflow Ads FAQ: https://docs.onflowads.com/cross-promo/faq
