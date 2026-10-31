@@ -27,6 +27,7 @@ python -m publisher import-candidates --csv candidates.csv
 python -m publisher import-catalog
 python -m publisher review-target --id 1 --decision approve --policy allowed --evidence "Rules explicitly allow one relevant promotional post"
 python -m publisher list-targets
+python -m publisher show-target --id 1
 python -m publisher pause-target --id 1
 python -m publisher add-draft --title "Airdrop checklist" --text "Useful original content with a transparent reference to @cryptoping_ru."
 ```
@@ -38,7 +39,7 @@ deliberate gate prevents an unreviewed draft from entering a publication plan.
 python -m publisher plan --draft-id 1
 ```
 
-Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
+Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `show-target --id N` before review to inspect the full catalog description, source link, observed size, discovery status, notes and any separately recorded permission evidence. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
 
 The existing `distribution/targets.json` inventory is the canonical source for community discovery. `import-catalog` imports its `communities` array and preserves source metadata (name, language, topics, stated permission, member count, evidence URL and discovery status) in a separate metadata table. Imported targets always remain `pending` with `promotion_policy=unknown`; catalog descriptions are not treated as verified permission. Re-running the import updates metadata without duplicating targets.
 
