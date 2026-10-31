@@ -89,6 +89,25 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("Sample PR group", listing.getvalue())
         self.assertIn("discovered_not_joined", listing.getvalue())
 
+    def test_catalog_import_rejects_malformed_item_and_continues(self):
+        catalog_path = Path(self.tmp.name) / "targets.json"
+        catalog_path.write_text(json.dumps({
+            "communities": [
+                None,
+                {
+                    "id": "valid",
+                    "name": "Valid group",
+                    "url": "https://t.me/valid_group",
+                    "kind": "public_self_promotion_group",
+                },
+            ]
+        }), encoding="utf-8")
+        output = StringIO()
+        with redirect_stdout(output):
+            publisher_main(["--db", str(self.store.db_path), "import-catalog", "--json", str(catalog_path)])
+        self.assertIn("processed=1, rejected=1", output.getvalue())
+        self.assertEqual(len(self.store.list_targets()), 1)
+
     def test_catalog_reimport_updates_metadata_without_duplicates(self):
         catalog_path = Path(self.tmp.name) / "targets.json"
         first = {
