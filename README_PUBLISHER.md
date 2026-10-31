@@ -9,7 +9,7 @@ This Publisher module lives inside the existing `telegram-growth` repository. It
 - Record a human review of each community's promotion rules.
 - Approve a target only when promotion is explicitly allowed and permission evidence
   is recorded.
-- Reject or pause unsuitable targets. Pausing preserves the candidate and its review history while immediately excluding it from plans.
+- Reject or pause unsuitable targets. Each approval, rejection and pause is appended to a review-history table with its timestamp, policy and evidence. Pausing immediately excludes a target from plans without deleting its record.
 - Save content drafts and mark them approved in the local SQLite database.
 - Build a dry-run plan that excludes unreviewed, stale, prohibited, or recently used
   targets.
@@ -39,7 +39,7 @@ deliberate gate prevents an unreviewed draft from entering a publication plan.
 python -m publisher plan --draft-id 1
 ```
 
-Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `show-target --id N` before review to inspect the full catalog description, source link, observed size, discovery status, notes and any separately recorded permission evidence. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
+Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `show-target --id N` before review to inspect the full catalog description, source link, observed size, discovery status, notes, current permission evidence and the append-only review history. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
 
 The first manually prioritized review shortlist is in [distribution/REVIEW_QUEUE.md](distribution/REVIEW_QUEUE.md). It is a review queue only; none of its entries are approved.
 
