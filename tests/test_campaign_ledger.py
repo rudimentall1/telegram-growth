@@ -73,6 +73,9 @@ class CampaignLedgerTests(unittest.TestCase):
         errors = validate_ledger({"version": 1, "placements": [row]})
         self.assertTrue(any("rules_evidence_type must be in_chat_rules" in e for e in errors))
 
+    def test_published_with_complete_evidence_is_valid(self):
+        self.assertEqual(validate_ledger({"version": 1, "placements": [published_row()]}), [])
+
     def test_published_requires_explicit_permission(self):
         row = published_row()
         row["permission_decision"] = "needs_clarification"
