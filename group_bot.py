@@ -242,6 +242,49 @@ async def growth_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.effective_message.reply_text("\n".join(lines))
 
 
+
+async def growth_retention(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await _growth_admin(update, context):
+        await update.effective_message.reply_text("Команда доступна только администраторам группы.")
+        return
+    days = 30
+    if context.args:
+        if len(context.args) != 1:
+            await update.effective_message.reply_text(
+                "Использование: /growthretention [30d]"
+            )
+            return
+        match = re.fullmatch(r"(\\d{1,4})(?:d|д)?", context.args[0].strip().lower())
+        if not match or not 1 <= int(match.group(1)) <= 3650:
+            await update.effective_message.reply_text(
+                "Укажи окно когорты: /growthretention 30d."
+            )
+            return
+        days = int(match.group(1))
+
+    rows = growth_db.cohort_retention(days=days, retention_days=7)
+    lines = [
+        "Удержание CryptoPing RU",
+        f"Окно первых наблюдаемых вступлений: {days} дн.",
+        "Метрика: доля участников, оставшихся в канале через 7 дней после вступления.",
+        "Учитываются только когорты, для которых прошло полных 7 дней.",
+        "",
+    ]
+    if rows:
+        for source, cohort_size, retained, rate in rows:
+            lines.append(
+                f"{source}: {retained}/{cohort_size} удержано ({rate:.1f}%)"
+            )
+    else:
+        lines.append("Пока нет зрелых когорт с достаточной историей для D7.")
+    lines.extend([
+        "",
+        "Это удержание среди первых вступлений, наблюдавшихся ботом, а не среди всех подписчиков. "
+        "Пропущенные Telegram chat_member updates могут исказить результат.",
+    ])
+    await update.effective_message.reply_text("\\n".join(lines))
+
+
 def is_telegram_member(chat_member):
     """Treat restricted users as members only when Telegram sets is_member=True."""
     status = getattr(chat_member, "status", None)
@@ -450,6 +493,7 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("growthlink", growth_link))
     app.add_handler(CommandHandler("growthreport", growth_report))
+    app.add_handler(CommandHandler("growthretention", growth_retention))
     app.add_handler(CommandHandler("allowpromo", allow_promotion))
     app.add_handler(CommandHandler("disablepromo", disable_promotion))
     app.add_handler(CommandHandler("promotetargets", promotion_targets_report))
