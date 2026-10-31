@@ -10,6 +10,9 @@
       "registry_last_checked_at": "2026-10-28",
       "discovery_status": "discovered_not_joined",
       "discovery_evidence_url": "https://t.me/ifreepr",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram public preview describes the group as a free advertising group for channels, groups and bots. Pinned rules and posting conditions were not verified.",
+      "public_description_evidence_url": "https://t.me/ifreepr",
       "status": "candidate"
     },
     {
@@ -21,6 +24,9 @@
       "registry_last_checked_at": "2026-10-28",
       "discovery_status": "discovered_not_joined",
       "discovery_evidence_url": "https://t.me/prchatik",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram public preview advertises free promotion and mutual promotion, but also references a price list and paid advertising. Pinned rules and eligibility for a free post were not verified.",
+      "public_description_evidence_url": "https://t.me/prchatik",
       "status": "candidate"
     },
     {
@@ -32,6 +38,9 @@
       "registry_last_checked_at": "2026-10-28",
       "discovery_status": "discovered_not_joined",
       "discovery_evidence_url": "https://t.me/prbirza1",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram public preview describes a mutual-promotion chat and explicitly mentions free advertising. It also references a price list; pinned rules and free-post conditions were not verified.",
+      "public_description_evidence_url": "https://t.me/prbirza1",
       "status": "candidate"
     },
     {
@@ -43,6 +52,9 @@
       "registry_last_checked_at": "2026-10-28",
       "discovery_status": "discovered_not_joined",
       "discovery_evidence_url": "https://t.me/p1rchat",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram public preview describes the group as a free mutual-promotion chat and invites users to publish posts. Pinned rules and topic restrictions were not verified.",
+      "public_description_evidence_url": "https://t.me/p1rchat",
       "status": "candidate"
     },
     {
@@ -54,6 +66,9 @@
       "registry_last_checked_at": "2026-10-28",
       "discovery_status": "discovered_not_joined",
       "discovery_evidence_url": "https://t.me/reklamabesplatnoz",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram public preview advertises free promotion for projects, websites, Telegram channels, products and services. Pinned rules and posting conditions were not verified.",
+      "public_description_evidence_url": "https://t.me/reklamabesplatnoz",
       "status": "candidate"
     }
   ]
