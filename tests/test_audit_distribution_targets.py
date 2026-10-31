@@ -53,6 +53,14 @@ class DistributionRegistryAuditTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertTrue(any("invalid checked_at date" in item for item in result["errors"]))
 
+    def test_non_string_record_ids_are_structural_errors(self):
+        for value in ([], {}, 123):
+            with self.subTest(value=value):
+                self.registry["communities"][0]["id"] = value
+                result = audit_registry(self.registry, date(2026, 10, 31))
+                self.assertFalse(result["ok"])
+                self.assertTrue(any("id must be a non-empty string" in item for item in result["errors"]))
+
     def test_non_object_registry_root_is_rejected(self):
         with self.assertRaises(ValueError):
             audit_registry([], date(2026, 10, 31))
