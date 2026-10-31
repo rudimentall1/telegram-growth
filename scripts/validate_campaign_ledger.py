@@ -10,7 +10,7 @@ from pathlib import Path
 STATUSES = {"candidate", "rules_checked", "permission_confirmed", "published", "measured"}
 DECISIONS = {"approved_for_manual_post", "not_allowed", "needs_clarification"}
 METRICS = {"views_24h", "views_7d", "attributed_joins", "observed_leaves", "d7_retained"}
-URL_RE = re.compile(r"^https?://\S+$")
+URL_RE = re.compile(r"^https?://\\S+$")
 
 
 def is_date(value):
@@ -76,6 +76,10 @@ def validate_ledger(data):
         if status in {"rules_checked", "permission_confirmed", "published", "measured"}:
             if not is_date(row.get("rules_checked_at")):
                 errors.append(f"{prefix}.rules_checked_at must be YYYY-MM-DD")
+            if not is_url(row.get("rules_evidence_url")):
+                errors.append(f"{prefix}.rules_evidence_url must be a permalink to the current rules (http/https)")
+            if not isinstance(row.get("rules_checked_by"), str) or not row["rules_checked_by"].strip():
+                errors.append(f"{prefix}.rules_checked_by is required")
 
         if status in {"permission_confirmed", "published", "measured"}:
             if decision != "approved_for_manual_post":
