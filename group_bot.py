@@ -282,7 +282,7 @@ async def growth_retention(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Это удержание среди первых вступлений, наблюдавшихся ботом, а не среди всех подписчиков. "
         "Пропущенные Telegram chat_member updates могут исказить результат.",
     ])
-    await update.effective_message.reply_text("\\n".join(lines))
+    await update.effective_message.reply_text("\n".join(lines))
 
 
 def is_telegram_member(chat_member):
