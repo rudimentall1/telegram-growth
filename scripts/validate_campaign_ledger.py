@@ -56,6 +56,17 @@ def validate_ledger(data):
         if status not in STATUSES:
             errors.append(f"{prefix}.status must be one of {', '.join(sorted(STATUSES))}")
             continue
+        preview_fields = ("public_description_checked_at", "public_description_summary", "public_description_evidence_url")
+        present_preview_fields = [field for field in preview_fields if field in row]
+        if present_preview_fields and len(present_preview_fields) != len(preview_fields):
+            errors.append(f"{prefix} public description evidence requires checked_at, summary and evidence_url together")
+        if "public_description_checked_at" in row and not is_date(row.get("public_description_checked_at")):
+            errors.append(f"{prefix}.public_description_checked_at must be YYYY-MM-DD")
+        if "public_description_summary" in row and (not isinstance(row.get("public_description_summary"), str) or not row["public_description_summary"].strip()):
+            errors.append(f"{prefix}.public_description_summary is required when supplied")
+        if "public_description_evidence_url" in row and not is_url(row.get("public_description_evidence_url")):
+            errors.append(f"{prefix}.public_description_evidence_url must be an http(s) URL")
+
         decision = row.get("permission_decision")
         if decision is not None and decision not in DECISIONS:
             errors.append(f"{prefix}.permission_decision is invalid")
