@@ -54,7 +54,7 @@ def validate_ledger(data):
             seen_ids.add(record_id)
 
         status = row.get("status")
-        if status not in STATUSES:
+        if not isinstance(status, str) or status not in STATUSES:
             errors.append(f"{prefix}.status must be one of {', '.join(sorted(STATUSES))}")
             continue
         preview_fields = ("public_description_checked_at", "public_description_summary", "public_description_evidence_url")
@@ -69,9 +69,9 @@ def validate_ledger(data):
             errors.append(f"{prefix}.public_description_evidence_url must be an http(s) URL")
 
         decision = row.get("permission_decision")
-        if decision is not None and decision not in DECISIONS:
+        if decision is not None and (not isinstance(decision, str) or decision not in DECISIONS):
             errors.append(f"{prefix}.permission_decision is invalid")
-        if status == "rules_checked" and decision not in DECISIONS:
+        if status == "rules_checked" and (not isinstance(decision, str) or decision not in DECISIONS):
             errors.append(f"{prefix}.permission_decision is required for rules_checked status")
 
         if status in {"rules_checked", "permission_confirmed", "published", "measured"}:
