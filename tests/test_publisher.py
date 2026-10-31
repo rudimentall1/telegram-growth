@@ -227,6 +227,32 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(target["status"], "paused")
         self.assertFalse(evaluate_target(target)[0])
 
+    def test_review_history_preserves_each_decision_and_pause(self):
+        target_id = self.store.add_target("group", "@example")
+        self.store.review_target(
+            target_id, "approve", "allowed", "Pinned rules permit one promo post"
+        )
+        self.store.review_target(
+            target_id, "reject", "prohibited", "Moderator later prohibited promotion"
+        )
+        self.store.pause_target(target_id)
+
+        history = self.store.list_target_review_history(target_id)
+        self.assertEqual(
+            [entry["action"] for entry in history],
+            ["approved", "rejected", "paused"],
+        )
+        self.assertEqual(
+            history[0]["permission_evidence"],
+            "Pinned rules permit one promo post",
+        )
+        self.assertEqual(
+            history[1]["permission_evidence"],
+            "Moderator later prohibited promotion",
+        )
+        self.assertEqual(history[2]["promotion_policy"], "prohibited")
+        self.assertEqual(self.store.get_target(target_id)["status"], "paused")
+
     def test_stale_review_is_ineligible(self):
         old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
         target = {
