@@ -239,5 +239,53 @@ class GrowthDbTests(unittest.TestCase):
                     growth_db.due_promotion_targets(interval)
 
 
+    def test_cohort_retention_counts_users_still_member_at_day_seven(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        growth_db.record_member(2, 202, "https://t.me/+campaignB", True)
+        growth_db.record_member(3, 303, "https://t.me/+campaignA", True)
+        with growth_db.connect() as db:
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-10 days') WHERE update_id IN (1,2,3)"
+            )
+        growth_db.record_member(4, 101, None, False)
+        with growth_db.connect() as db:
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-5 days') WHERE update_id=4"
+            )
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-2 days') WHERE update_id=3"
+            )
+
+        report = {row[0]: row[1:] for row in growth_db.cohort_retention(days=30, retention_days=7)}
+        self.assertEqual(report["campaign_a"], (1, 0, 0.0))
+        self.assertEqual(report["campaign_b"], (1, 1, 100.0))
+        self.assertNotIn("unattributed", report)
+
+    def test_cohort_retention_uses_latest_event_at_day_seven(self):
+        growth_db.record_member(1, 101, "https://t.me/+campaignA", True)
+        growth_db.record_member(2, 101, None, False)
+        growth_db.record_member(3, 101, "https://t.me/+campaignB", True)
+        with growth_db.connect() as db:
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-12 days') WHERE update_id=1"
+            )
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-8 days') WHERE update_id=2"
+            )
+            db.execute(
+                "UPDATE growth_events SET event_at=datetime('now','-3 days') WHERE update_id=3"
+            )
+
+        report = {row[0]: row[1:] for row in growth_db.cohort_retention(days=30, retention_days=7)}
+        self.assertEqual(report["campaign_a"], (1, 0, 0.0))
+        self.assertNotIn("campaign_b", report)
+
+    def test_cohort_retention_rejects_invalid_periods(self):
+        for days, retention_days in ((0, 7), (30, 0), (3651, 7), (30, 3651), ("last week", 7)):
+            with self.subTest(days=days, retention_days=retention_days):
+                with self.assertRaises(ValueError):
+                    growth_db.cohort_retention(days, retention_days)
+
+
 if __name__ == "__main__":
     unittest.main()
