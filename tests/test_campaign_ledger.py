@@ -23,6 +23,7 @@ def published_row():
         "status": "published",
         "rules_checked_at": "2026-10-31",
         "rules_evidence_url": "https://t.me/chat_a/10",
+        "rules_evidence_type": "in_chat_rules",
         "rules_checked_by": "reviewer-1",
         "permission_decision": "approved_for_manual_post",
         "permission_evidence_url": "https://t.me/chat_a/12",
