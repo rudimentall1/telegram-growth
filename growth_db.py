@@ -390,6 +390,7 @@ def cohort_retention(days=30, retention_days=7):
                            ORDER BY event_at ASC, update_id ASC
                        ) AS event_rank
                 FROM growth_events
+                WHERE event_type = 'join'
             ),
             first_joins AS (
                 SELECT user_id, source, event_at AS joined_at
