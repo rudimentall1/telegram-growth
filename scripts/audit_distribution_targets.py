@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[1] / "distribution" / "targets.json"
-DATE_RE = re.compile(r"^\\d{4}-\\d{2}-\\d{2}$")
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 GROUP_FIELDS = {
     "networks": "setup_status",
