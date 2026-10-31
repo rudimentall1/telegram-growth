@@ -31,6 +31,9 @@ def build_parser():
     catalog = commands.add_parser("import-catalog", help="import public communities from distribution/targets.json")
     catalog.add_argument("--json", dest="json_path", default="distribution/targets.json")
 
+    pause = commands.add_parser("pause-target", help="pause a target without deleting its review history")
+    pause.add_argument("--id", type=int, required=True)
+
     commands.add_parser("list-targets", help="list registered communities")
 
     draft = commands.add_parser("add-draft", help="save a draft; it is not published")
@@ -94,11 +97,19 @@ def main(argv=None):
                 rejected += 1
                 print("Rejected catalog item " + str(item.get("id", "<unknown>")) + ": " + str(exc))
         print("Catalog import complete: processed=" + str(imported) + ", rejected=" + str(rejected))
+    elif args.command == "pause-target":
+        store.pause_target(args.id)
+        print(f"Target {args.id}: paused")
     elif args.command == "list-targets":
         for target in store.list_targets():
+            name = target.get("display_name") or target["handle"]
+            language = target.get("language") or "?"
+            source_status = target.get("source_status") or "manual"
+            topics = target.get("audience_topics_json") or "[]"
             print(
-                f"#{target['id']} {target['handle']} [{target['kind']}] "
-                f"status={target['status']} policy={target['promotion_policy']}"
+                f"#{target['id']} {name} ({target['handle']}) [{target['kind']}] "
+                f"status={target['status']} policy={target['promotion_policy']} "
+                f"language={language} source={source_status} topics={topics}"
             )
     elif args.command == "add-draft":
         draft_id = store.add_draft(args.title, args.text)
