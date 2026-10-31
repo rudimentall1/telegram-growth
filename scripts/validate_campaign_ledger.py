@@ -78,6 +78,8 @@ def validate_ledger(data):
                 errors.append(f"{prefix}.rules_checked_at must be YYYY-MM-DD")
             if not is_url(row.get("rules_evidence_url")):
                 errors.append(f"{prefix}.rules_evidence_url must be a permalink to the current rules (http/https)")
+            if row.get("rules_evidence_type") != "in_chat_rules":
+                errors.append(f"{prefix}.rules_evidence_type must be in_chat_rules; public previews are discovery evidence only")
             if not isinstance(row.get("rules_checked_by"), str) or not row["rules_checked_by"].strip():
                 errors.append(f"{prefix}.rules_checked_by is required")
 
