@@ -45,6 +45,18 @@ class DistributionRegistryAuditTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertTrue(any("duplicate id c1" in item for item in result["errors"]))
 
+    def test_noncanonical_and_impossible_dates_are_rejected(self):
+        for value in ("20261028", "2026-W44-3", "2026-02-30"):
+            with self.subTest(value=value):
+                self.registry["communities"][0]["checked_at"] = value
+                result = audit_registry(self.registry, date(2026, 10, 31))
+                self.assertFalse(result["ok"])
+                self.assertTrue(any("invalid checked_at date" in item for item in result["errors"]))
+
+    def test_non_object_registry_root_is_rejected(self):
+        with self.assertRaises(ValueError):
+            audit_registry([], date(2026, 10, 31))
+
     def test_invalid_dates_and_negative_age_are_rejected(self):
         self.registry["communities"][0]["checked_at"] = "not-a-date"
         result = audit_registry(self.registry, date(2026, 10, 31))
