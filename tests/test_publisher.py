@@ -41,10 +41,10 @@ class PublisherTests(unittest.TestCase):
     def test_csv_import_adds_deduplicates_and_rejects_invites(self):
         csv_path = Path(self.tmp.name) / "candidates.csv"
         csv_path.write_text(
-            "kind,handle,rules_url\\n"
-            "group,https://t.me/example_group,https://t.me/example_group\\n"
-            "group,@example_group,\\n"
-            "channel,https://t.me/+privateInvite,\\n",
+            "kind,handle,rules_url\n"
+            "group,https://t.me/example_group,https://t.me/example_group\n"
+            "group,@example_group,\n"
+            "channel,https://t.me/+privateInvite,\n",
             encoding="utf-8",
         )
         output = StringIO()
