@@ -120,6 +120,14 @@ class CampaignLedgerTests(unittest.TestCase):
                 errors = validate_ledger({"version": 1, "placements": [row]})
                 self.assertTrue(any(".rules_checked_at must be YYYY-MM-DD" in e for e in errors))
 
+    def test_unhashable_status_and_permission_decision_return_validation_errors(self):
+        for field, value in (("status", []), ("permission_decision", {})):
+            with self.subTest(field=field):
+                row = {"record_id": "r1", "target_id": "chat-a", "status": "candidate"}
+                row[field] = value
+                errors = validate_ledger({"version": 1, "placements": [row]})
+                self.assertTrue(errors)
+
     def test_impossible_calendar_date_fails(self):
         row = published_row()
         row["rules_checked_at"] = "2026-02-30"
