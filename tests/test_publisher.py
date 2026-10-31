@@ -83,6 +83,11 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(targets[0]["source_status"], "discovered_not_joined")
         self.assertEqual(targets[0]["status"], "pending")
         self.assertEqual(targets[0]["promotion_policy"], "unknown")
+        listing = StringIO()
+        with redirect_stdout(listing):
+            publisher_main(["--db", str(self.store.db_path), "list-targets"])
+        self.assertIn("Sample PR group", listing.getvalue())
+        self.assertIn("discovered_not_joined", listing.getvalue())
 
     def test_catalog_reimport_updates_metadata_without_duplicates(self):
         catalog_path = Path(self.tmp.name) / "targets.json"
@@ -134,6 +139,25 @@ class PublisherTests(unittest.TestCase):
         target_id = self.store.add_target("channel", "@example")
         self.store.review_target(target_id, "reject", "prohibited", "Rules prohibit promotion")
         self.assertFalse(evaluate_target(self.store.get_target(target_id))[0])
+
+    def test_future_review_timestamp_is_ineligible(self):
+        future = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+        target = {
+            "status": "approved",
+            "promotion_policy": "allowed",
+            "permission_evidence": "rules URL",
+            "reviewed_at": future,
+            "last_posted_at": None,
+        }
+        self.assertEqual(evaluate_target(target), (False, "review timestamp is in the future"))
+
+    def test_pause_target_blocks_planning_and_preserves_record(self):
+        target_id = self.store.add_target("group", "@example")
+        self.store.review_target(target_id, "approve", "allowed", "Explicit moderator permission")
+        self.store.pause_target(target_id)
+        target = self.store.get_target(target_id)
+        self.assertEqual(target["status"], "paused")
+        self.assertFalse(evaluate_target(target)[0])
 
     def test_stale_review_is_ineligible(self):
         old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
