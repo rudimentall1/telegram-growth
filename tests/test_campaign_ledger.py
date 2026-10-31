@@ -10,6 +10,7 @@ def rules_checked_row():
         "status": "rules_checked",
         "rules_checked_at": "2026-10-31",
         "rules_evidence_url": "https://t.me/chat_a/10",
+        "rules_evidence_type": "in_chat_rules",
         "rules_checked_by": "reviewer-1",
         "permission_decision": "needs_clarification",
     }
@@ -64,6 +65,12 @@ class CampaignLedgerTests(unittest.TestCase):
 
     def test_rules_checked_with_explicit_evidence_is_valid(self):
         self.assertEqual(validate_ledger({"version": 1, "placements": [rules_checked_row()]}), [])
+
+    def test_public_preview_cannot_substitute_for_in_chat_rules(self):
+        row = rules_checked_row()
+        row["rules_evidence_type"] = "public_preview"
+        errors = validate_ledger({"version": 1, "placements": [row]})
+        self.assertTrue(any("rules_evidence_type must be in_chat_rules" in e for e in errors))
 
     def test_published_requires_explicit_permission(self):
         row = published_row()
