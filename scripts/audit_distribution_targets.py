@@ -82,6 +82,12 @@ def audit_registry(data: dict[str, Any], as_of: date, max_age_days: int = 14) ->
             if group == "communities" and not record.get("publicly_stated_permission"):
                 missing_permission += 1
 
+            if group == "networks":
+                if record.get("money_required") is True and record.get("free_cash_route_confirmed") is True:
+                    errors.append(f"{label}: paid route cannot be marked as a confirmed free-cash route")
+                if record.get("recommendation") == "first_wave" and record.get("free_cash_route_confirmed") is not True:
+                    errors.append(f"{label}: first_wave requires a confirmed zero-cash route")
+
         if missing_evidence:
             warnings.append(f"{group}: {missing_evidence} records lack evidence_url")
         if missing_dates:
