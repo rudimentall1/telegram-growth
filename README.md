@@ -142,3 +142,26 @@ Public self-promotion candidates include `@ifreepr`, `@prchatik`, `@prbirza1`,
 `@p1rchat`, `@TGvzaim` and related communities. The inventory also tracks
 free directories and adjacent business audiences; these are not treated as
 automatic placements unless their current rules and publishing permissions allow it.
+
+
+## Publisher: community review and publication planning
+
+The Publisher review module is part of this repository and reuses the curated
+`distribution/targets.json` community inventory. It stores its review state and
+content drafts in a separate `data/publisher.db` SQLite database; it does not
+modify `data/growth.db` or the running bot's tables.
+
+Import the existing community inventory and inspect candidates:
+
+```bash
+python -m publisher import-catalog
+python -m publisher list-targets
+```
+
+Imported communities remain pending. A public description or a discovery record
+is not treated as permission to publish. An operator must review current rules
+and record explicit permission evidence before a target can become eligible.
+The Publisher currently supports candidate review, draft approval and dry-run
+planning only. It has no Telegram sender or MTProto session.
+
+See [README_PUBLISHER.md](README_PUBLISHER.md) for commands, policy and tests.
