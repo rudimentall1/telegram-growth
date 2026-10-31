@@ -21,6 +21,18 @@ Allowed permission decisions: approved_for_manual_post, not_allowed, needs_clari
 5. A human publishes the post. Record the public post URL and date. This workflow does not post to third-party communities.
 6. Record views at 24 hours and 7 days where visible, attributed joins and observed leaves. Add D7 retained only after the cohort matures and relevant membership events were observed.
 
+## First-wave public preview review (2026-10-31)
+
+Public Telegram previews were checked for the five seeded candidates. The ledger records the preview date, a short description and the public preview URL for each target. This is discovery evidence only.
+
+- @ifreepr: preview describes a free advertising group for channels, groups and bots.
+- @prchatik: preview advertises free and mutual promotion, while also referencing a price list.
+- @prbirza1: preview advertises free advertising and mutual promotion, while also referencing a price list.
+- @p1rchat: preview describes a free mutual-promotion chat and invites users to publish posts.
+- @reklamabesplatnoz: preview advertises free promotion for projects, websites, Telegram channels, products and services.
+
+The public previews do not expose enough information to verify current pinned rules, topic restrictions, post frequency limits, or whether a specific CryptoPing RU post is allowed. Therefore all five records deliberately remain candidate. No group was joined, no administrator was contacted, and no post was published. The next gate is a human review of the current in-chat rules and, where unclear, explicit moderator permission.
+
 ## Validation
 
 Run:
@@ -32,7 +44,6 @@ The validator is local and read-only. It checks evidence gates, dates, URLs, uni
 ## Measurement limits
 
 Telegram Bot API does not expose ordinary invite-link click counts. attributed_joins means join events attributed by the bot to the recorded invite link; it is not clicks or guaranteed unique reach. D7 retention must be interpreted against observed event coverage and the cohort definition documented by the retention report.
-
 
 ## Importing selected candidates
 
