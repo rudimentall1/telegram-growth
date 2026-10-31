@@ -280,6 +280,20 @@ class GrowthDbTests(unittest.TestCase):
         self.assertEqual(report["campaign_a"], (1, 0, 0.0))
         self.assertNotIn("campaign_b", report)
 
+    def test_cohort_retention_uses_first_join_even_if_legacy_leave_is_earlier(self):
+        with growth_db.connect() as db:
+            db.execute(
+                "INSERT INTO growth_events(update_id,user_id,source,event_type,event_at) "
+                "VALUES(1,101,'campaign_c','leave',datetime('now','-15 days'))"
+            )
+            db.execute(
+                "INSERT INTO growth_events(update_id,user_id,source,event_type,event_at) "
+                "VALUES(2,101,'campaign_c','join',datetime('now','-12 days'))"
+            )
+
+        report = {row[0]: row[1:] for row in growth_db.cohort_retention(days=30, retention_days=7)}
+        self.assertEqual(report["campaign_c"], (1, 1, 100.0))
+
     def test_cohort_retention_rejects_invalid_periods(self):
         for days, retention_days in ((0, 7), (30, 0), (3651, 7), (30, 3651), ("last week", 7)):
             with self.subTest(days=days, retention_days=retention_days):
