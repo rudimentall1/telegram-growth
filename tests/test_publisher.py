@@ -88,6 +88,7 @@ class PublisherTests(unittest.TestCase):
             publisher_main(["--db", str(self.store.db_path), "list-targets"])
         self.assertIn("Sample PR group", listing.getvalue())
         self.assertIn("discovered_not_joined", listing.getvalue())
+        self.assertIn("catalog_id=sample-pr", listing.getvalue())
 
     def test_full_distribution_catalog_import_is_conservative(self):
         catalog_path = Path(__file__).resolve().parents[1] / "distribution" / "targets.json"
