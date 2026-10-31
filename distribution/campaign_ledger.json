@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "placements": [
+    {
+      "record_id": "target-ifreepr",
+      "target_id": "ifreepr",
+      "target_name": "Free пиар чат",
+      "target_url": "https://t.me/ifreepr",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/ifreepr",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram preview identifies this as a free-advertising group for channels, groups and bots. It does not expose the pinned rules or post limits.",
+      "public_description_evidence_url": "https://t.me/ifreepr",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-prchatik",
+      "target_id": "prchatik",
+      "target_name": "Взаимопиар реклама",
+      "target_url": "https://t.me/prchatik",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/prchatik",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram preview advertises free and mutual promotion and links to related promotion channels; it also points to a price list and a paid-placement contact. Free-post conditions and pinned rules are not visible in the preview.",
+      "public_description_evidence_url": "https://t.me/prchatik",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-prbirza1",
+      "target_id": "prbirza1",
+      "target_name": "Взаимопиар Free PR chat",
+      "target_url": "https://t.me/prbirza1",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/prbirza1",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram preview identifies a free mutual-promotion chat and links to related promo channels; it also points to a price list and paid-placement contact. Free-post conditions and pinned rules are not visible in the preview.",
+      "public_description_evidence_url": "https://t.me/prbirza1",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-p1rchat",
+      "target_id": "p1rchat",
+      "target_name": "ВзаимоПиар, Бесплатный пиар",
+      "target_url": "https://t.me/p1rchat",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/p1rchat",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram preview explicitly invites users to publish posts in a free mutual-promotion chat and provides an admin/ban-contact route. It does not show topic restrictions, post limits or pinned rules.",
+      "public_description_evidence_url": "https://t.me/p1rchat",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-reklamabesplatnoz",
+      "target_id": "reklamabesplatnoz",
+      "target_name": "Бесплатная реклама | Взаимопиар",
+      "target_url": "https://t.me/reklamabesplatnoz",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/reklamabesplatnoz",
+      "public_description_checked_at": "2026-10-31",
+      "public_description_summary": "Telegram preview advertises free placement for projects, websites, Telegram channels, products and services, and claims no bots or fake views. It does not expose pinned rules, eligibility criteria or post limits.",
+      "public_description_evidence_url": "https://t.me/reklamabesplatnoz",
+      "status": "candidate"
+    }
+  ]
+}
