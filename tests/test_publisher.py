@@ -89,6 +89,52 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("Sample PR group", listing.getvalue())
         self.assertIn("discovered_not_joined", listing.getvalue())
 
+    def test_full_distribution_catalog_import_is_conservative(self):
+        catalog_path = Path(__file__).resolve().parents[1] / "distribution" / "targets.json"
+        output = StringIO()
+        with redirect_stdout(output):
+            publisher_main([
+                "--db", str(self.store.db_path),
+                "import-catalog", "--json", str(catalog_path),
+            ])
+        self.assertIn("processed=119, rejected=6", output.getvalue())
+        targets = self.store.list_targets()
+        self.assertEqual(len(targets), 119)
+        self.assertTrue(all(t["status"] == "pending" for t in targets))
+        self.assertTrue(all(t["promotion_policy"] == "unknown" for t in targets))
+
+    def test_show_target_displays_permission_and_source_evidence(self):
+        catalog_path = Path(self.tmp.name) / "targets.json"
+        catalog_path.write_text(json.dumps({
+            "communities": [{
+                "id": "show-me",
+                "name": "Review candidate",
+                "url": "https://t.me/review_candidate",
+                "kind": "public_self_promotion_group",
+                "language": "ru",
+                "audience_topics": ["crypto", "airdrops"],
+                "publicly_stated_permission": "Description says free promotion.",
+                "observed_members": 321,
+                "checked_at": "2026-10-29",
+                "automation_status": "discovered_rules_need_review",
+                "evidence_url": "https://t.me/review_candidate",
+                "notes": "Check pinned rules."
+            }]
+        }), encoding="utf-8")
+        with redirect_stdout(StringIO()):
+            publisher_main([
+                "--db", str(self.store.db_path),
+                "import-catalog", "--json", str(catalog_path),
+            ])
+        output = StringIO()
+        with redirect_stdout(output):
+            publisher_main(["--db", str(self.store.db_path), "show-target", "--id", "1"])
+        rendered = output.getvalue()
+        self.assertIn("Review candidate", rendered)
+        self.assertIn("Description says free promotion.", rendered)
+        self.assertIn("Permission evidence: not recorded", rendered)
+        self.assertIn("Check pinned rules.", rendered)
+
     def test_catalog_import_rejects_malformed_item_and_continues(self):
         catalog_path = Path(self.tmp.name) / "targets.json"
         catalog_path.write_text(json.dumps({
