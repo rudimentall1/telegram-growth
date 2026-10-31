@@ -9,7 +9,7 @@ This Publisher module lives inside the existing `telegram-growth` repository. It
 - Record a human review of each community's promotion rules.
 - Approve a target only when promotion is explicitly allowed and permission evidence
   is recorded.
-- Reject or pause unsuitable targets.
+- Reject or pause unsuitable targets. Pausing preserves the candidate and its review history while immediately excluding it from plans.
 - Save content drafts and mark them approved in the local SQLite database.
 - Build a dry-run plan that excludes unreviewed, stale, prohibited, or recently used
   targets.
@@ -27,6 +27,7 @@ python -m publisher import-candidates --csv candidates.csv
 python -m publisher import-catalog
 python -m publisher review-target --id 1 --decision approve --policy allowed --evidence "Rules explicitly allow one relevant promotional post"
 python -m publisher list-targets
+python -m publisher pause-target --id 1
 python -m publisher add-draft --title "Airdrop checklist" --text "Useful original content with a transparent reference to @cryptoping_ru."
 ```
 
@@ -37,7 +38,7 @@ deliberate gate prevents an unreviewed draft from entering a publication plan.
 python -m publisher plan --draft-id 1
 ```
 
-Default database: `data/publisher.db`. Override it with the global `--db` option.
+Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
 
 The existing `distribution/targets.json` inventory is the canonical source for community discovery. `import-catalog` imports its `communities` array and preserves source metadata (name, language, topics, stated permission, member count, evidence URL and discovery status) in a separate metadata table. Imported targets always remain `pending` with `promotion_policy=unknown`; catalog descriptions are not treated as verified permission. Re-running the import updates metadata without duplicating targets.
 
