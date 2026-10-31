@@ -47,6 +47,13 @@ class SeedCampaignLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate target id"):
             seed_records(self.registry, self.ledger, ["ifreepr"])
 
+    def test_generated_record_id_collision_fails(self):
+        ledger = {"version": 1, "placements": [
+            {"record_id": "target-ifreepr", "target_id": "different-target", "status": "candidate"}
+        ]}
+        with self.assertRaisesRegex(ValueError, "record_id already exists"):
+            seed_records(self.registry, ledger, ["ifreepr"])
+
     def test_invalid_ledger_shape_fails(self):
         with self.assertRaisesRegex(ValueError, "placements"):
             seed_records(self.registry, {"version": 1, "placements": None}, ["ifreepr"])
