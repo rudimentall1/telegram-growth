@@ -142,6 +142,15 @@ class PublisherStore:
             if cur.rowcount != 1:
                 raise LookupError(f"target {target_id} not found")
 
+    def pause_target(self, target_id):
+        with self.connect() as db:
+            cur = db.execute(
+                "UPDATE targets SET status='paused' WHERE id=?",
+                (target_id,),
+            )
+            if cur.rowcount != 1:
+                raise LookupError(f"target {target_id} not found")
+
     def list_targets(self):
         with self.connect() as db:
             rows = db.execute("""
