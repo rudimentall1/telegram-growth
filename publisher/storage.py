@@ -56,6 +56,18 @@ class PublisherStore:
                     notes TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS target_review_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    target_id INTEGER NOT NULL REFERENCES targets(id) ON DELETE CASCADE,
+                    action TEXT NOT NULL CHECK(action IN ('approved','rejected','paused')),
+                    promotion_policy TEXT NOT NULL,
+                    permission_evidence TEXT,
+                    recorded_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_target_review_history_target
+                    ON target_review_history(target_id, id);
+
                 CREATE TABLE IF NOT EXISTS drafts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
@@ -143,8 +155,18 @@ class PublisherStore:
             )
             if cur.rowcount != 1:
                 raise LookupError(f"target {target_id} not found")
+            db.execute(
+                """INSERT INTO target_review_history(
+                       target_id, action, promotion_policy, permission_evidence, recorded_at
+                   ) VALUES (?, ?, ?, ?, ?)""",
+                (target_id, status, promotion_policy,
+                 evidence.strip() if evidence else None, reviewed_at),
+            )
 
     def pause_target(self, target_id):
+        from datetime import datetime, timezone
+
+        recorded_at = datetime.now(timezone.utc).isoformat()
         with self.connect() as db:
             cur = db.execute(
                 "UPDATE targets SET status='paused' WHERE id=?",
@@ -152,6 +174,26 @@ class PublisherStore:
             )
             if cur.rowcount != 1:
                 raise LookupError(f"target {target_id} not found")
+            target = db.execute(
+                "SELECT promotion_policy, permission_evidence FROM targets WHERE id=?",
+                (target_id,),
+            ).fetchone()
+            db.execute(
+                """INSERT INTO target_review_history(
+                       target_id, action, promotion_policy, permission_evidence, recorded_at
+                   ) VALUES (?, 'paused', ?, ?, ?)""",
+                (target_id, target["promotion_policy"],
+                 target["permission_evidence"], recorded_at),
+            )
+
+    def list_target_review_history(self, target_id):
+        with self.connect() as db:
+            rows = db.execute(
+                """SELECT action, promotion_policy, permission_evidence, recorded_at
+                   FROM target_review_history WHERE target_id=? ORDER BY id""",
+                (target_id,),
+            ).fetchall()
+            return [dict(row) for row in rows]
 
     def list_targets(self):
         with self.connect() as db:
