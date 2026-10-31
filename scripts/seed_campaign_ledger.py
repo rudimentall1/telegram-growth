@@ -30,8 +30,21 @@ def seed_records(registry, ledger, target_ids):
                     raise ValueError(f"duplicate target id in registry: {row['id']}")
                 index[row["id"]] = (section, row)
 
-    existing = {row.get("target_id") for row in placements if isinstance(row, dict)}
-    existing_record_ids = {row.get("record_id") for row in placements if isinstance(row, dict)}
+    existing = set()
+    existing_record_ids = set()
+    for position, row in enumerate(placements):
+        if not isinstance(row, dict):
+            raise ValueError(f"ledger.placements[{position}] must be an object")
+        target_id = row.get("target_id")
+        record_id = row.get("record_id")
+        if target_id is not None and not isinstance(target_id, str):
+            raise ValueError(f"ledger.placements[{position}].target_id must be a string")
+        if record_id is not None and not isinstance(record_id, str):
+            raise ValueError(f"ledger.placements[{position}].record_id must be a string")
+        if target_id is not None:
+            existing.add(target_id)
+        if record_id is not None:
+            existing_record_ids.add(record_id)
     created, skipped = [], []
     for target_id in target_ids:
         if target_id in existing:
