@@ -30,6 +30,19 @@ class CampaignLedgerTests(unittest.TestCase):
         ]}
         self.assertEqual(validate_ledger(data), [])
 
+    def test_public_description_evidence_must_be_complete(self):
+        row = {"record_id": "r1", "target_id": "chat-a", "status": "candidate",
+               "public_description_checked_at": "2026-10-31"}
+        errors = validate_ledger({"version": 1, "placements": [row]})
+        self.assertTrue(any("public description evidence requires" in error for error in errors))
+
+    def test_complete_public_description_evidence_is_valid_for_candidate(self):
+        row = {"record_id": "r1", "target_id": "chat-a", "status": "candidate",
+               "public_description_checked_at": "2026-10-31",
+               "public_description_summary": "Preview says free promotion; rules unverified.",
+               "public_description_evidence_url": "https://t.me/chat_a"}
+        self.assertEqual(validate_ledger({"version": 1, "placements": [row]}), [])
+
     def test_published_requires_explicit_permission(self):
         row = published_row()
         row["permission_decision"] = "needs_clarification"
