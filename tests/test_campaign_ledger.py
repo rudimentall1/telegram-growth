@@ -112,6 +112,20 @@ class CampaignLedgerTests(unittest.TestCase):
         errors = validate_ledger({"version": 1, "placements": [row]})
         self.assertTrue(any(".rules_checked_at must be YYYY-MM-DD" in e for e in errors))
 
+    def test_noncanonical_iso_date_fails(self):
+        for value in ("20261031", "2026-W44-6", "2026-10"):
+            with self.subTest(value=value):
+                row = published_row()
+                row["rules_checked_at"] = value
+                errors = validate_ledger({"version": 1, "placements": [row]})
+                self.assertTrue(any(".rules_checked_at must be YYYY-MM-DD" in e for e in errors))
+
+    def test_impossible_calendar_date_fails(self):
+        row = published_row()
+        row["rules_checked_at"] = "2026-02-30"
+        errors = validate_ledger({"version": 1, "placements": [row]})
+        self.assertTrue(any(".rules_checked_at must be YYYY-MM-DD" in e for e in errors))
+
 
 if __name__ == "__main__":
     unittest.main()
