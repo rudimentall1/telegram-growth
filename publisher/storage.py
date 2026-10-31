@@ -87,7 +87,7 @@ class PublisherStore:
         handle = normalize_public_target(url)
         raw_kind = str(item.get("kind") or "").lower()
         kind = "channel" if "channel" in raw_kind else "group"
-        target_id = self.add_target(kind, handle, item.get("evidence_url") or url)
+        target_id = self.add_target(kind, handle, item.get("rules_url"))
         with self.connect() as db:
             db.execute("""
                 INSERT INTO target_catalog_metadata (
