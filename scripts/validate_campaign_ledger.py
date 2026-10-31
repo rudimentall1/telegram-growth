@@ -10,7 +10,7 @@ from pathlib import Path
 STATUSES = {"candidate", "rules_checked", "permission_confirmed", "published", "measured"}
 DECISIONS = {"approved_for_manual_post", "not_allowed", "needs_clarification"}
 METRICS = {"views_24h", "views_7d", "attributed_joins", "observed_leaves", "d7_retained"}
-URL_RE = re.compile(r"^https?://\\S+$")
+URL_RE = re.compile(r"^https?://\S+$")
 
 
 def is_date(value):
