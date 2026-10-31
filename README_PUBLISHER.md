@@ -1,7 +1,6 @@
 # CryptoPing RU Publisher foundation
 
-This is the first isolated Publisher vertical slice. It does not change the legacy
-RSS poster, Telegram group bot, or growth attribution database.
+This Publisher module lives inside the existing `telegram-growth` repository. It is a separate review/planning subsystem and does not change the legacy RSS poster, Telegram group bot, cross-promotion scheduler, or growth attribution database.
 
 ## Current capability
 
@@ -25,6 +24,7 @@ Requires Python 3.10+ and only the Python standard library.
 python -m publisher --help
 python -m publisher add-target --kind group --handle https://t.me/community_name --rules-url https://t.me/community_name
 python -m publisher import-candidates --csv candidates.csv
+python -m publisher import-catalog
 python -m publisher review-target --id 1 --decision approve --policy allowed --evidence "Rules explicitly allow one relevant promotional post"
 python -m publisher list-targets
 python -m publisher add-draft --title "Airdrop checklist" --text "Useful original content with a transparent reference to @cryptoping_ru."
@@ -38,6 +38,8 @@ python -m publisher plan --draft-id 1
 ```
 
 Default database: `data/publisher.db`. Override it with the global `--db` option.
+
+The existing `distribution/targets.json` inventory is the canonical source for community discovery. `import-catalog` imports its `communities` array and preserves source metadata (name, language, topics, stated permission, member count, evidence URL and discovery status) in a separate metadata table. Imported targets always remain `pending` with `promotion_policy=unknown`; catalog descriptions are not treated as verified permission. Re-running the import updates metadata without duplicating targets.
 
 CSV intake expects a header row with `kind,handle` and an optional `rules_url` column.
 Accepted handles are public Telegram usernames (5-32 characters) or direct public
@@ -61,7 +63,7 @@ channel,@example_channel,https://t.me/example_channel
 - Permission review expires after 30 days.
 - A target has a seven-day cooldown after a recorded publication (publication
   integration is not part of this slice yet).
-- Candidate intake is currently CSV/manual; no Telegram scraping or automatic discovery is enabled.
+- Candidate intake is from the existing curated JSON inventory or CSV; no Telegram scraping or automatic discovery is enabled.
 - This foundation intentionally has no MTProto session or automatic sender.
 
 ## Tests
