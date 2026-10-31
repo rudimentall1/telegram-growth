@@ -1,9 +1,18 @@
-import json
-import tempfile
 import unittest
-from pathlib import Path
 
 from scripts.validate_campaign_ledger import validate_ledger
+
+
+def rules_checked_row():
+    return {
+        "record_id": "rules-chat-a",
+        "target_id": "chat-a",
+        "status": "rules_checked",
+        "rules_checked_at": "2026-10-31",
+        "rules_evidence_url": "https://t.me/chat_a/10",
+        "rules_checked_by": "reviewer-1",
+        "permission_decision": "needs_clarification",
+    }
 
 
 def published_row():
@@ -12,6 +21,8 @@ def published_row():
         "target_id": "chat-a",
         "status": "published",
         "rules_checked_at": "2026-10-31",
+        "rules_evidence_url": "https://t.me/chat_a/10",
+        "rules_checked_by": "reviewer-1",
         "permission_decision": "approved_for_manual_post",
         "permission_evidence_url": "https://t.me/chat_a/12",
         "approved_by": "channel-owner-confirmed",
@@ -42,6 +53,17 @@ class CampaignLedgerTests(unittest.TestCase):
                "public_description_summary": "Preview says free promotion; rules unverified.",
                "public_description_evidence_url": "https://t.me/chat_a"}
         self.assertEqual(validate_ledger({"version": 1, "placements": [row]}), [])
+
+    def test_rules_checked_requires_rules_permalink_and_reviewer(self):
+        row = rules_checked_row()
+        row.pop("rules_evidence_url")
+        row.pop("rules_checked_by")
+        errors = validate_ledger({"version": 1, "placements": [row]})
+        self.assertTrue(any(".rules_evidence_url" in e for e in errors))
+        self.assertTrue(any(".rules_checked_by is required" in e for e in errors))
+
+    def test_rules_checked_with_explicit_evidence_is_valid(self):
+        self.assertEqual(validate_ledger({"version": 1, "placements": [rules_checked_row()]}), [])
 
     def test_published_requires_explicit_permission(self):
         row = published_row()
