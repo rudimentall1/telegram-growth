@@ -41,6 +41,8 @@ python -m publisher plan --draft-id 1
 
 Default database: `data/publisher.db`. Override it with the global `--db` option. The target list includes imported display name, language, discovery status and topic metadata where available. Use `show-target --id N` before review to inspect the full catalog description, source link, observed size, discovery status, notes and any separately recorded permission evidence. Use `pause-target` to suspend a previously reviewed target without deleting its record; a paused target is ineligible for planning.
 
+The first manually prioritized review shortlist is in [distribution/REVIEW_QUEUE.md](distribution/REVIEW_QUEUE.md). It is a review queue only; none of its entries are approved.
+
 The existing `distribution/targets.json` inventory is the canonical source for community discovery. `import-catalog` imports its `communities` array and preserves source metadata (name, language, topics, stated permission, member count, evidence URL and discovery status) in a separate metadata table. Imported targets always remain `pending` with `promotion_policy=unknown`; catalog descriptions are not treated as verified permission. Re-running the import updates metadata without duplicating targets.
 
 CSV intake expects a header row with `kind,handle` and an optional `rules_url` column.
