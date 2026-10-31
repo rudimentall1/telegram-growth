@@ -32,3 +32,13 @@ The validator is local and read-only. It checks evidence gates, dates, URLs, uni
 ## Measurement limits
 
 Telegram Bot API does not expose ordinary invite-link click counts. attributed_joins means join events attributed by the bot to the recorded invite link; it is not clicks or guaranteed unique reach. D7 retention must be interpreted against observed event coverage and the cohort definition documented by the retention report.
+
+
+## Importing selected candidates
+
+Use the seed helper to copy exact registry IDs into the ledger. It is a dry run unless --write is supplied:
+
+    python scripts/seed_campaign_ledger.py --target-id ifreepr --target-id prchatik
+    python scripts/seed_campaign_ledger.py --target-id ifreepr --target-id prchatik --write
+
+The helper is idempotent and rejects unknown or duplicate registry IDs. Imported records are always candidate status. It copies discovery evidence only; it does not infer current posting permission, join a group, contact an admin, or publish anything.
