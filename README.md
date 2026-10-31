@@ -142,3 +142,10 @@ Public self-promotion candidates include `@ifreepr`, `@prchatik`, `@prbirza1`,
 `@p1rchat`, `@TGvzaim` and related communities. The inventory also tracks
 free directories and adjacent business audiences; these are not treated as
 automatic placements unless their current rules and publishing permissions allow it.
+
+
+## Acquisition cohort retention
+
+- `/growthretention 30d` — D7 retention by first-observed acquisition source for mature cohorts.
+- The report excludes cohorts younger than seven days so every included user has a full D7 observation window.
+- Cohorts are based on the first join event observed by this bot. Missing Telegram `chat_member` updates can affect the result; this is not a full-channel analytics metric.
