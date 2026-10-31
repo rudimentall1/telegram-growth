@@ -34,6 +34,9 @@ def build_parser():
     pause = commands.add_parser("pause-target", help="pause a target without deleting its review history")
     pause.add_argument("--id", type=int, required=True)
 
+    show = commands.add_parser("show-target", help="show full candidate metadata and permission evidence")
+    show.add_argument("--id", type=int, required=True)
+
     commands.add_parser("list-targets", help="list registered communities")
 
     draft = commands.add_parser("add-draft", help="save a draft; it is not published")
@@ -101,6 +104,26 @@ def main(argv=None):
     elif args.command == "pause-target":
         store.pause_target(args.id)
         print(f"Target {args.id}: paused")
+    elif args.command == "show-target":
+        target = store.get_target(args.id)
+        if not target:
+            raise LookupError(f"target {args.id} not found")
+        topics = target.get("audience_topics_json") or "[]"
+        print(f"Target #{target['id']}: {target.get('display_name') or target['handle']}")
+        print(f"Handle: {target['handle']}")
+        print(f"Kind: {target['kind']} (catalog: {target.get('source_kind') or 'manual'})")
+        print(f"Status: {target['status']} | policy: {target['promotion_policy']}")
+        print(f"Language: {target.get('language') or 'unknown'}")
+        print(f"Topics: {topics}")
+        print(f"Observed members: {target.get('observed_members') if target.get('observed_members') is not None else 'unknown'}")
+        print(f"Discovery status: {target.get('source_status') or 'manual'}")
+        print(f"Catalog checked: {target.get('source_checked_at') or 'unknown'}")
+        print(f"Rules URL: {target.get('rules_url') or 'not set'}")
+        print(f"Catalog evidence URL: {target.get('evidence_url') or 'not set'}")
+        print(f"Publicly stated permission: {target.get('publicly_stated_permission') or 'not recorded'}")
+        print(f"Permission evidence: {target.get('permission_evidence') or 'not recorded'}")
+        print(f"Reviewed at: {target.get('reviewed_at') or 'not reviewed'}")
+        print(f"Notes: {target.get('notes') or 'none'}")
     elif args.command == "list-targets":
         for target in store.list_targets():
             name = target.get("display_name") or target["handle"]
