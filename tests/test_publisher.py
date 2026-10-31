@@ -41,10 +41,10 @@ class PublisherTests(unittest.TestCase):
     def test_csv_import_adds_deduplicates_and_rejects_invites(self):
         csv_path = Path(self.tmp.name) / "candidates.csv"
         csv_path.write_text(
-            "kind,handle,rules_url\n"
-            "group,https://t.me/example_group,https://t.me/example_group\n"
-            "group,@example_group,\n"
-            "channel,https://t.me/+privateInvite,\n",
+            "kind,handle,rules_url\\n"
+            "group,https://t.me/example_group,https://t.me/example_group\\n"
+            "group,@example_group,\\n"
+            "channel,https://t.me/+privateInvite,\\n",
             encoding="utf-8",
         )
         output = StringIO()
@@ -83,6 +83,38 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(targets[0]["source_status"], "discovered_not_joined")
         self.assertEqual(targets[0]["status"], "pending")
         self.assertEqual(targets[0]["promotion_policy"], "unknown")
+
+    def test_catalog_reimport_updates_metadata_without_duplicates(self):
+        catalog_path = Path(self.tmp.name) / "targets.json"
+        first = {
+            "communities": [{
+                "id": "sample-pr",
+                "name": "Original name",
+                "url": "https://t.me/sample_pr_group",
+                "kind": "public_self_promotion_group",
+                "language": "ru",
+                "audience_topics": ["promotion"],
+                "checked_at": "2026-10-28",
+                "automation_status": "discovered_not_joined",
+            }]
+        }
+        catalog_path.write_text(json.dumps(first), encoding="utf-8")
+        with redirect_stdout(StringIO()):
+            publisher_main(["--db", str(self.store.db_path), "import-catalog", "--json", str(catalog_path)])
+
+        first_id = self.store.list_targets()[0]["id"]
+        first["communities"][0]["name"] = "Updated name"
+        catalog_path.write_text(json.dumps(first), encoding="utf-8")
+        with redirect_stdout(StringIO()):
+            publisher_main(["--db", str(self.store.db_path), "import-catalog", "--json", str(catalog_path)])
+
+        targets = self.store.list_targets()
+        self.assertEqual(len(targets), 1)
+        self.assertEqual(targets[0]["id"], first_id)
+        self.assertEqual(targets[0]["display_name"], "Updated name")
+        self.assertEqual(targets[0]["status"], "pending")
+        self.assertEqual(targets[0]["promotion_policy"], "unknown")
+
     def test_new_target_is_pending_and_ineligible(self):
         target_id = self.store.add_target("group", "@example")
         target = self.store.get_target(target_id)
