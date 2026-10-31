@@ -41,6 +41,9 @@ def validate_ledger(data):
         if not isinstance(row, dict):
             errors.append(f"{prefix} must be an object")
             continue
+        target_id = row.get("target_id")
+        if not isinstance(target_id, str) or not target_id.strip():
+            errors.append(f"{prefix}.target_id is required")
         record_id = row.get("record_id")
         if not isinstance(record_id, str) or not record_id.strip():
             errors.append(f"{prefix}.record_id is required")
@@ -56,6 +59,8 @@ def validate_ledger(data):
         decision = row.get("permission_decision")
         if decision is not None and decision not in DECISIONS:
             errors.append(f"{prefix}.permission_decision is invalid")
+        if status == "rules_checked" and decision not in DECISIONS:
+            errors.append(f"{prefix}.permission_decision is required for rules_checked status")
 
         if status in {"rules_checked", "permission_confirmed", "published", "measured"}:
             if not is_date(row.get("rules_checked_at")):
