@@ -81,6 +81,8 @@ class PublisherStore:
             return cur.lastrowid
 
     def import_catalog_community(self, item):
+        if not isinstance(item, dict):
+            raise ValueError("catalog community must be an object")
         url = item.get("url") or item.get("evidence_url")
         handle = normalize_public_target(url)
         raw_kind = str(item.get("kind") or "").lower()
