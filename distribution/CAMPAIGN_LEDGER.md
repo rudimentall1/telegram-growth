@@ -25,11 +25,11 @@ Allowed permission decisions: approved_for_manual_post, not_allowed, needs_clari
 
 Public Telegram previews were checked for the five seeded candidates. The ledger records the preview date, a short description and the public preview URL for each target. This is discovery evidence only.
 
-- @ifreepr: preview describes a free advertising group for channels, groups and bots.
-- @prchatik: preview advertises free and mutual promotion, while also referencing a price list.
-- @prbirza1: preview advertises free advertising and mutual promotion, while also referencing a price list.
-- @p1rchat: preview describes a free mutual-promotion chat and invites users to publish posts.
-- @reklamabesplatnoz: preview advertises free promotion for projects, websites, Telegram channels, products and services.
+- @ifreepr: preview describes a free-advertising group for channels, groups and bots.
+- @prchatik: preview advertises free and mutual promotion, links to related promotion channels, and also points to a price list and paid-placement contact.
+- @prbirza1: preview describes a free mutual-promotion chat, links to related promotion channels, and also points to a price list and paid-placement contact.
+- @p1rchat: preview explicitly invites users to publish posts in a free mutual-promotion chat and provides an admin/ban-contact route.
+- @reklamabesplatnoz: preview advertises free placement for projects, websites, Telegram channels, products and services, and claims no bots or fake views.
 
 The public previews do not expose enough information to verify current pinned rules, topic restrictions, post frequency limits, or whether a specific CryptoPing RU post is allowed. Therefore all five records deliberately remain candidate. No group was joined, no administrator was contacted, and no post was published. The next gate is a human review of the current in-chat rules and, where unclear, explicit moderator permission.
 
