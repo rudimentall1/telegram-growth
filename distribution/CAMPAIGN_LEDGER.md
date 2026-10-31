@@ -15,7 +15,7 @@ Allowed permission decisions: approved_for_manual_post, not_allowed, needs_clari
 ## Operating sequence
 
 1. Create a ledger record with a unique record_id and the original target_id.
-2. Review the current pinned/in-chat rules. Record rules_checked_at, a direct rules_evidence_url permalink, rules_checked_by and permission_decision. A public group preview or directory description is not evidence that the rules were checked.
+2. Review the current pinned/in-chat rules. Record rules_checked_at, a direct rules_evidence_url permalink, rules_evidence_type=in_chat_rules, rules_checked_by and permission_decision. A public group preview or directory description is not evidence that the rules were checked.
 3. For an approved target, record the exact permission_evidence_url, who confirmed it and the date. A public directory description or old discovery note is not proof of current permission.
 4. Create a unique bot invite link with /growthlink wave1_targetkey before a permitted post. Record the returned link and source key.
 5. A human publishes the post. Record the public post URL and date. This workflow does not post to third-party communities.
