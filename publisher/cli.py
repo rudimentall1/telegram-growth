@@ -1,6 +1,7 @@
 """Command-line interface for reviewing targets and creating dry-run plans."""
 import argparse
 import csv
+import json
 import sqlite3
 
 from .links import normalize_public_target
@@ -26,6 +27,9 @@ def build_parser():
 
     importer = commands.add_parser("import-candidates", help="import public community candidates from CSV")
     importer.add_argument("--csv", required=True, dest="csv_path")
+
+    catalog = commands.add_parser("import-catalog", help="import public communities from distribution/targets.json")
+    catalog.add_argument("--json", dest="json_path", default="distribution/targets.json")
 
     commands.add_parser("list-targets", help="list registered communities")
 
@@ -74,6 +78,22 @@ def main(argv=None):
                     rejected += 1
                     print(f"CSV line {line_number}: rejected ({exc})")
         print(f"Import complete: added={imported}, duplicates={duplicates}, rejected={rejected}")
+    elif args.command == "import-catalog":
+        with open(args.json_path, "r", encoding="utf-8") as source:
+            catalog = json.load(source)
+        communities = catalog.get("communities")
+        if not isinstance(communities, list):
+            raise ValueError("catalog JSON must contain a communities array")
+        imported = 0
+        rejected = 0
+        for item in communities:
+            try:
+                store.import_catalog_community(item)
+                imported += 1
+            except (ValueError, sqlite3.Error, TypeError) as exc:
+                rejected += 1
+                print("Rejected catalog item " + str(item.get("id", "<unknown>")) + ": " + str(exc))
+        print("Catalog import complete: processed=" + str(imported) + ", rejected=" + str(rejected))
     elif args.command == "list-targets":
         for target in store.list_targets():
             print(
