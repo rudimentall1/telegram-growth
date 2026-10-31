@@ -133,6 +133,7 @@ def main(argv=None):
             print(
                 f"#{target['id']} {name} ({target['handle']}) [{target['kind']}] "
                 f"status={target['status']} policy={target['promotion_policy']} "
+                f"catalog_id={target.get('catalog_id') or '-'} "
                 f"language={language} source={source_status} topics={topics}"
             )
     elif args.command == "add-draft":
