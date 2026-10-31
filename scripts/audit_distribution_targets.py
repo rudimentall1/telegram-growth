@@ -50,9 +50,11 @@ def audit_registry(data: dict[str, Any], as_of: date, max_age_days: int = 14) ->
                 if not record.get(field):
                     errors.append(f"{label}: missing {field}")
             record_id = record.get("id")
-            if record_id:
-                if record_id in seen_ids:
-                    errors.append(f"{label}: duplicate id {record_id}")
+            if not isinstance(record_id, str) or not record_id.strip():
+                errors.append(f"{label}: id must be a non-empty string")
+            elif record_id in seen_ids:
+                errors.append(f"{label}: duplicate id {record_id}")
+            else:
                 seen_ids.add(record_id)
 
             status = record.get(status_field)
