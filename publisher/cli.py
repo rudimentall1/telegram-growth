@@ -95,7 +95,8 @@ def main(argv=None):
                 imported += 1
             except (ValueError, sqlite3.Error, TypeError) as exc:
                 rejected += 1
-                print("Rejected catalog item " + str(item.get("id", "<unknown>")) + ": " + str(exc))
+                item_id = item.get("id", "<unknown>") if isinstance(item, dict) else "<unknown>"
+                print("Rejected catalog item " + str(item_id) + ": " + str(exc))
         print("Catalog import complete: processed=" + str(imported) + ", rejected=" + str(rejected))
     elif args.command == "pause-target":
         store.pause_target(args.id)
