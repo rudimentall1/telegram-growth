@@ -362,3 +362,70 @@ def mark_promotion_failed(chat_id, error, disable=False):
                 updated_at=CURRENT_TIMESTAMP
             WHERE chat_id=?
         """, (message, int(bool(disable)), chat_id))
+
+
+def cohort_retention(days=30, retention_days=7):
+    """Return mature first-observed-join cohorts and their retained share.
+
+    Cohort members are users whose first recorded join event fell within the
+    requested acquisition window, ending retention_days ago. A user is counted
+    as retained when their latest recorded membership event at the retention
+    horizon is a join. This is observed Dn retention, not click attribution or
+    a full-channel metric; results depend on uninterrupted chat_member updates.
+    """
+    try:
+        days = int(days)
+        retention_days = int(retention_days)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("days and retention_days must be integers between 1 and 3650") from exc
+    if not 1 <= days <= 3650 or not 1 <= retention_days <= 3650:
+        raise ValueError("days and retention_days must be integers between 1 and 3650")
+
+    with connect() as db:
+        rows = db.execute("""
+            WITH ranked_events AS (
+                SELECT user_id, source, event_type, event_at, update_id,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY user_id
+                           ORDER BY event_at ASC, update_id ASC
+                       ) AS event_rank
+                FROM growth_events
+                WHERE event_type = 'join'
+            ),
+            first_joins AS (
+                SELECT user_id, source, event_at AS joined_at
+                FROM ranked_events
+                WHERE event_rank = 1
+                  AND event_type = 'join'
+                  AND event_at >= datetime('now', ?)
+                  AND event_at <= datetime('now', ?)
+            ),
+            cohort_status AS (
+                SELECT f.user_id, f.source,
+                       (
+                           SELECT e.event_type
+                           FROM growth_events AS e
+                           WHERE e.user_id = f.user_id
+                             AND e.event_at <= datetime(f.joined_at, ?)
+                           ORDER BY e.event_at DESC, e.update_id DESC
+                           LIMIT 1
+                       ) AS status_at_horizon
+                FROM first_joins AS f
+            )
+            SELECT source,
+                   COUNT(*) AS cohort_size,
+                   SUM(CASE WHEN status_at_horizon = 'join' THEN 1 ELSE 0 END) AS retained
+            FROM cohort_status
+            GROUP BY source
+            ORDER BY retained DESC, cohort_size DESC, source
+        """, (
+            f"-{days + retention_days} days",
+            f"-{retention_days} days",
+            f"+{retention_days} days",
+        )).fetchall()
+
+    return [
+        (source, int(cohort_size), int(retained or 0),
+         round(100.0 * int(retained or 0) / int(cohort_size), 1))
+        for source, cohort_size, retained in rows
+    ]
