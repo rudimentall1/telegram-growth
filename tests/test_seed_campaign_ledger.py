@@ -54,6 +54,18 @@ class SeedCampaignLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "record_id already exists"):
             seed_records(self.registry, ledger, ["ifreepr"])
 
+    def test_malformed_existing_target_id_fails_cleanly(self):
+        ledger = {"version": 1, "placements": [
+            {"record_id": "r1", "target_id": [], "status": "candidate"}
+        ]}
+        with self.assertRaisesRegex(ValueError, "target_id must be a string"):
+            seed_records(self.registry, ledger, ["ifreepr"])
+
+    def test_non_object_existing_placement_fails_cleanly(self):
+        ledger = {"version": 1, "placements": ["bad-row"]}
+        with self.assertRaisesRegex(ValueError, "must be an object"):
+            seed_records(self.registry, ledger, ["ifreepr"])
+
     def test_invalid_ledger_shape_fails(self):
         with self.assertRaisesRegex(ValueError, "placements"):
             seed_records(self.registry, {"version": 1, "placements": None}, ["ifreepr"])
