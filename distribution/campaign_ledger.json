@@ -1,1 +1,60 @@
-{"version": 1, "placements": []}
+{
+  "version": 1,
+  "placements": [
+    {
+      "record_id": "target-ifreepr",
+      "target_id": "ifreepr",
+      "target_name": "Free пиар чат",
+      "target_url": "https://t.me/ifreepr",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/ifreepr",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-prchatik",
+      "target_id": "prchatik",
+      "target_name": "Взаимопиар реклама",
+      "target_url": "https://t.me/prchatik",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/prchatik",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-prbirza1",
+      "target_id": "prbirza1",
+      "target_name": "Взаимопиар Free PR chat",
+      "target_url": "https://t.me/prbirza1",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/prbirza1",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-p1rchat",
+      "target_id": "p1rchat",
+      "target_name": "ВзаимоПиар, Бесплатный пиар",
+      "target_url": "https://t.me/p1rchat",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/p1rchat",
+      "status": "candidate"
+    },
+    {
+      "record_id": "target-reklamabesplatnoz",
+      "target_id": "reklamabesplatnoz",
+      "target_name": "Бесплатная реклама | Взаимопиар",
+      "target_url": "https://t.me/reklamabesplatnoz",
+      "registry_section": "communities",
+      "registry_last_checked_at": "2026-10-28",
+      "discovery_status": "discovered_not_joined",
+      "discovery_evidence_url": "https://t.me/reklamabesplatnoz",
+      "status": "candidate"
+    }
+  ]
+}
