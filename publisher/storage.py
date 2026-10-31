@@ -168,7 +168,15 @@ class PublisherStore:
 
     def get_target(self, target_id):
         with self.connect() as db:
-            row = db.execute("SELECT * FROM targets WHERE id=?", (target_id,)).fetchone()
+            row = db.execute("""
+                SELECT t.*, m.catalog_id, m.display_name, m.source_kind,
+                       m.language, m.audience_topics_json,
+                       m.publicly_stated_permission, m.observed_members,
+                       m.source_checked_at, m.source_status, m.evidence_url, m.notes
+                FROM targets t
+                LEFT JOIN target_catalog_metadata m ON m.target_id=t.id
+                WHERE t.id=?
+            """, (target_id,)).fetchone()
             return dict(row) if row else None
 
     def add_draft(self, title, body):
