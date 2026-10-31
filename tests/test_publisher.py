@@ -133,6 +133,8 @@ class PublisherTests(unittest.TestCase):
         self.assertIn("Review candidate", rendered)
         self.assertIn("Description says free promotion.", rendered)
         self.assertIn("Permission evidence: not recorded", rendered)
+        self.assertIn("Rules URL: not set", rendered)
+        self.assertIn("Catalog evidence URL: https://t.me/review_candidate", rendered)
         self.assertIn("Check pinned rules.", rendered)
 
     def test_catalog_import_rejects_malformed_item_and_continues(self):
