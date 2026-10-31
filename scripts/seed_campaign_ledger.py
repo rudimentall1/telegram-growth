@@ -31,6 +31,7 @@ def seed_records(registry, ledger, target_ids):
                 index[row["id"]] = (section, row)
 
     existing = {row.get("target_id") for row in placements if isinstance(row, dict)}
+    existing_record_ids = {row.get("record_id") for row in placements if isinstance(row, dict)}
     created, skipped = [], []
     for target_id in target_ids:
         if target_id in existing:
@@ -39,8 +40,11 @@ def seed_records(registry, ledger, target_ids):
         if target_id not in index:
             raise ValueError(f"unknown target id: {target_id}")
         section, target = index[target_id]
+        record_id = f"target-{target_id}"
+        if record_id in existing_record_ids:
+            raise ValueError(f"record_id already exists in ledger: {record_id}")
         record = {
-            "record_id": f"target-{target_id}",
+            "record_id": record_id,
             "target_id": target_id,
             "target_name": target.get("name"),
             "target_url": target.get("url"),
@@ -52,6 +56,7 @@ def seed_records(registry, ledger, target_ids):
             record["discovery_evidence_url"] = evidence
         placements.append(record)
         existing.add(target_id)
+        existing_record_ids.add(record_id)
         created.append(record)
     return ledger, created, skipped
 
