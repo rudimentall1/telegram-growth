@@ -254,7 +254,7 @@ async def growth_retention(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Использование: /growthretention [30d]"
             )
             return
-        match = re.fullmatch(r"(\\d{1,4})(?:d|д)?", context.args[0].strip().lower())
+        match = re.fullmatch(r"(\d{1,4})(?:d|д)?", context.args[0].strip().lower())
         if not match or not 1 <= int(match.group(1)) <= 3650:
             await update.effective_message.reply_text(
                 "Укажи окно когорты: /growthretention 30d."
