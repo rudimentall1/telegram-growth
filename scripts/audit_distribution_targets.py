@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter
 from datetime import date, timedelta
@@ -11,6 +12,8 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[1] / "distribution" / "targets.json"
+DATE_RE = re.compile(r"^\\d{4}-\\d{2}-\\d{2}$")
+
 GROUP_FIELDS = {
     "networks": "setup_status",
     "communities": "automation_status",
@@ -19,6 +22,8 @@ GROUP_FIELDS = {
 
 
 def audit_registry(data: dict[str, Any], as_of: date, max_age_days: int = 14) -> dict[str, Any]:
+    if not isinstance(data, dict):
+        raise ValueError("registry root must be an object")
     if max_age_days < 0:
         raise ValueError("max_age_days must be non-negative")
     errors: list[str] = []
@@ -63,7 +68,10 @@ def audit_registry(data: dict[str, Any], as_of: date, max_age_days: int = 14) ->
                 missing_dates += 1
             else:
                 try:
-                    checked_date = date.fromisoformat(str(checked))
+                    checked_text = str(checked)
+                    if not DATE_RE.fullmatch(checked_text):
+                        raise ValueError("checked_at must use YYYY-MM-DD")
+                    checked_date = date.fromisoformat(checked_text)
                     if checked_date < as_of - timedelta(days=max_age_days):
                         stale += 1
                 except ValueError:
