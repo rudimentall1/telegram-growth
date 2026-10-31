@@ -108,6 +108,49 @@ class CrossPromoTests(unittest.TestCase):
         self.assertTrue(cross_promo.set_channel_status(-1000000000001, "active"))
         self.assertEqual(cross_promo.get_channel(-1000000000001)["status"], "active")
 
+    def test_partner_performance_reports_deliveries_and_attributed_members(self):
+        partner_chat_id = -1000000000002
+        self.add_active(partner_chat_id, "Partner", "partner_channel", 27, 42)
+        invite_link = f"https://t.me/+tracked{abs(partner_chat_id)}"
+        growth_db.save_link(invite_link, f"xpromo_{abs(partner_chat_id)}", 42)
+
+        growth_db.record_member(201, 501, invite_link, True)
+        growth_db.record_member(202, 501, None, False)
+        growth_db.record_member(203, 502, invite_link, True)
+
+        cross_promo.mark_delivery(-1000000000001, partner_chat_id, 555)
+        cross_promo.mark_delivery(partner_chat_id, -1000000000001, 556)
+
+        rows = cross_promo.partner_performance(
+            days=30, home_chat_id=-1000000000001
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["username"], "partner_channel")
+        self.assertEqual(rows[0]["posts_hosted"], 1)
+        self.assertEqual(rows[0]["posts_featured"], 1)
+        self.assertEqual(rows[0]["joins"], 2)
+        self.assertEqual(rows[0]["leaves"], 1)
+        self.assertEqual(rows[0]["net"], 1)
+        self.assertEqual(rows[0]["active_attributed"], 1)
+        self.assertTrue(rows[0]["attribution_available"])
+
+    def test_partner_performance_marks_missing_invite_attribution(self):
+        cross_promo.add_pending_channel(
+            -1000000000002, "Untracked partner", "untracked_partner", 15, 42, None
+        )
+        rows = cross_promo.partner_performance(
+            days=30, home_chat_id=-1000000000001
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertFalse(rows[0]["attribution_available"])
+        self.assertEqual(rows[0]["joins"], 0)
+
+    def test_partner_performance_rejects_invalid_period(self):
+        for value in (0, -1, 3651, "last week"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    cross_promo.partner_performance(value, -1000000000001)
+
     def test_interval_validation(self):
         for invalid in (0, -1, 721, "never"):
             with self.subTest(invalid=invalid):
