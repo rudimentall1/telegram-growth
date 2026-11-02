@@ -226,7 +226,8 @@ def register_handlers(app, admin_check, community_chat_id=None):
             "/pubtargets - show registered destinations\n"
             "/pubdraft Title | message text - create a draft\n"
             "/pubsources - show latest posts captured from our news channel\n"
-            "New channel posts become drafts automatically; approve manually.\n"
+            "New posts from our own channel are auto-checked and sent to our community.\n"
+            "External destinations remain blocked until their permission is verified.\n"
             "/pubapprove DRAFT_ID - approve a draft\n"
             "/pubreview TARGET_ID allow | evidence\n"
             "/pubreview TARGET_ID reject | reason\n"
@@ -276,12 +277,12 @@ def register_handlers(app, admin_check, community_chat_id=None):
         if not rows:
             await update.effective_message.reply_text("Пока нет новых текстовых постов из канала.")
             return
-        lines = ["Последние посты канала, сохранённые как черновики:"]
+        lines = ["Последние посты канала и статус автоматической публикации:"]
         for row in rows:
             source = row.get("source_url") or f"message {row['source_message_id']}"
             lines.append(
                 f"Draft #{row['draft_id']} [{row['draft_status']}] {row['title']}\n{source}\n"
-                f"Одобрить: /pubapprove {row['draft_id']}"
+                f"Автопроцесс: {'готов к публикации' if row['draft_status'] == 'draft' else row['draft_status']}"
             )
         await update.effective_message.reply_text("\n\n".join(lines)[:4000])
 
