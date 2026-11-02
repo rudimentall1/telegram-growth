@@ -1,0 +1,272 @@
+import tempfile
+import unittest
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
+
+from telegram.error import Forbidden, NetworkError
+
+from publisher.storage import PublisherStore
+from publisher.telegram import publish_draft_to_target
+
+
+class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.store = PublisherStore(str(Path(self.temp.name) / "publisher.db"))
+        self.target_id = self.store.add_target("channel", "@sample_channel")
+        self.store.review_target(
+            self.target_id, "approve", "allowed",
+            "Moderator rules explicitly allow one relevant promotional post",
+        )
+        self.draft_id = self.store.add_draft("CryptoPing", "Useful crypto news digest.")
+        self.store.approve_draft(self.draft_id)
+        self.bot = SimpleNamespace(
+            get_chat=AsyncMock(return_value=SimpleNamespace(
+                id=-100123456789, type="channel", username="sample_channel"
+            )),
+            get_me=AsyncMock(return_value=SimpleNamespace(id=777)),
+            get_chat_member=AsyncMock(return_value=SimpleNamespace(
+                status="administrator", can_post_messages=True
+            )),
+            send_message=AsyncMock(return_value=SimpleNamespace(message_id=99)),
+        )
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    async def test_send_checks_rights_and_records_publication_once(self):
+        first = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(first["status"], "sent")
+        self.assertEqual(first["message_url"], "https://t.me/sample_channel/99")
+        self.bot.get_chat_member.assert_awaited_once_with(-100123456789, 777)
+        self.bot.send_message.assert_awaited_once_with(
+            chat_id=-100123456789,
+            text="Useful crypto news digest.",
+            disable_web_page_preview=True,
+        )
+        delivery = self.store.get_delivery(self.draft_id, self.target_id)
+        self.assertEqual(delivery["status"], "sent")
+        self.assertEqual(delivery["telegram_message_id"], 99)
+        self.assertIsNotNone(self.store.get_target(self.target_id)["last_posted_at"])
+
+        second = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(second["status"], "sent")
+        self.bot.send_message.assert_awaited_once()
+
+    async def test_non_admin_bot_is_rejected_before_delivery_claim(self):
+        self.bot.get_chat_member.return_value = SimpleNamespace(status="member")
+        with self.assertRaises(PermissionError):
+            await publish_draft_to_target(
+                self.bot, self.store, self.draft_id, self.target_id
+            )
+        self.assertIsNone(self.store.get_delivery(self.draft_id, self.target_id))
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_channel_without_post_permission_is_rejected(self):
+        self.bot.get_chat_member.return_value = SimpleNamespace(
+            status="administrator", can_post_messages=False
+        )
+        with self.assertRaises(PermissionError):
+            await publish_draft_to_target(
+                self.bot, self.store, self.draft_id, self.target_id
+            )
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_target_kind_must_match_actual_chat_type(self):
+        self.bot.get_chat.return_value = SimpleNamespace(
+            id=-100123456789, type="supergroup", username="sample_channel"
+        )
+        with self.assertRaises(PermissionError):
+            await publish_draft_to_target(
+                self.bot, self.store, self.draft_id, self.target_id
+            )
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_stale_permission_is_skipped_without_telegram_call(self):
+        old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
+        with self.store.connect() as db:
+            db.execute(
+                "UPDATE targets SET reviewed_at=? WHERE id=?",
+                (old, self.target_id),
+            )
+        result = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(result["status"], "skipped")
+        self.bot.get_chat.assert_not_awaited()
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_network_error_becomes_unknown_and_is_never_retried(self):
+        self.bot.send_message.side_effect = NetworkError("connection lost")
+        first = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(first["status"], "unknown")
+        second = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(second["status"], "unknown")
+        self.bot.send_message.assert_awaited_once()
+        self.assertEqual(
+            self.store.get_delivery(self.draft_id, self.target_id)["status"],
+            "unknown",
+        )
+
+    async def test_definitive_telegram_failure_can_be_retried_manually(self):
+        self.bot.send_message.side_effect = [Forbidden("posting forbidden"), SimpleNamespace(message_id=100)]
+        first = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(first["status"], "failed")
+        second = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id
+        )
+        self.assertEqual(second["status"], "sent")
+        self.assertEqual(
+            self.store.get_delivery(self.draft_id, self.target_id)["attempt_count"],
+            2,
+        )
+
+    async def test_unapproved_draft_cannot_be_sent(self):
+        draft_id = self.store.add_draft("Not approved", "Do not publish.")
+        with self.assertRaises(ValueError):
+            await publish_draft_to_target(
+                self.bot, self.store, draft_id, self.target_id
+            )
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_oversized_draft_is_rejected(self):
+        draft_id = self.store.add_draft("Too long", "x" * 4097)
+        self.store.approve_draft(draft_id)
+        with self.assertRaises(ValueError):
+            await publish_draft_to_target(
+                self.bot, self.store, draft_id, self.target_id
+            )
+        self.bot.send_message.assert_not_awaited()
+
+
+    async def test_batch_sends_only_reviewed_targets(self):
+        from publisher.telegram import publish_draft_to_eligible_targets
+
+        second_id = self.store.add_target("channel", "@second_channel")
+        self.store.review_target(
+            second_id, "approve", "allowed",
+            "Moderator explicitly approved one promotional post",
+        )
+        pending_id = self.store.add_target("group", "@pending_group")
+
+        self.bot.get_chat.side_effect = [
+            SimpleNamespace(id=-100123456789, type="channel", username="sample_channel"),
+            SimpleNamespace(id=-100987654321, type="channel", username="second_channel"),
+        ]
+        self.bot.get_chat_member.side_effect = [
+            SimpleNamespace(status="administrator", can_post_messages=True),
+            SimpleNamespace(status="administrator", can_post_messages=True),
+        ]
+        self.bot.send_message.side_effect = [
+            SimpleNamespace(message_id=101),
+            SimpleNamespace(message_id=102),
+        ]
+
+        draft, results, _ = await publish_draft_to_eligible_targets(
+            self.bot, self.store, self.draft_id, delay_seconds=0
+        )
+        self.assertEqual(draft["id"], self.draft_id)
+        self.assertEqual([row["target_id"] for row in results], [self.target_id, second_id, pending_id])
+        self.assertEqual([row["status"] for row in results], ["sent", "sent", "skipped"])
+        self.assertIsNone(self.store.get_delivery(self.draft_id, pending_id))
+        self.assertEqual(self.bot.send_message.await_count, 2)
+
+    async def test_command_registration_exposes_guarded_publisher_controls(self):
+        from publisher.telegram import register_handlers
+
+        class FakeApp:
+            def __init__(self):
+                self.handlers = []
+
+            def add_handler(self, handler):
+                self.handlers.append(handler)
+
+        async def admin_check(update, context):
+            return True
+
+        app = FakeApp()
+        register_handlers(app, admin_check)
+        commands = {next(iter(handler.commands)) for handler in app.handlers}
+        self.assertEqual(commands, {
+            "pubhelp", "pubtargets", "pubdraft", "pubapprove",
+            "pubreview", "pubplan", "pubsend", "pubsendall", "pubdelivery",
+        })
+
+
+    async def test_batch_limit_defers_remaining_targets_and_next_run_continues(self):
+        from publisher.telegram import publish_draft_to_eligible_targets
+
+        second_id = self.store.add_target("channel", "@second_channel")
+        self.store.review_target(
+            second_id, "approve", "allowed",
+            "Moderator explicitly approved one promotional post",
+        )
+        self.bot.get_chat.side_effect = [
+            SimpleNamespace(id=-100123456789, type="channel", username="sample_channel"),
+        ]
+        self.bot.get_chat_member.side_effect = [
+            SimpleNamespace(status="administrator", can_post_messages=True),
+        ]
+        self.bot.send_message.side_effect = [SimpleNamespace(message_id=201)]
+
+        _, first_run, cursor = await publish_draft_to_eligible_targets(
+            self.bot, self.store, self.draft_id, delay_seconds=0, max_targets=1
+        )
+        self.assertEqual([row["status"] for row in first_run], ["sent", "deferred"])
+        self.assertEqual(cursor, self.target_id)
+
+        self.bot.get_chat.side_effect = [
+            SimpleNamespace(id=-100987654321, type="channel", username="second_channel"),
+        ]
+        self.bot.get_chat_member.side_effect = [
+            SimpleNamespace(status="administrator", can_post_messages=True),
+        ]
+        self.bot.send_message.side_effect = [SimpleNamespace(message_id=202)]
+        _, second_run, second_cursor = await publish_draft_to_eligible_targets(
+            self.bot, self.store, self.draft_id, delay_seconds=0, max_targets=1,
+            after_target_id=cursor,
+        )
+        self.assertEqual([row["status"] for row in second_run], ["sent"])
+        self.assertEqual(second_cursor, second_id)
+        self.assertEqual(self.bot.send_message.await_count, 2)
+
+    async def test_non_admin_cannot_execute_publish_command(self):
+        from publisher.telegram import register_handlers
+
+        class FakeApp:
+            def __init__(self):
+                self.handlers = []
+
+            def add_handler(self, handler):
+                self.handlers.append(handler)
+
+        async def deny_admin(update, context):
+            return False
+
+        app = FakeApp()
+        register_handlers(app, deny_admin)
+        handler = next(item for item in app.handlers if "pubsend" in item.commands)
+        reply_text = AsyncMock()
+        update = SimpleNamespace(
+            effective_message=SimpleNamespace(reply_text=reply_text)
+        )
+        context = SimpleNamespace(args=["1", "1"], bot=self.bot)
+        await handler.callback(update, context)
+        reply_text.assert_awaited_once_with("Administrator access required.")
+        self.bot.send_message.assert_not_awaited()
+
+
+if __name__ == "__main__":
+    unittest.main()

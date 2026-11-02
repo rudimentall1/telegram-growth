@@ -149,3 +149,23 @@ automatic placements unless their current rules and publishing permissions allow
 - `/growthretention 30d` — D7 retention by first-observed acquisition source for mature cohorts.
 - The report excludes cohorts younger than seven days so every included user has a full D7 observation window.
 - Cohorts are based on the first join event observed by this bot. Missing Telegram `chat_member` updates can affect the result; this is not a full-channel analytics metric.
+
+
+## Publisher: permission-checked community posts
+
+The Publisher module is integrated into the existing `group_bot.py` Telegram
+application. It shares the running bot process but stores its review, drafts
+and delivery ledger separately in `data/publisher.db`.
+
+Operators can register candidates from the existing inventory, review explicit
+community rules, create and approve drafts, preview eligible targets, and publish
+one-by-one or as a controlled batch. Telegram destination type and bot admin
+rights are checked immediately before every send. Unknown network outcomes are
+not retried automatically, preventing duplicate posts.
+
+Commands: `/pubhelp`, `/pubtargets`, `/pubdraft`, `/pubapprove`,
+`/pubreview`, `/pubplan`, `/pubsend`, `/pubsendall`, `/pubdelivery`.
+
+See [README_PUBLISHER.md](README_PUBLISHER.md) for setup, permissions, delivery
+safety and tests. The module does not join communities, scrape Telegram, send
+unsolicited DMs, or bypass moderator rules.

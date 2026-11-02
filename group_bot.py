@@ -17,6 +17,7 @@ import config
 from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
 import cross_promo
+from publisher.telegram import register_handlers as register_publisher_handlers
 
 logging.basicConfig(level=logging.INFO)
 # httpx logs full Telegram Bot API request URLs at INFO level; those URLs contain
@@ -500,6 +501,7 @@ def main():
     app.add_handler(ChatMemberHandler(track_channel_member, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
     cross_promo.register_handlers(app)
+    register_publisher_handlers(app, _growth_admin)
 
     interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
     if not 1 <= interval_hours <= 720:
