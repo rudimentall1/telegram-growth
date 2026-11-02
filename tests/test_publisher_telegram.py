@@ -59,6 +59,24 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(second["status"], "sent")
         self.bot.send_message.assert_awaited_once()
 
+    async def test_publication_appends_and_reuses_target_specific_community_invite(self):
+        self.bot.create_chat_invite_link = AsyncMock(return_value=SimpleNamespace(
+            invite_link="https://t.me/+trackedInvite"
+        ))
+        first = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id,
+            community_chat_id=-1004298750600,
+        )
+        self.assertEqual(first["status"], "sent")
+        self.bot.create_chat_invite_link.assert_awaited_once_with(
+            chat_id=-1004298750600,
+            name=f"cp-pub-{self.draft_id}-{self.target_id}",
+            creates_join_request=False,
+        )
+        sent_text = self.bot.send_message.await_args.kwargs["text"]
+        self.assertIn("Наше сообщество: https://t.me/+trackedInvite", sent_text)
+        self.assertEqual(self.store.get_target_invite(self.target_id), "https://t.me/+trackedInvite")
+
     async def test_non_admin_bot_is_rejected_before_delivery_claim(self):
         self.bot.get_chat_member.return_value = SimpleNamespace(status="member")
         with self.assertRaises(PermissionError):
@@ -201,7 +219,7 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         commands = {next(iter(handler.commands)) for handler in app.handlers}
         self.assertEqual(commands, {
             "pubhelp", "pubtargets", "pubdraft", "pubapprove",
-            "pubreview", "pubplan", "pubsend", "pubsendall", "pubdelivery",
+            "pubsources", "pubreview", "pubplan", "pubsend", "pubsendall", "pubdelivery",
         })
 
 

@@ -6,6 +6,7 @@ from telegram import Update
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import (
     ApplicationBuilder,
+    TypeHandler,
     ChatMemberHandler,
     CommandHandler,
     ContextTypes,
@@ -18,6 +19,7 @@ from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
 import cross_promo
 from publisher.telegram import register_handlers as register_publisher_handlers
+from publisher.storage import PublisherStore
 
 logging.basicConfig(level=logging.INFO)
 # httpx logs full Telegram Bot API request URLs at INFO level; those URLs contain
@@ -82,6 +84,33 @@ def is_mostly_greeting(text):
     if len(words) > 4:
         return False
     return any(greeting in text for greeting in GREETINGS)
+
+
+async def on_source_channel_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Capture new text/caption posts from our own news channel as drafts only."""
+    post = update.channel_post
+    if not post:
+        return
+    configured_source = str(CHAT_ID).strip()
+    if configured_source.startswith("@"):
+        if (getattr(post.chat, "username", None) or "").lower() != configured_source[1:].lower():
+            return
+    elif str(post.chat_id) != configured_source:
+        return
+    body = (post.text or post.caption or "").strip()
+    if not body:
+        logging.info("publisher source post skipped: no text/caption message_id=%s", post.message_id)
+        return
+    title = " ".join(body.split())[:100]
+    username = getattr(post.chat, "username", None)
+    source_url = f"https://t.me/{username}/{post.message_id}" if username else None
+    try:
+        draft_id, created = PublisherStore().capture_source_post(
+            post.chat_id, post.message_id, title, body, source_url
+        )
+        logging.info("publisher source captured draft_id=%s message_id=%s created=%s", draft_id, post.message_id, created)
+    except Exception:
+        logging.exception("Unable to capture source channel post message_id=%s", post.message_id)
 
 
 async def on_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -491,6 +520,7 @@ async def publish_due_promotions(context: ContextTypes.DEFAULT_TYPE):
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, on_new_member))
+    app.add_handler(TypeHandler(Update, on_source_channel_post), group=1)
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("growthlink", growth_link))
     app.add_handler(CommandHandler("growthreport", growth_report))
@@ -501,7 +531,7 @@ def main():
     app.add_handler(ChatMemberHandler(track_channel_member, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
     cross_promo.register_handlers(app)
-    register_publisher_handlers(app, _growth_admin)
+    register_publisher_handlers(app, _growth_admin, GROUP_CHAT_ID)
 
     interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
     if not 1 <= interval_hours <= 720:

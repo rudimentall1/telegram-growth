@@ -58,3 +58,23 @@ explicit and current.
 
 The current Publisher is a local review and dry-run planner. It does not join groups,
 scrape Telegram, contact moderators, send messages, or use an MTProto session.
+
+
+## Public rules research update: 2026-11-02
+
+This pass checked current public Telegram previews and one published submission post. It did not join groups, inspect private/pinned in-chat messages, contact moderators, or grant posting permission. Public descriptions are useful for triage only.
+
+| Target | Public evidence found | Operational decision |
+|---|---|---|
+| [@ifreepr](https://t.me/ifreepr) | Telegram preview says free advertising of channels, groups and bots. | Best low-friction candidate to inspect manually. Pinned rules, crypto/finance restrictions, frequency and bot posting remain unknown. No automated post. |
+| [@p1rchat](https://t.me/p1rchat) | Preview says free PR and invites users to publish posts; also lists an advertising contact. | Possible manual post candidate after current rules check. Bot-authored posts and limits unknown. |
+| [@reklamabesplatnoz](https://t.me/reklamabesplatnoz) | Preview offers free project/Telegram advertising but explicitly says “Без ботов и фейков”. | Do not send via Publisher bot. Manual owner post only if group rules permit. |
+| [@prbirza1](https://t.me/prbirza1) | Preview lists separate free-advertising/mutual-PR groups and a paid placement contact/price. | Do not assume this group itself offers a free post. Clarify exact free destination first. |
+| [@prchatik](https://t.me/prchatik) | Preview routes users to other free-PR groups/catalogs and lists an advertising price/reviews contact. | Not approved for direct free posting. Investigate linked destination only as a separate candidate. |
+| [@TGvzaim](https://t.me/TGvzaim) | Preview describes mutual subscriptions and reciprocal subscriber growth. | Exclude from one-way news promotion. Do not participate in forced or artificial subscription exchanges. |
+| [@katalogtelegramkanalov](https://t.me/s/katalogtelegramkanalov?before=27) | Published post offers free reciprocal channel promotion, requires subscribing to the catalog channel and asks admins to comment with topic, channel link, reach and subscriber count. | This is a negotiated reciprocal exchange, not unilateral automated posting. Manual admin negotiation only. |
+| [@cryptoadminsVP](https://t.me/cryptoadminsVP) | Existing catalog snapshot reports crypto-admin advertising/cross-promotion and prohibits flooding/spam; current full rules were not visible in this pass. | Best topical match, but free terms, bot permission and frequency remain unknown. No post until explicit confirmation. |
+
+**Result:** no target is approved for automated publishing from public previews alone. In particular, “free promotion” does not automatically mean bot posting is permitted. The Publisher must continue to require fresh, explicit permission evidence and live Telegram admin rights. Keep one post per approved target, use a per-target invite link, and stop on any moderator objection.
+
+Sources: Telegram previews for [@ifreepr](https://t.me/ifreepr), [@p1rchat](https://t.me/p1rchat), [@reklamabesplatnoz](https://t.me/reklamabesplatnoz), [@prbirza1](https://t.me/prbirza1), [@prchatik](https://t.me/prchatik), [@TGvzaim](https://t.me/TGvzaim), and [@cryptoadminsVP](https://t.me/cryptoadminsVP); published instructions at [Каталог телеграм каналов](https://t.me/s/katalogtelegramkanalov?before=27).

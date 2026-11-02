@@ -77,6 +77,22 @@ class PublisherStore:
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS source_posts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    source_chat_id INTEGER NOT NULL,
+                    source_message_id INTEGER NOT NULL,
+                    source_url TEXT,
+                    draft_id INTEGER NOT NULL REFERENCES drafts(id),
+                    captured_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(source_chat_id, source_message_id)
+                );
+
+                CREATE TABLE IF NOT EXISTS target_invite_links (
+                    target_id INTEGER PRIMARY KEY REFERENCES targets(id) ON DELETE CASCADE,
+                    invite_link TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+
                 CREATE TABLE IF NOT EXISTS publication_deliveries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     draft_id INTEGER NOT NULL REFERENCES drafts(id),
@@ -235,6 +251,59 @@ class PublisherStore:
                 WHERE t.id=?
             """, (target_id,)).fetchone()
             return dict(row) if row else None
+
+
+    def capture_source_post(self, chat_id, message_id, title, body, source_url=None):
+        """Create one reviewable draft per incoming source-channel post."""
+        with self.connect() as db:
+            existing = db.execute(
+                "SELECT draft_id FROM source_posts WHERE source_chat_id=? AND source_message_id=?",
+                (chat_id, message_id),
+            ).fetchone()
+            if existing:
+                return existing["draft_id"], False
+            cur = db.execute(
+                "INSERT INTO drafts(title, body) VALUES (?, ?)",
+                (title.strip()[:120] or f"Source post {message_id}", body.strip()),
+            )
+            draft_id = cur.lastrowid
+            db.execute(
+                "INSERT INTO source_posts(source_chat_id, source_message_id, source_url, draft_id) VALUES (?, ?, ?, ?)",
+                (chat_id, message_id, source_url, draft_id),
+            )
+            return draft_id, True
+
+    def list_source_posts(self, limit=10):
+        with self.connect() as db:
+            rows = db.execute("""
+                SELECT s.*, d.title, d.status AS draft_status
+                FROM source_posts s JOIN drafts d ON d.id=s.draft_id
+                ORDER BY s.id DESC LIMIT ?
+            """, (max(1, min(int(limit), 20)),)).fetchall()
+            return [dict(row) for row in rows]
+
+    def get_or_create_target_invite(self, target_id, invite_link):
+        """Persist a target-scoped community invite so retries reuse the same URL."""
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT invite_link FROM target_invite_links WHERE target_id=?",
+                (target_id,),
+            ).fetchone()
+            if row:
+                return row["invite_link"], False
+            db.execute(
+                "INSERT INTO target_invite_links(target_id, invite_link) VALUES (?, ?)",
+                (target_id, invite_link),
+            )
+            return invite_link, True
+
+    def get_target_invite(self, target_id):
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT invite_link FROM target_invite_links WHERE target_id=?",
+                (target_id,),
+            ).fetchone()
+            return row["invite_link"] if row else None
 
     def add_draft(self, title, body):
         if not title.strip() or not body.strip():

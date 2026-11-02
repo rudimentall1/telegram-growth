@@ -12,7 +12,7 @@ MAX_TELEGRAM_TEXT_LENGTH = 4096
 MAX_BATCH_TARGETS = 20
 
 
-async def publish_draft_to_target(bot, store, draft_id, target_id):
+async def publish_draft_to_target(bot, store, draft_id, target_id, community_chat_id=None):
     draft = store.get_draft(draft_id)
     if not draft:
         raise LookupError("draft not found")
@@ -38,8 +38,22 @@ async def publish_draft_to_target(bot, store, draft_id, target_id):
     body = (draft.get("body") or "").strip()
     if not body:
         raise ValueError("draft body is empty")
+    # A unique, persistent invite to our own community is appended per approved target.
+    # No invite is created for pending/rejected targets because policy is checked above.
+    if community_chat_id is not None:
+        invite_link = store.get_target_invite(target_id)
+        if not invite_link:
+            invite = await bot.create_chat_invite_link(
+                chat_id=community_chat_id,
+                name=f"cp-pub-{draft_id}-{target_id}"[:32],
+                creates_join_request=False,
+            )
+            invite_link, _ = store.get_or_create_target_invite(
+                target_id, invite.invite_link
+            )
+        body = f"{body.rstrip()}\n\nНаше сообщество: {invite_link}"
     if len(body) > MAX_TELEGRAM_TEXT_LENGTH:
-        raise ValueError("draft exceeds Telegram's 4096-character text limit")
+        raise ValueError("draft plus community invite exceeds Telegram's 4096-character text limit")
 
     # Check the live destination and bot permissions before claiming a delivery.
     chat = await bot.get_chat(target["handle"])
@@ -112,7 +126,7 @@ async def publish_draft_to_target(bot, store, draft_id, target_id):
 
 async def publish_draft_to_eligible_targets(
     bot, store, draft_id, delay_seconds=1.2, max_targets=MAX_BATCH_TARGETS,
-    after_target_id=0,
+    after_target_id=0, community_chat_id=None,
 ):
     """Publish sequentially to a bounded batch and return a stable continuation cursor."""
     if max_targets < 1:
@@ -144,7 +158,8 @@ async def publish_draft_to_eligible_targets(
 
         try:
             result = await publish_draft_to_target(
-                bot, store, draft_id, item.target_id
+                bot, store, draft_id, item.target_id,
+                community_chat_id=community_chat_id,
             )
         except (PermissionError, TelegramError, LookupError, ValueError) as exc:
             result = {"status": "blocked", "reason": str(exc)[:300]}
@@ -160,7 +175,7 @@ async def publish_draft_to_eligible_targets(
     return draft, results, last_processed_id
 
 
-def register_handlers(app, admin_check):
+def register_handlers(app, admin_check, community_chat_id=None):
     """Register Publisher operator commands on the existing Telegram application."""
 
     async def require_admin(update, context):
@@ -176,6 +191,8 @@ def register_handlers(app, admin_check):
             "Publisher commands (administrators only):\n"
             "/pubtargets - show registered destinations\n"
             "/pubdraft Title | message text - create a draft\n"
+            "/pubsources - show latest posts captured from our news channel\n"
+            "New channel posts become drafts automatically; approve manually.\n"
             "/pubapprove DRAFT_ID - approve a draft\n"
             "/pubreview TARGET_ID allow | evidence\n"
             "/pubreview TARGET_ID reject | reason\n"
@@ -217,6 +234,22 @@ def register_handlers(app, admin_check):
         await update.effective_message.reply_text(
             f"Draft #{draft_id} created. Approve it with /pubapprove {draft_id}."
         )
+
+    async def pub_sources(update, context):
+        if not await require_admin(update, context):
+            return
+        rows = PublisherStore().list_source_posts(10)
+        if not rows:
+            await update.effective_message.reply_text("Пока нет новых текстовых постов из канала.")
+            return
+        lines = ["Последние посты канала, сохранённые как черновики:"]
+        for row in rows:
+            source = row.get("source_url") or f"message {row['source_message_id']}"
+            lines.append(
+                f"Draft #{row['draft_id']} [{row['draft_status']}] {row['title']}\n{source}\n"
+                f"Одобрить: /pubapprove {row['draft_id']}"
+            )
+        await update.effective_message.reply_text("\n\n".join(lines)[:4000])
 
     async def pub_approve(update, context):
         if not await require_admin(update, context):
@@ -288,7 +321,8 @@ def register_handlers(app, admin_check):
                 raise ValueError("Format: /pubsend DRAFT_ID TARGET_ID")
             result = await publish_draft_to_target(
                 context.bot, PublisherStore(),
-                int(context.args[0]), int(context.args[1])
+                int(context.args[0]), int(context.args[1]),
+                community_chat_id=community_chat_id,
             )
         except (ValueError, LookupError, PermissionError, TelegramError) as exc:
             await update.effective_message.reply_text(
@@ -310,6 +344,7 @@ def register_handlers(app, admin_check):
             draft, results, last_processed_id = await publish_draft_to_eligible_targets(
                 context.bot, PublisherStore(), int(context.args[0]),
                 after_target_id=after_target_id,
+                community_chat_id=community_chat_id,
             )
         except (ValueError, LookupError) as exc:
             await update.effective_message.reply_text(str(exc))
@@ -359,6 +394,7 @@ def register_handlers(app, admin_check):
     app.add_handler(CommandHandler("pubhelp", pub_help))
     app.add_handler(CommandHandler("pubtargets", pub_targets))
     app.add_handler(CommandHandler("pubdraft", pub_draft))
+    app.add_handler(CommandHandler("pubsources", pub_sources))
     app.add_handler(CommandHandler("pubapprove", pub_approve))
     app.add_handler(CommandHandler("pubreview", pub_review))
     app.add_handler(CommandHandler("pubplan", pub_plan))

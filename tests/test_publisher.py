@@ -253,6 +253,21 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(history[2]["promotion_policy"], "prohibited")
         self.assertEqual(self.store.get_target(target_id)["status"], "paused")
 
+    def test_source_post_capture_is_idempotent_and_creates_reviewable_draft(self):
+        first_id, created = self.store.capture_source_post(
+            -100123, 77, "A new Web3 update", "Full source post text", "https://t.me/news/77"
+        )
+        second_id, created_again = self.store.capture_source_post(
+            -100123, 77, "A new Web3 update", "Full source post text", "https://t.me/news/77"
+        )
+        self.assertTrue(created)
+        self.assertFalse(created_again)
+        self.assertEqual(first_id, second_id)
+        self.assertEqual(self.store.get_draft(first_id)["status"], "draft")
+        rows = self.store.list_source_posts()
+        self.assertEqual(rows[0]["source_url"], "https://t.me/news/77")
+        self.assertEqual(rows[0]["draft_id"], first_id)
+
     def test_stale_review_is_ineligible(self):
         old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
         target = {
