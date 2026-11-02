@@ -12,7 +12,7 @@ MAX_TELEGRAM_TEXT_LENGTH = 4096
 MAX_BATCH_TARGETS = 20
 
 
-async def publish_draft_to_target(bot, store, draft_id, target_id, community_chat_id=None):
+async def publish_draft_to_target(bot, store, draft_id, target_id, community_chat_id=None, min_interval_days=7):
     draft = store.get_draft(draft_id)
     if not draft:
         raise LookupError("draft not found")
@@ -31,7 +31,7 @@ async def publish_draft_to_target(bot, store, draft_id, target_id, community_cha
             "message_url": existing.get("message_url"),
         }
 
-    eligible, reason = evaluate_target(target)
+    eligible, reason = evaluate_target(target, min_interval_days=min_interval_days)
     if not eligible:
         return {"status": "skipped", "reason": reason}
 
@@ -173,6 +173,40 @@ async def publish_draft_to_eligible_targets(
         if delay_seconds > 0 and attempts < max_targets:
             await asyncio.sleep(delay_seconds)
     return draft, results, last_processed_id
+
+
+
+async def publish_captured_source_posts(bot, store, target_id, limit=10):
+    """Autonomously approve own-channel posts and publish them to our own community."""
+    outcomes = []
+    for source in store.list_unprocessed_source_posts(limit=limit):
+        draft_id = source["draft_id"]
+        body = (source.get("body") or "").strip()
+        # Source-channel posts are trusted as editorial input, but malformed or
+        # oversized content is held rather than silently truncated or rewritten.
+        if (
+            not body
+            or len(body) < 30
+            or len(body) > MAX_TELEGRAM_TEXT_LENGTH
+            or body.startswith("/")
+        ):
+            outcomes.append({
+                "draft_id": draft_id,
+                "status": "held",
+                "reason": "source post is empty, too short, a bot command, or oversized",
+            })
+            continue
+        try:
+            store.approve_draft(draft_id)
+            result = await publish_draft_to_target(
+                bot, store, draft_id, target_id,
+                community_chat_id=None,
+                min_interval_days=0,
+            )
+            outcomes.append({"draft_id": draft_id, **result})
+        except Exception as exc:
+            outcomes.append({"draft_id": draft_id, "status": "error", "reason": str(exc)[:240]})
+    return outcomes
 
 
 def register_handlers(app, admin_check, community_chat_id=None):

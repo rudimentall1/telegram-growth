@@ -282,6 +282,20 @@ class PublisherStore:
             """, (max(1, min(int(limit), 20)),)).fetchall()
             return [dict(row) for row in rows]
 
+    def list_unprocessed_source_posts(self, limit=10):
+        """Return captured source drafts with no delivery record for any target."""
+        with self.connect() as db:
+            rows = db.execute("""
+                SELECT s.*, d.title, d.body, d.status AS draft_status
+                FROM source_posts s JOIN drafts d ON d.id=s.draft_id
+                WHERE d.status='draft'
+                  AND NOT EXISTS (
+                    SELECT 1 FROM publication_deliveries p WHERE p.draft_id=d.id
+                  )
+                ORDER BY s.id ASC LIMIT ?
+            """, (max(1, min(int(limit), 20)),)).fetchall()
+            return [dict(row) for row in rows]
+
     def get_or_create_target_invite(self, target_id, invite_link):
         """Persist a target-scoped community invite so retries reuse the same URL."""
         with self.connect() as db:

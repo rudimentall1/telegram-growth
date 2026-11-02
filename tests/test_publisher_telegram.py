@@ -201,6 +201,35 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.store.get_delivery(self.draft_id, pending_id))
         self.assertEqual(self.bot.send_message.await_count, 2)
 
+
+    async def test_autonomous_source_pipeline_approves_and_publishes_only_captured_source_posts(self):
+        from publisher.telegram import publish_captured_source_posts
+        source_draft = self.store.capture_source_post(
+            -100111, 55, "Own channel news", "Fresh verified crypto news from our own channel.",
+            "https://t.me/cryptoping_ru/55",
+        )[0]
+        manual_draft = self.store.add_draft("Manual draft", "Must remain unapproved.")
+        result = await publish_captured_source_posts(
+            self.bot, self.store, self.target_id, limit=10
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["draft_id"], source_draft)
+        self.assertEqual(result[0]["status"], "sent")
+        self.assertEqual(self.store.get_draft(source_draft)["status"], "approved")
+        self.assertEqual(self.store.get_draft(manual_draft)["status"], "draft")
+        self.bot.send_message.assert_awaited_once()
+
+    async def test_autonomous_source_pipeline_holds_commands_and_short_posts(self):
+        from publisher.telegram import publish_captured_source_posts
+        command_id = self.store.capture_source_post(-100111, 56, "/pubsources", "/pubsources")[0]
+        short_id = self.store.capture_source_post(-100111, 57, "Tiny", "tiny")[0]
+        result = await publish_captured_source_posts(self.bot, self.store, self.target_id)
+        self.assertEqual([x["draft_id"] for x in result], [command_id, short_id])
+        self.assertTrue(all(x["status"] == "held" for x in result))
+        self.assertEqual(self.store.get_draft(command_id)["status"], "draft")
+        self.assertEqual(self.store.get_draft(short_id)["status"], "draft")
+        self.bot.send_message.assert_not_awaited()
+
     async def test_command_registration_exposes_guarded_publisher_controls(self):
         from publisher.telegram import register_handlers
 
