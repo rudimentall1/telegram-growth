@@ -61,6 +61,28 @@ class DistributionRegistryAuditTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertTrue(any("id must be a non-empty string" in item for item in result["errors"]))
 
+    def test_paid_network_cannot_be_recommended_as_free_first_wave(self):
+        network = self.registry["networks"][0]
+        network.update({
+            "money_required": True,
+            "free_cash_route_confirmed": True,
+            "recommendation": "first_wave",
+        })
+        result = audit_registry(self.registry, date(2026, 10, 31))
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("paid route cannot be marked" in item for item in result["errors"]))
+
+    def test_first_wave_requires_confirmed_zero_cash_route(self):
+        network = self.registry["networks"][0]
+        network.update({
+            "money_required": False,
+            "free_cash_route_confirmed": False,
+            "recommendation": "first_wave",
+        })
+        result = audit_registry(self.registry, date(2026, 10, 31))
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("first_wave requires a confirmed zero-cash route" in item for item in result["errors"]))
+
     def test_non_object_registry_root_is_rejected(self):
         with self.assertRaises(ValueError):
             audit_registry([], date(2026, 10, 31))

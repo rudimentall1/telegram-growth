@@ -391,6 +391,99 @@ def mark_delivery_failed(chat_id: int, error: Exception, *, disable: bool) -> No
         )
 
 
+def partner_performance(days: int = 30, home_chat_id: int | None = None) -> list[dict[str, Any]]:
+    """Summarize partner deliveries and invite-attributed joins to CryptoPing RU."""
+    try:
+        days = int(days)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("days must be an integer between 1 and 3650") from exc
+    if not 1 <= days <= 3650:
+        raise ValueError("days must be an integer between 1 and 3650")
+
+    if home_chat_id is None:
+        home_chat_id = CHAT_ID
+
+    results: list[dict[str, Any]] = []
+    with growth_db.connect() as db:
+        cursor = db.execute(
+            """
+            SELECT * FROM crosspromo_channels
+            WHERE chat_id != ?
+            ORDER BY title COLLATE NOCASE, id
+            """,
+            (int(home_chat_id),),
+        )
+        channels = [_dict_from_row(cursor, row) for row in cursor.fetchall()]
+
+        for channel in channels:
+            invite_link = channel.get("home_invite_link")
+            source = None
+            if invite_link:
+                link_row = db.execute(
+                    "SELECT source FROM growth_links WHERE invite_link = ?",
+                    (invite_link,),
+                ).fetchone()
+                source = link_row[0] if link_row else None
+
+            joins = leaves = active = 0
+            if source:
+                event_row = db.execute(
+                    """
+                    SELECT
+                        SUM(CASE WHEN event_type='join' THEN 1 ELSE 0 END),
+                        SUM(CASE WHEN event_type='leave' THEN 1 ELSE 0 END)
+                    FROM growth_events
+                    WHERE source=? AND event_at >= datetime('now', ?)
+                    """,
+                    (source, f"-{days} days"),
+                ).fetchone()
+                joins, leaves = (int(value or 0) for value in event_row)
+                active = int(db.execute(
+                    """
+                    SELECT COUNT(*) FROM growth_members
+                    WHERE is_member=1 AND invite_link=?
+                    """,
+                    (invite_link,),
+                ).fetchone()[0])
+
+            hosted = int(db.execute(
+                """
+                SELECT COUNT(*) FROM crosspromo_deliveries
+                WHERE target_chat_id=? AND sent_at >= datetime('now', ?)
+                """,
+                (channel["chat_id"], f"-{days} days"),
+            ).fetchone()[0])
+            featured = int(db.execute(
+                """
+                SELECT COUNT(*) FROM crosspromo_deliveries
+                WHERE promoted_chat_id=? AND sent_at >= datetime('now', ?)
+                """,
+                (channel["chat_id"], f"-{days} days"),
+            ).fetchone()[0])
+
+            results.append({
+                "channel_id": int(channel["id"]),
+                "chat_id": int(channel["chat_id"]),
+                "title": channel["title"],
+                "username": channel["username"],
+                "member_count": int(channel["member_count"] or 0),
+                "status": channel["status"],
+                "posts_hosted": hosted,
+                "posts_featured": featured,
+                "joins": joins,
+                "leaves": leaves,
+                "net": joins - leaves,
+                "active_attributed": active,
+                "attribution_available": bool(source),
+                "last_promo_at": channel["last_promo_at"],
+            })
+
+    return sorted(
+        results,
+        key=lambda item: (-item["joins"], -item["net"], item["title"].casefold()),
+    )
+
+
 async def _is_main_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     user = update.effective_user
     message = update.effective_message
@@ -429,6 +522,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/crosspromoapprove ID — одобрить канал.\n"
         "/crosspromoreject ID — отклонить заявку.\n"
         "/crosspromolist — активная сеть.\n"
+        "/crosspromoreport [30d] — результаты партнёров и наблюдаемые вступления.\n"
         "/crosspromopause — приостановить участие @cryptoping_ru.\n"
         "/crosspromoresume — возобновить участие.\n\n"
         f"Публикации выходят не чаще раза в {int(getattr(config, 'CROSSPROMO_INTERVAL_HOURS', DEFAULT_INTERVAL_HOURS))} ч. "
@@ -617,6 +711,58 @@ async def list_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await message.reply_text("\n".join(lines)[:4000])
 
 
+async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = update.effective_message
+    if not message:
+        return
+    if not await _is_main_admin(update, context):
+        await message.reply_text("Только администратор CryptoPing RU может просматривать отчёт партнёров.")
+        return
+
+    days = 30
+    if context.args:
+        if len(context.args) != 1:
+            await message.reply_text("Использование: /crosspromoreport [30d]")
+            return
+        match = re.fullmatch(r"(\d{1,4})(?:d|д)?", context.args[0].strip().lower())
+        if not match or not 1 <= int(match.group(1)) <= 3650:
+            await message.reply_text("Укажи период: /crosspromoreport 30d.")
+            return
+        days = int(match.group(1))
+
+    rows = partner_performance(days)
+    lines = [
+        f"Результаты взаимного продвижения за {days} дн.",
+        "Вступления учитываются только по invite-ссылкам, которые бот увидел в событиях канала.",
+        "",
+    ]
+    if not rows:
+        lines.append("Партнёров пока нет.")
+    else:
+        for row in rows:
+            label = f"@{row['username']}" if row["username"] else row["title"]
+            lines.append(
+                f"{label} · {row['status']} · {row['member_count']} подписчиков"
+            )
+            lines.append(
+                f"Публикаций в канале партнёра: {row['posts_hosted']}; "
+                f"упоминаний партнёра в сети: {row['posts_featured']}."
+            )
+            if row["attribution_available"]:
+                lines.append(
+                    f"Вступления: +{row['joins']}; отписки: {row['leaves']}; "
+                    f"баланс: {row['net']}; активны по ссылке сейчас: {row['active_attributed']}."
+                )
+            else:
+                lines.append("Атрибуция вступлений недоступна: нет проверенной invite-ссылки партнёра.")
+            lines.append("")
+    lines.append(
+        "Публикации и вступления — разные метрики. Telegram Bot API не показывает клики. "
+        "Активные по ссылке — только участники, которых бот наблюдал и чья текущая ссылка известна."
+    )
+    await message.reply_text("\n".join(lines)[:4000])
+
+
 async def pause_home_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = update.effective_message
     if not message:
@@ -743,6 +889,7 @@ def register_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("crosspromoapprove", approve_command))
     app.add_handler(CommandHandler("crosspromoreject", reject_command))
     app.add_handler(CommandHandler("crosspromolist", list_command))
+    app.add_handler(CommandHandler("crosspromoreport", report_command))
     app.add_handler(CommandHandler("crosspromopause", pause_home_command))
     app.add_handler(CommandHandler("crosspromoresume", resume_home_command))
 
