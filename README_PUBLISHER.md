@@ -89,3 +89,36 @@ duplicate-send protection, cooldown behavior, manual retry of definitive
 failures, and non-retry of ambiguous network outcomes. They do not claim that a
 live bot has permissions in any real community; those rights must be verified
 at runtime before the first actual post.
+
+## Autonomous AI moderation
+
+Captured posts from `@cryptoping_ru` are checked by the moderation model before
+the bot approves or sends them to the owned community `@cryptoping_ru_chat`.
+Only a high-confidence `allow` for `news`, `analysis`, or `education`
+with no risk flags can pass automatically. Promotions, referrals, uncertain
+claims, off-topic posts, and borderline cases are held. Clear phishing, wallet
+theft, malware, impersonation, and fraud are blocked.
+
+The model classifies the supplied text; it does not independently verify facts,
+open links, or certify a project's claims. A successful model verdict is not a
+fact-check.
+
+Configure the service environment using `.env.example`:
+
+- `OPENAI_API_KEY` - API Platform key.
+- `CRYPTOPING_MODERATOR_MODEL` - defaults to `gpt-6-luna`.
+- `CRYPTOPING_MODERATOR_TIMEOUT_SECONDS` - defaults to 30 seconds.
+
+The API key is not included in this repository. ChatGPT subscriptions and API
+Platform billing are separate. Without a valid API key, when the API times out,
+or when the response fails schema validation, the post stays unpublished and
+the error is recorded for retry after ten minutes. Final allow/hold/block
+decisions are retained in `source_moderation_reviews` and visible to the bot
+administrator through `/pubsources`.
+
+The moderator uses the OpenAI Responses API with strict JSON-schema output.
+The classifier is not a promise of perfect fraud detection. External
+destinations remain subject to the separate permission and live-membership
+checks described above.
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
