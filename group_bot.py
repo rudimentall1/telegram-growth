@@ -18,7 +18,10 @@ import config
 from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
 import cross_promo
-from publisher.telegram import register_handlers as register_publisher_handlers
+from publisher.telegram import (
+    register_handlers as register_publisher_handlers,
+    publish_captured_source_posts,
+)
 from publisher.storage import PublisherStore
 
 logging.basicConfig(level=logging.INFO)
@@ -517,6 +520,30 @@ async def publish_due_promotions(context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(1.2)
 
 
+
+async def publish_captured_channel_posts(context: ContextTypes.DEFAULT_TYPE):
+    """Auto-publish new posts from our news channel into our own community."""
+    try:
+        store = PublisherStore()
+        target = next((
+            row for row in store.list_targets()
+            if row["handle"] == "@cryptoping_ru_chat"
+            and row["status"] == "approved"
+            and row["promotion_policy"] == "allowed"
+        ), None)
+        if not target:
+            logging.error("publisher autonomous route disabled: owned community target is not approved")
+            return
+        outcomes = await publish_captured_source_posts(context.bot, store, target["id"], limit=3)
+        for item in outcomes:
+            logging.info(
+                "publisher autonomous result draft_id=%s status=%s reason=%s",
+                item.get("draft_id"), item.get("status"), item.get("reason", ""),
+            )
+    except Exception:
+        logging.exception("publisher autonomous source pipeline failed")
+
+
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, on_new_member))
@@ -551,6 +578,13 @@ def main():
         name="opt-in-promotion-scheduler",
         job_kwargs={"max_instances": 1, "coalesce": True},
     )
+    app.job_queue.run_repeating(
+        publish_captured_channel_posts,
+        interval=60,
+        first=20,
+        name="publisher-own-channel-autopublish",
+        job_kwargs={"max_instances": 1, "coalesce": True},
+    )
     logging.info(
         "Opt-in promotion scheduler enabled interval_hours=%s check_interval_minutes=%s",
         interval_hours, check_interval_minutes,
@@ -560,3 +594,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
