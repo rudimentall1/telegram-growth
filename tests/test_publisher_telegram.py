@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 from telegram.error import Forbidden, NetworkError
 
@@ -201,6 +201,87 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.store.get_delivery(self.draft_id, pending_id))
         self.assertEqual(self.bot.send_message.await_count, 2)
 
+
+    async def test_autonomous_source_pipeline_approves_and_publishes_only_captured_source_posts(self):
+        from publisher.telegram import publish_captured_source_posts
+        source_draft = self.store.capture_source_post(
+            -100111, 55, "Own channel news", "Fresh crypto market update from our own channel.",
+            "https://t.me/cryptoping_ru/55",
+        )[0]
+        manual_draft = self.store.add_draft("Manual draft", "Must remain unapproved.")
+        review = {
+            "provider": "openai", "model": "gpt-6-luna",
+            "decision": "allow", "confidence": 0.97, "category": "news",
+            "reason": "Relevant informational market update.",
+            "flags": [], "raw_response": '{"decision":"allow"}',
+        }
+        with patch("publisher.telegram.moderate_source_post", new=AsyncMock(return_value=review)):
+            result = await publish_captured_source_posts(
+                self.bot, self.store, self.target_id, limit=10
+            )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["draft_id"], source_draft)
+        self.assertEqual(result[0]["status"], "sent")
+        self.assertEqual(result[0]["moderation"], "allow")
+        self.assertEqual(self.store.get_draft(source_draft)["status"], "approved")
+        self.assertEqual(self.store.get_draft(manual_draft)["status"], "draft")
+        self.assertEqual(self.store.list_source_posts()[0]["moderation_decision"], "allow")
+        self.bot.send_message.assert_awaited_once()
+
+    async def test_commands_are_held_but_short_informational_posts_can_be_allowed(self):
+        from publisher.telegram import publish_captured_source_posts
+        command_id = self.store.capture_source_post(-100111, 56, "/pubsources", "/pubsources")[0]
+        short_id = self.store.capture_source_post(-100111, 57, "Tiny", "tiny")[0]
+        review = {
+            "provider": "openai", "model": "gpt-6-luna",
+            "decision": "allow", "confidence": 0.96, "category": "news",
+            "reason": "Short but relevant informational update.",
+            "flags": [], "raw_response": '{"decision":"allow"}',
+        }
+        with patch("publisher.telegram.moderate_source_post", new=AsyncMock(return_value=review)) as moderator:
+            result = await publish_captured_source_posts(self.bot, self.store, self.target_id)
+        self.assertEqual([x["draft_id"] for x in result], [command_id, short_id])
+        self.assertEqual([x["status"] for x in result], ["held", "sent"])
+        moderator.assert_awaited_once_with("Tiny", "tiny")
+        self.assertEqual(self.store.get_draft(command_id)["status"], "draft")
+        self.assertEqual(self.store.get_draft(short_id)["status"], "approved")
+        self.bot.send_message.assert_awaited_once()
+
+    async def test_moderation_error_fails_closed_and_is_not_retried_immediately(self):
+        from publisher.telegram import publish_captured_source_posts
+        draft_id = self.store.capture_source_post(
+            -100111, 58, "Crypto news", "A new protocol testnet was announced today."
+        )[0]
+        with patch(
+            "publisher.telegram.moderate_source_post",
+            new=AsyncMock(side_effect=RuntimeError("openai_timeout")),
+        ):
+            result = await publish_captured_source_posts(self.bot, self.store, self.target_id)
+        self.assertEqual(result[0]["status"], "error")
+        self.assertEqual(self.store.get_draft(draft_id)["status"], "draft")
+        self.assertIsNone(self.store.get_delivery(draft_id, self.target_id))
+        self.assertEqual(self.store.list_source_posts()[0]["moderation_decision"], "error")
+        self.assertEqual(self.store.list_unprocessed_source_posts(), [])
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_low_confidence_allow_is_held(self):
+        from publisher.telegram import publish_captured_source_posts
+        draft_id = self.store.capture_source_post(
+            -100111, 59, "Possible market update", "A token may be listed soon."
+        )[0]
+        review = {
+            "provider": "openai", "model": "gpt-6-luna",
+            "decision": "allow", "confidence": 0.72, "category": "news",
+            "reason": "Not enough context to classify with high confidence.",
+            "flags": [], "raw_response": '{"decision":"allow"}',
+        }
+        with patch("publisher.telegram.moderate_source_post", new=AsyncMock(return_value=review)):
+            result = await publish_captured_source_posts(self.bot, self.store, self.target_id)
+        self.assertEqual(result[0]["status"], "held")
+        self.assertEqual(self.store.get_draft(draft_id)["status"], "draft")
+        self.assertEqual(self.store.list_source_posts()[0]["moderation_decision"], "hold")
+        self.bot.send_message.assert_not_awaited()
+
     async def test_command_registration_exposes_guarded_publisher_controls(self):
         from publisher.telegram import register_handlers
 
@@ -288,3 +369,5 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
