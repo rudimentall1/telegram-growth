@@ -3,6 +3,7 @@ import asyncio
 
 from telegram.error import NetworkError, TelegramError, TimedOut
 
+from .moderator import can_auto_publish, configured_model, moderate_source_post
 from .policy import evaluate_target
 from .service import PublisherService
 from .storage import PublisherStore
@@ -176,26 +177,76 @@ async def publish_draft_to_eligible_targets(
 
 
 
-async def publish_captured_source_posts(bot, store, target_id, limit=10):
-    """Autonomously approve own-channel posts and publish them to our own community."""
+async def publish_captured_source_posts(bot, store, target_id, limit=3):
+    """LLM-moderate captured own-channel posts before publishing to our community."""
     outcomes = []
     for source in store.list_unprocessed_source_posts(limit=limit):
         draft_id = source["draft_id"]
         body = (source.get("body") or "").strip()
-        # Source-channel posts are trusted as editorial input, but malformed or
-        # oversized content is held rather than silently truncated or rewritten.
-        if (
-            not body
-            or len(body) < 30
-            or len(body) > MAX_TELEGRAM_TEXT_LENGTH
-            or body.startswith("/")
-        ):
+        title = (source.get("title") or "").strip()
+
+        # Deterministic gates run before any model call.
+        rule_reason = None
+        if not body:
+            rule_reason = "source post is empty"
+        elif len(body) > MAX_TELEGRAM_TEXT_LENGTH:
+            rule_reason = "source post exceeds Telegram's text limit"
+        elif body.startswith("/"):
+            rule_reason = "bot commands are never reposted"
+
+        if rule_reason:
+            store.record_moderation_review(draft_id, {
+                "provider": "rules",
+                "model": "publisher-rules-v1",
+                "decision": "hold",
+                "confidence": 1.0,
+                "category": "other",
+                "reason": rule_reason,
+            })
+            outcomes.append({"draft_id": draft_id, "status": "held", "reason": rule_reason})
+            continue
+
+        try:
+            review = await moderate_source_post(title, body)
+        except Exception as exc:
+            reason = str(exc).strip()[:240] or type(exc).__name__
+            store.record_moderation_review(draft_id, {
+                "provider": "openai",
+                "model": configured_model(),
+                "decision": "error",
+                "category": "other",
+                "reason": reason,
+            })
+            outcomes.append({"draft_id": draft_id, "status": "error", "reason": reason})
+            continue
+
+        if not can_auto_publish(review):
+            decision = review.get("decision")
+            if decision == "allow":
+                decision = "hold"
+                reason = (
+                    f"{review.get('reason', 'Model review did not meet the auto-publish policy')} "
+                    "(automatic publication threshold not met)"
+                )
+            else:
+                decision = decision if decision in ("hold", "block") else "hold"
+                reason = review.get("reason") or "Model did not explicitly approve this post"
+            review_to_store = {
+                **review,
+                "decision": decision,
+                "reason": reason[:400],
+            }
+            store.record_moderation_review(draft_id, review_to_store)
             outcomes.append({
                 "draft_id": draft_id,
-                "status": "held",
-                "reason": "source post is empty, too short, a bot command, or oversized",
+                "status": "blocked" if decision == "block" else "held",
+                "reason": reason[:240],
+                "confidence": review.get("confidence"),
+                "category": review.get("category"),
             })
             continue
+
+        store.record_moderation_review(draft_id, review)
         try:
             store.approve_draft(draft_id)
             result = await publish_draft_to_target(
@@ -203,7 +254,12 @@ async def publish_captured_source_posts(bot, store, target_id, limit=10):
                 community_chat_id=None,
                 min_interval_days=0,
             )
-            outcomes.append({"draft_id": draft_id, **result})
+            outcomes.append({
+                "draft_id": draft_id,
+                "moderation": "allow",
+                "confidence": review.get("confidence"),
+                **result,
+            })
         except Exception as exc:
             outcomes.append({"draft_id": draft_id, "status": "error", "reason": str(exc)[:240]})
     return outcomes
@@ -226,7 +282,7 @@ def register_handlers(app, admin_check, community_chat_id=None):
             "/pubtargets - show registered destinations\n"
             "/pubdraft Title | message text - create a draft\n"
             "/pubsources - show latest posts captured from our news channel\n"
-            "New posts from our own channel are auto-checked and sent to our community.\n"
+            "New posts from our own channel are checked by the AI moderator; only high-confidence informational posts are auto-published. Unclear posts are held.\n"
             "External destinations remain blocked until their permission is verified.\n"
             "/pubapprove DRAFT_ID - approve a draft\n"
             "/pubreview TARGET_ID allow | evidence\n"
@@ -280,9 +336,13 @@ def register_handlers(app, admin_check, community_chat_id=None):
         lines = ["Последние посты канала и статус автоматической публикации:"]
         for row in rows:
             source = row.get("source_url") or f"message {row['source_message_id']}"
+            moderation = row.get("moderation_decision") or "pending"
+            confidence = row.get("moderation_confidence")
+            score = f" ({confidence:.2f})" if confidence is not None else ""
+            reason = (row.get("moderation_reason") or "")[:160]
             lines.append(
                 f"Draft #{row['draft_id']} [{row['draft_status']}] {row['title']}\n{source}\n"
-                f"Автопроцесс: {'готов к публикации' if row['draft_status'] == 'draft' else row['draft_status']}"
+                f"AI moderator: {moderation}{score} {reason}"
             )
         await update.effective_message.reply_text("\n\n".join(lines)[:4000])
 

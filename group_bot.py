@@ -534,7 +534,7 @@ async def publish_captured_channel_posts(context: ContextTypes.DEFAULT_TYPE):
         if not target:
             logging.error("publisher autonomous route disabled: owned community target is not approved")
             return
-        outcomes = await publish_captured_source_posts(context.bot, store, target["id"], limit=10)
+        outcomes = await publish_captured_source_posts(context.bot, store, target["id"], limit=3)
         for item in outcomes:
             logging.info(
                 "publisher autonomous result draft_id=%s status=%s reason=%s",
