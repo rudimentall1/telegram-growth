@@ -107,6 +107,22 @@ class PublisherStore:
                     sent_at TEXT,
                     UNIQUE(draft_id, target_id)
                 );
+
+                CREATE TABLE IF NOT EXISTS source_moderation_reviews (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    draft_id INTEGER NOT NULL REFERENCES drafts(id),
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    decision TEXT NOT NULL CHECK(decision IN ('allow','hold','block','error')),
+                    confidence REAL,
+                    category TEXT,
+                    reason TEXT NOT NULL,
+                    raw_response TEXT,
+                    reviewed_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_source_moderation_reviews_draft
+                    ON source_moderation_reviews(draft_id, id);
             """)
 
     def add_target(self, kind, handle, rules_url=None):
@@ -273,12 +289,79 @@ class PublisherStore:
             )
             return draft_id, True
 
+    def record_moderation_review(self, draft_id, review):
+        """Append an immutable moderation decision or retryable provider error."""
+        from datetime import datetime, timezone
+
+        decision = review.get("decision")
+        if decision not in ("allow", "hold", "block", "error"):
+            raise ValueError("invalid moderation decision")
+        raw_response = review.get("raw_response")
+        if raw_response is not None and not isinstance(raw_response, str):
+            raw_response = json.dumps(raw_response, ensure_ascii=False)
+        with self.connect() as db:
+            cur = db.execute("""
+                INSERT INTO source_moderation_reviews(
+                    draft_id, provider, model, decision, confidence,
+                    category, reason, raw_response, reviewed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                int(draft_id),
+                str(review.get("provider") or "unknown")[:80],
+                str(review.get("model") or "unknown")[:120],
+                decision,
+                review.get("confidence"),
+                str(review.get("category") or "other")[:40],
+                str(review.get("reason") or "No reason supplied")[:400],
+                raw_response[:4000] if raw_response else None,
+                datetime.now(timezone.utc).isoformat(),
+            ))
+            return cur.lastrowid
+
     def list_source_posts(self, limit=10):
         with self.connect() as db:
             rows = db.execute("""
-                SELECT s.*, d.title, d.status AS draft_status
-                FROM source_posts s JOIN drafts d ON d.id=s.draft_id
+                SELECT s.*, d.title, d.status AS draft_status,
+                       r.provider AS moderation_provider,
+                       r.model AS moderation_model,
+                       r.decision AS moderation_decision,
+                       r.confidence AS moderation_confidence,
+                       r.category AS moderation_category,
+                       r.reason AS moderation_reason,
+                       r.reviewed_at AS moderation_reviewed_at
+                FROM source_posts s
+                JOIN drafts d ON d.id=s.draft_id
+                LEFT JOIN source_moderation_reviews r
+                  ON r.id=(
+                    SELECT MAX(r2.id) FROM source_moderation_reviews r2
+                    WHERE r2.draft_id=s.draft_id
+                  )
                 ORDER BY s.id DESC LIMIT ?
+            """, (max(1, min(int(limit), 20)),)).fetchall()
+            return [dict(row) for row in rows]
+
+    def list_unprocessed_source_posts(self, limit=10):
+        """Return source drafts not yet reviewed or sent; transient errors retry after ten minutes."""
+        with self.connect() as db:
+            rows = db.execute("""
+                SELECT s.*, d.title, d.body, d.status AS draft_status
+                FROM source_posts s JOIN drafts d ON d.id=s.draft_id
+                WHERE d.status='draft'
+                  AND NOT EXISTS (
+                    SELECT 1 FROM publication_deliveries p WHERE p.draft_id=d.id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM source_moderation_reviews r
+                    WHERE r.draft_id=d.id
+                      AND (
+                        r.decision IN ('allow','hold','block')
+                        OR (
+                            r.decision='error'
+                            AND julianday(r.reviewed_at) > julianday('now', '-10 minutes')
+                        )
+                      )
+                  )
+                ORDER BY s.id ASC LIMIT ?
             """, (max(1, min(int(limit), 20)),)).fetchall()
             return [dict(row) for row in rows]
 
@@ -414,3 +497,5 @@ class PublisherStore:
                 (draft_id,),
             ).fetchall()
             return [dict(row) for row in rows]
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
