@@ -149,3 +149,18 @@ routes include free Telegram Suggested Posts, member-level posts where current
 rules allow them, editorial/directory submissions, owned web/RSS assets, and
 organic contributions that comply with community rules. Do not use unattended
 userbot mass-posting, unsolicited DMs, or repetitive link drops.
+
+
+## Current architecture and known limitations (reviewed 2026-11-05)
+
+The source of this autonomous relay is the public channel `@cryptoping_ru`, populated by the existing RSS publisher at `/root/crypto-bot-farm/main.py`. The second bot captures channel posts; it does not currently ingest messages from the owned discussion group or arbitrary third-party groups. It moderates eligible source posts and relays them to `@cryptoping_ru_chat`.
+
+External fan-out is currently restricted in code to `@ifreepr` and `@prchatik`. The bot must already be a member of a destination and Telegram must confirm live send permission. Ordinary group membership can be sufficient; administrator rights are not universally required. The bot cannot join groups autonomously. A catalogue entry is not permission to publish.
+
+The publisher appends a persistent, target-specific referral invite to the public channel `@cryptoping_ru` (the configured `CHAT_ID`). Links are cached per target, not rotated for every message. Change the referral destination only after an explicit owner decision.
+
+There are no project-imposed daily, per-news or per-target cooldown caps in the current policy. A 24-hour delivery counter exists in storage but is not connected to the policy gate. Do not describe numeric caps as implemented. The owner has not approved new arbitrary caps. Telegram flood-control responses, destination rules, live permission checks and per-draft/per-target duplicate protection remain authoritative.
+
+The autonomous moderation path requires at least one working configured LLM provider. If no provider key is configured or all providers fail, the post remains unpublished. There is no publish-without-moderation fallback.
+
+Do not replace the Bot API publisher with an unattended Telethon/Pyrogram promotional userbot. No unsolicited DMs, mass invitations, repetitive link drops or spam-like automation. For the full assessment and prioritized gaps, see `docs/THREE-ADVICE-TECHNICAL-REVIEW-2026-11-05.md`.

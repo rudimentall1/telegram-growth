@@ -17,7 +17,7 @@ Grow `@cryptoping_ru` and `@cryptoping_ru_chat` with free, permission-respecting
 | Organic contributions on Reddit and other communities | No | Community-specific rules | Draft and research automatically; publish selectively, no repetitive automation | 5 |
 | Direct partner content exchange | No | Partner agrees to publish content themselves | Prepare assets and track partnership | 6 |
 | Telegram Ads | No | Budget in TON; paid | Not a current zero-budget priority | Parked |
-| External group Bot API posting as ordinary member | No admin rights; bot must already be a member | Current rules explicitly allow the content; Telegram confirms member send permission | Automated only for reviewed targets with strict caps | 2 |
+| External group Bot API posting as ordinary member | No admin rights; bot must already be a member | Current rules explicitly allow the content; Telegram confirms member send permission | Automated only for reviewed targets; live permission checks, Telegram flood control and duplicate protection | 2 |
 | MTProto/userbot mass-posting | Not necessarily | Account/group restrictions; significant abuse risk | Prohibited for unattended promotion | NEVER |
 
 ## 1. Telegram Suggested Posts

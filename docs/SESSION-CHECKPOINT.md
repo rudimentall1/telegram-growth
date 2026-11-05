@@ -820,7 +820,7 @@ Read-only audit of Gensyn2, both existing bot paths, live SQLite state, reposito
 - The live Bot API membership check returned `left` for both `@ifreepr` and `@prchatik` (confirmed by service journal at 2026-11-05 05:39 UTC). Therefore zero trial posts have been sent to external groups. The bot cannot send into groups it has not joined. The owner's personal subscription does not add the separate bot account.
 - The owner must add `@crypto_source_farm_bot` as an ordinary member to each of the two groups (not administrator). The running service checks membership every five minutes; once Telegram reports membership and ordinary send permission, it will enable the target and deliver eligible news automatically.
 - Do not claim external distribution has started until `publication_deliveries` records status=`sent` for these handles. No external group messages were sent during this implementation.
-- No commit, push, reset, rebase or merge was performed; the repository's pre-existing divergence and unrelated changes remain untouched.
+- This statement describes the state at the time of the original implementation checkpoint only. The subsequent GitHub synchronization is recorded in the section below.
 
 
 ## GitHub repository synchronization (2026-11-05)
@@ -829,8 +829,46 @@ Read-only audit of Gensyn2, both existing bot paths, live SQLite state, reposito
 - Before synchronization, local `main` was 3 commits ahead and 8 commits behind `origin/main`. Created a local safety branch `backup/pre-github-sync-20261105`, merged the 8 remote commits into local `main`, preserved the 3 local commits, restored the working changes, and committed the final project snapshot.
 - Merge commit: `45d60ab` (`Merge remote-tracking branch 'origin/main'`).
 - Project synchronization commit pushed to GitHub default branch `main`: `1ffeec40af1760791068075a01db9c39403a44ff` (`Sync Telegram growth publisher and distribution workflows`).
-- GitHub API comparison of `de7d65c` to `1ffeec40af1760791068075a01db9c39403a44ff` confirmed 5 new commits and 38 changed files. Git fetch then confirmed local `HEAD` and `origin/main` both at `1ffeec40af1760791068075a01db9c39403a44ff`, with zero ahead/behind.
+- A final checkpoint correction was then committed and pushed: `a9a93c2e1b697397b984fe93ded4da107f787aac` (`Record verified GitHub repository sync`). This is the final synchronized `main` HEAD.
+- GitHub API comparison of `de7d65c` to final HEAD `a9a93c2e1b697397b984fe93ded4da107f787aac` confirmed 6 new commits and 38 changed files. A subsequent `git fetch origin` confirmed local `HEAD` and `origin/main` both at `a9a93c2e1b697397b984fe93ded4da107f787aac`, with zero ahead/behind (`0 0`).
 - The push includes the RSS handoff module, the first-two-group trial code and tests, the standalone RSS sender patch and application instructions, the updated distribution target catalogue, project docs/checkpoint, and the decommissioning of the legacy reciprocal cross-promotion module.
 - Verification before push: full unittest suite `Ran 130 tests ... OK`; Python compilation passed for project Python files and the external RSS sender; secret scan of staged blobs returned no matches. The GitHub API confirmed both `publisher/rss_handoff.py` and `integrations/legacy-rss-publisher/main.py.patch` on `main`.
 - The repository's existing server service remains active. This Git synchronization did not send Telegram posts, change the live databases, or add the bot to external groups. At last live Bot API check, the bot was still `left` in `@ifreepr` and `@prchatik`; external trial publication has not started.
 - The initial HTTPS push attempt stalled because no HTTPS credential helper was configured and was interrupted. The successful push used the already-configured GitHub SSH identity for `rudimentall1`. The repository's fetch URL remains HTTPS; local `main` is synchronized with `origin/main`.
+
+
+## Final checkpoint state — verified 2026-11-05
+
+- Authoritative GitHub `main` HEAD is `a9a93c2e1b697397b984fe93ded4da107f787aac` (`Record verified GitHub repository sync`). The earlier `1ffeec4` commit is the project synchronization commit, not the final branch HEAD.
+- Final GitHub comparison against the previous remote base `de7d65c` reports 6 commits ahead and 38 changed files. A fresh fetch confirmed local `HEAD` equals `origin/main`; ahead/behind is `0 0` and the working tree was clean at verification.
+- The prior sentence saying no commit/push/merge occurred applies only to the implementation stage before repository synchronization; it is superseded by the GitHub synchronization record above.
+- Repository synchronization did not publish Telegram posts or add the bot to groups. External trial delivery remains blocked until Telegram confirms `@crypto_source_farm_bot` is a member with ordinary send permission in `@ifreepr` and `@prchatik`.
+
+
+## Review of three external technical assessments (2026-11-05)
+
+A detailed code-based review is recorded in `docs/THREE-ADVICE-TECHNICAL-REVIEW-2026-11-05.md`.
+
+### Architecture confirmed
+- The existing RSS publisher at `/root/crypto-bot-farm/main.py` sends to configured `CHAT_ID`; the current architecture identifies it as the public news channel `@cryptoping_ru`.
+- The second bot in `/opt/telegram-growth/group_bot.py` captures `channel_post` updates from that channel, applies deterministic checks and Gemini/Groq/optional OpenAI moderation, then relays approved items to the owned community `@cryptoping_ru_chat`.
+- External destinations are not news sources. The external fan-out is currently hard-coded to `@ifreepr` and `@prchatik`.
+- Referral links appended by the publisher currently lead to the public channel `CHAT_ID`, are cached per target, and are not dynamically rotated per post.
+- The autonomous scheduler runs every 60 seconds and processes up to three source posts per pass. Moderation is fail-closed if no provider key is configured or all providers fail.
+- `chat_member` tracks member joins/leaves for invite attribution; `my_chat_member` detects the bot's own group membership.
+
+### Assessment of the advice
+- Correct: Bot API cannot autonomously join groups; the bot must be added. The external allowlist is hard-coded. The referral destination is the channel. No 1-per-news / 3-per-24h / 1-per-7-days caps are implemented; the 24-hour counter exists but is not used in the policy gate. The group-capture handler does not exist.
+- Important correction: Bot API does **not** require admin rights in every group. Current code supports ordinary bot membership when Telegram confirms members can send. External group admin rights remain prohibited by owner decision.
+- The suggestion to switch to Telethon/Pyrogram for unattended promotional posting is rejected. It conflicts with the permanent anti-spam rule and exposes a personal account to restrictions. Random delays do not make unsolicited or rule-breaking bulk promotion acceptable.
+- The group-capture handler is not needed for the current architecture because the first RSS publisher's intended source route is the public channel, not the owned discussion group. Only add a group-source handler if the owner deliberately changes the first publisher's destination; then require exact chat ID and sender-bot verification.
+- Numeric cooldown/cap suggestions are not implemented and are not approved project policy. Preserve the current owner instruction against invented caps unless the owner explicitly changes it.
+- The larger target catalogue is a discovery/review inventory, not a live autonomous send list. New targets need a controlled config/database workflow and destination-specific permission review.
+- No live code, service, database, or Telegram behavior was changed during this assessment.
+
+### Next engineering actions
+1. Verify live `CHAT_ID` resolves to `@cryptoping_ru` and the first RSS publisher is publishing there; confirm the second bot captures that channel.
+2. Recheck current Bot API membership and send permission for `@ifreepr` and `@prchatik`; no external posts until Telegram confirms access.
+3. Design data-driven external targets with explicit disabled-by-default review state; do not widen the current allowlist automatically.
+4. Decide explicitly whether referral links should continue pointing to `@cryptoping_ru` or instead to `@cryptoping_ru_chat`.
+5. Keep provider moderation fail-closed and verify provider health without exposing API keys.
