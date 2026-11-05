@@ -1,0 +1,63 @@
+--- a/main.py
++++ b/main.py
+@@ -214,9 +214,60 @@
+     if r.status_code != 200:
+         print("Ошибка отправки:", r.status_code, r.text)
+         return False
++
++    # Do not change RSS delivery semantics: once Telegram accepted the post,
++    # it remains successful even if the secondary Publisher DB is temporarily
++    # unavailable. The handoff module persists a JSONL retry record in that case.
++    try:
++        payload = r.json()
++        message = payload.get("result") if payload.get("ok") else None
++        chat = (message or {}).get("chat") or {}
++        message_id = (message or {}).get("message_id")
++        chat_id = chat.get("id")
++        if message_id and chat_id:
++            project_dir = "/opt/telegram-growth"
++            if project_dir not in sys.path:
++                sys.path.insert(0, project_dir)
++            from publisher.rss_handoff import enqueue_published_post
++
++            username = chat.get("username") or str(CHAT_ID).strip().lstrip("@")
++            source_url = (
++                f"https://t.me/{username}/{message_id}" if username else None
++            )
++            handoff = enqueue_published_post(
++                chat_id, message_id, msg, source_url=source_url
++            )
++            print(
++                "Publisher handoff:",
++                handoff.get("status"),
++                "draft_id=",
++                handoff.get("draft_id", "-"),
++                "message_id=",
++                message_id,
++                "error=",
++                handoff.get("error", "-"),
++            )
++        else:
++            print("Publisher handoff skipped: Telegram response has no message id/chat id")
++    except Exception as e:
++        print("Publisher handoff error (RSS post remains sent):", str(e)[:240])
+     return True
+ 
+ def run():
++    # Retry any successful RSS sends that could not be inserted into Publisher
++    # during a previous run. The JSONL outbox survives service restarts.
++    try:
++        project_dir = "/opt/telegram-growth"
++        if project_dir not in sys.path:
++            sys.path.insert(0, project_dir)
++        from publisher.rss_handoff import flush_pending_publisher_posts
++
++        flush_result = flush_pending_publisher_posts()
++        if flush_result.get("processed") or flush_result.get("remaining"):
++            print("Publisher outbox:", flush_result)
++    except Exception as e:
++        print("Publisher outbox retry error:", str(e)[:240])
++
+     seen_list = load_json(SEEN_FILE, [])
+     seen = set(seen_list)
+     stats = load_json(STATS_FILE, {})

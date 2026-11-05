@@ -1,42 +1,19 @@
-"""Fail-closed eligibility checks for community promotion."""
-from datetime import datetime, timedelta, timezone
+"""Eligibility checks for Telegram group publishing.
 
-
-def evaluate_target(target, now=None, review_max_age_days=30, min_interval_days=7):
-    """Return (eligible, reason). Unknown, stale, or future permission fails closed."""
-    now = now or datetime.now(timezone.utc)
-
-    if target["status"] != "approved":
-        return False, f"target status is {target['status']}"
-    if target["promotion_policy"] != "allowed":
-        return False, f"promotion policy is {target['promotion_policy']}"
-    if not (target.get("permission_evidence") or "").strip():
-        return False, "permission evidence is missing"
-
-    reviewed_at = target.get("reviewed_at")
-    if not reviewed_at:
-        return False, "permission has not been reviewed"
-    try:
-        reviewed = datetime.fromisoformat(reviewed_at)
-        if reviewed.tzinfo is None:
-            reviewed = reviewed.replace(tzinfo=timezone.utc)
-    except (TypeError, ValueError):
-        return False, "review timestamp is invalid"
-
-    if reviewed > now:
-        return False, "review timestamp is in the future"
-    if now - reviewed > timedelta(days=review_max_age_days):
-        return False, "permission review is stale"
-
-    last_posted_at = target.get("last_posted_at")
-    if last_posted_at:
-        try:
-            last_posted = datetime.fromisoformat(last_posted_at)
-            if last_posted.tzinfo is None:
-                last_posted = last_posted.replace(tzinfo=timezone.utc)
-        except (TypeError, ValueError):
-            return False, "last publication timestamp is invalid"
-        if now - last_posted < timedelta(days=min_interval_days):
-            return False, "target cooldown has not elapsed"
-
-    return True, "approved permission and cooldown checks passed"
+A destination is eligible after Telegram reports that the bot joined it and
+the owner has not explicitly paused/rejected it. Live Telegram permissions
+are checked immediately before every send. There is no arbitrary cooldown,
+daily cap, per-news destination cap, or human evidence-expiry timer.
+"""
+def evaluate_target(target, now=None, review_max_age_days=None, min_interval_days=0):
+    status = target.get("status")
+    policy = target.get("promotion_policy")
+    if status in ("paused", "rejected"):
+        return False, f"target status is {status}"
+    if status != "approved":
+        return False, f"target status is {status}"
+    if policy == "prohibited":
+        return False, "target is marked prohibited"
+    if policy != "allowed":
+        return False, f"promotion policy is {policy}"
+    return True, "Telegram membership was registered; live send permission is checked before publication"

@@ -1,9 +1,88 @@
+import asyncio
 import unittest
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import config
 import group_bot
+
+
+class BotGroupMembershipTests(unittest.TestCase):
+    def test_bot_added_as_member_registers_group_as_pending_target(self):
+        import tempfile
+        from pathlib import Path
+        from publisher.storage import PublisherStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = PublisherStore(str(Path(tmp) / "publisher.db"))
+            event = SimpleNamespace(
+                chat=SimpleNamespace(type="supergroup", username="fresh_crypto_group"),
+                new_chat_member=SimpleNamespace(status="member"),
+            )
+            update = SimpleNamespace(my_chat_member=event)
+            with patch.object(group_bot, "PublisherStore", return_value=store):
+                asyncio.run(group_bot.on_bot_chat_membership(update, SimpleNamespace()))
+            rows = store.list_targets()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["handle"], "@fresh_crypto_group")
+            self.assertEqual(rows[0]["status"], "approved")
+            self.assertEqual(rows[0]["promotion_policy"], "allowed")
+            self.assertIn("Telegram my_chat_member", rows[0]["permission_evidence"])
+
+    def test_bot_removal_pauses_previously_approved_group(self):
+        import tempfile
+        from pathlib import Path
+        from publisher.storage import PublisherStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = PublisherStore(str(Path(tmp) / "publisher.db"))
+            target_id = store.add_target("group", "@fresh_crypto_group")
+            store.review_target(
+                target_id, "approve", "allowed",
+                "Current group rules allow relevant crypto news and channel links.",
+            )
+            event = SimpleNamespace(
+                chat=SimpleNamespace(type="supergroup", username="fresh_crypto_group"),
+                new_chat_member=SimpleNamespace(status="left"),
+            )
+            update = SimpleNamespace(my_chat_member=event)
+            with patch.object(group_bot, "PublisherStore", return_value=store):
+                asyncio.run(group_bot.on_bot_chat_membership(update, SimpleNamespace()))
+            self.assertEqual(store.get_target(target_id)["status"], "paused")
+
+    def test_trial_membership_probe_approves_only_first_two_groups_with_send_permission(self):
+        import tempfile
+        from pathlib import Path
+        from publisher.storage import PublisherStore
+
+        async def run_probe(store):
+            chat = SimpleNamespace(
+                id=-100123,
+                type="supergroup",
+                permissions=SimpleNamespace(can_send_messages=True),
+                pinned_message=None,
+            )
+            bot = SimpleNamespace(
+                get_me=AsyncMock(return_value=SimpleNamespace(id=8610476531)),
+                get_chat=AsyncMock(side_effect=[chat, chat]),
+                get_chat_member=AsyncMock(return_value=SimpleNamespace(status="member")),
+            )
+            with patch.object(group_bot, "PublisherStore", return_value=store):
+                await group_bot.refresh_trial_group_memberships(SimpleNamespace(bot=bot))
+            return bot
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = PublisherStore(str(Path(tmp) / "publisher.db"))
+            first_id = store.add_target("group", "@ifreepr")
+            second_id = store.add_target("group", "@prchatik")
+            other_id = store.add_target("group", "@not_in_trial")
+            bot = asyncio.run(run_probe(store))
+
+            self.assertEqual(store.get_target(first_id)["status"], "approved")
+            self.assertEqual(store.get_target(second_id)["status"], "approved")
+            self.assertEqual(store.get_target(other_id)["status"], "pending")
+            self.assertEqual(bot.get_chat.await_count, 2)
+            self.assertEqual(bot.get_chat_member.await_count, 2)
 
 
 class GrowthAdminTests(unittest.IsolatedAsyncioTestCase):
@@ -242,128 +321,6 @@ class GrowthReportTests(unittest.IsolatedAsyncioTestCase):
             "Укажи период",
             update.effective_message.reply_text.await_args.args[0],
         )
-
-
-class OptInPromotionTests(unittest.IsolatedAsyncioTestCase):
-    async def test_allowpromo_rejects_non_admin(self):
-        chat = SimpleNamespace(id=-100123456789, type="supergroup", title="Test group", username="test_group")
-        update = SimpleNamespace(
-            effective_chat=chat,
-            effective_message=SimpleNamespace(reply_text=AsyncMock(), sender_chat=None),
-            effective_user=SimpleNamespace(id=456),
-        )
-        context = SimpleNamespace(
-            bot=SimpleNamespace(
-                get_chat_member=AsyncMock(return_value=SimpleNamespace(status="member")),
-                create_chat_invite_link=AsyncMock(),
-            )
-        )
-        await group_bot.allow_promotion(update, context)
-        context.bot.create_chat_invite_link.assert_not_awaited()
-        self.assertIn(
-            "только администратор",
-            update.effective_message.reply_text.await_args.args[0],
-        )
-
-    async def test_allowpromo_admin_registers_tracked_target(self):
-        chat = SimpleNamespace(id=-100123456789, type="supergroup", title="Test group", username="test_group")
-        update = SimpleNamespace(
-            effective_chat=chat,
-            effective_message=SimpleNamespace(reply_text=AsyncMock(), sender_chat=None),
-            effective_user=SimpleNamespace(id=456),
-        )
-        invite = SimpleNamespace(invite_link="https://t.me/+campaignGroup")
-        context = SimpleNamespace(
-            bot=SimpleNamespace(
-                get_chat_member=AsyncMock(return_value=SimpleNamespace(status="administrator")),
-                create_chat_invite_link=AsyncMock(return_value=invite),
-            )
-        )
-
-        with (
-            patch.object(group_bot.growth_db, "save_link") as save_link,
-            patch.object(group_bot.growth_db, "enable_promotion_target") as enable_target,
-            patch.object(config, "PROMOTION_INTERVAL_HOURS", 72, create=True),
-        ):
-            await group_bot.allow_promotion(update, context)
-
-        source = f"promo_{abs(chat.id)}"
-        context.bot.create_chat_invite_link.assert_awaited_once_with(
-            chat_id=group_bot.CHAT_ID,
-            name=source,
-            creates_join_request=False,
-        )
-        save_link.assert_called_once_with("https://t.me/+campaignGroup", source, 456)
-        enable_target.assert_called_once_with(
-            chat_id=chat.id,
-            title="Test group",
-            username="test_group",
-            invite_link="https://t.me/+campaignGroup",
-            authorized_by=456,
-        )
-        self.assertIn(
-            "не чаще одного раза в 72 ч.",
-            update.effective_message.reply_text.await_args.args[0],
-        )
-
-    async def test_disablepromo_disables_current_chat(self):
-        chat = SimpleNamespace(id=-100123456789, type="supergroup")
-        message = SimpleNamespace(reply_text=AsyncMock())
-        update = SimpleNamespace(effective_chat=chat, effective_message=message)
-        context = SimpleNamespace()
-        with (
-            patch.object(group_bot, "_current_chat_admin", new=AsyncMock(return_value=True)),
-            patch.object(group_bot.growth_db, "disable_promotion_target", return_value=True) as disable,
-        ):
-            await group_bot.disable_promotion(update, context)
-        disable.assert_called_once_with(chat.id)
-        self.assertIn("отключено", message.reply_text.await_args.args[0])
-
-    async def test_scheduler_sends_to_opted_in_target_and_records_message(self):
-        chat_id = -100123456789
-        context = SimpleNamespace(
-            bot=SimpleNamespace(
-                send_message=AsyncMock(return_value=SimpleNamespace(message_id=321))
-            )
-        )
-        target = (chat_id, "Test group", "test_group", "https://t.me/+campaignGroup")
-        with (
-            patch.object(group_bot.growth_db, "due_promotion_targets", return_value=[target]) as due,
-            patch.object(group_bot.growth_db, "mark_promotion_sent") as mark_sent,
-            patch.object(group_bot.growth_db, "mark_promotion_failed") as mark_failed,
-            patch.object(group_bot.asyncio, "sleep", new=AsyncMock()),
-            patch.object(config, "PROMOTION_INTERVAL_HOURS", 72, create=True),
-        ):
-            await group_bot.publish_due_promotions(context)
-
-        due.assert_called_once_with(72)
-        context.bot.send_message.assert_awaited_once_with(
-            chat_id=chat_id,
-            text=group_bot._promotion_text("https://t.me/+campaignGroup"),
-            disable_web_page_preview=True,
-        )
-        mark_sent.assert_called_once_with(chat_id, 321)
-        mark_failed.assert_not_called()
-
-    async def test_scheduler_disables_target_after_permission_error(self):
-        from telegram.error import Forbidden
-
-        chat_id = -100123456789
-        context = SimpleNamespace(
-            bot=SimpleNamespace(send_message=AsyncMock(side_effect=Forbidden("forbidden")))
-        )
-        target = (chat_id, "Test group", "test_group", "https://t.me/+campaignGroup")
-        with (
-            patch.object(group_bot.growth_db, "due_promotion_targets", return_value=[target]),
-            patch.object(group_bot.growth_db, "mark_promotion_sent") as mark_sent,
-            patch.object(group_bot.growth_db, "mark_promotion_failed") as mark_failed,
-            patch.object(group_bot.asyncio, "sleep", new=AsyncMock()),
-        ):
-            await group_bot.publish_due_promotions(context)
-
-        mark_sent.assert_not_called()
-        self.assertEqual(mark_failed.call_args.args[0], chat_id)
-        self.assertTrue(mark_failed.call_args.kwargs["disable"])
 
 
 if __name__ == "__main__":

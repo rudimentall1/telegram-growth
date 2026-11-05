@@ -88,7 +88,7 @@ def connect():
 def save_link(link, source, user_id):
     with connect() as db:
         db.execute(
-            "INSERT INTO growth_links(invite_link, source, created_by) VALUES (?, ?, ?)",
+            "INSERT OR IGNORE INTO growth_links(invite_link, source, created_by) VALUES (?, ?, ?)",
             (link, source, user_id),
         )
 

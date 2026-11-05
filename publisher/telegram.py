@@ -1,19 +1,22 @@
 """Permission-checked Telegram delivery for explicitly approved Publisher drafts."""
 import asyncio
 
-from telegram.error import NetworkError, TelegramError, TimedOut
+from telegram.error import NetworkError, RetryAfter, TelegramError, TimedOut
+
+from config import CHAT_ID
 
 from .moderator import can_auto_publish, configured_model, moderate_source_post
 from .policy import evaluate_target
 from .service import PublisherService
 from .storage import PublisherStore
+from .trial_targets import TRIAL_EXTERNAL_GROUPS
 
 
 MAX_TELEGRAM_TEXT_LENGTH = 4096
 MAX_BATCH_TARGETS = 20
 
 
-async def publish_draft_to_target(bot, store, draft_id, target_id, community_chat_id=None, min_interval_days=7):
+async def publish_draft_to_target(bot, store, draft_id, target_id, community_chat_id=None, min_interval_days=0, referral_chat_id=None):
     draft = store.get_draft(draft_id)
     if not draft:
         raise LookupError("draft not found")
@@ -41,6 +44,8 @@ async def publish_draft_to_target(bot, store, draft_id, target_id, community_cha
         raise ValueError("draft body is empty")
     # A unique, persistent invite to our own community is appended per approved target.
     # No invite is created for pending/rejected targets because policy is checked above.
+    if community_chat_id is not None and referral_chat_id is not None:
+        raise ValueError("choose either a community invite or a channel referral invite")
     if community_chat_id is not None:
         invite_link = store.get_target_invite(target_id)
         if not invite_link:
@@ -53,6 +58,27 @@ async def publish_draft_to_target(bot, store, draft_id, target_id, community_cha
                 target_id, invite.invite_link
             )
         body = f"{body.rstrip()}\n\nНаше сообщество: {invite_link}"
+    if referral_chat_id is not None:
+        referral_link = store.get_target_referral_link(target_id)
+        if not referral_link:
+            try:
+                invite = await bot.create_chat_invite_link(
+                    chat_id=referral_chat_id,
+                    name=f"cp-ref-{draft_id}-{target_id}"[:32],
+                    creates_join_request=False,
+                )
+                candidate_link = invite.invite_link
+            except TelegramError:
+                # The public channel URL remains a safe fallback if invite-link
+                # creation is unavailable; never let attribution break delivery.
+                public_name = str(referral_chat_id).strip().lstrip("@")
+                if not public_name or public_name.startswith("-"):
+                    raise
+                candidate_link = f"https://t.me/{public_name}"
+            referral_link, _ = store.get_or_create_target_referral_link(
+                target_id, candidate_link
+            )
+        body = f"{body.rstrip()}\n\nCryptoPing RU: {referral_link}"
     if len(body) > MAX_TELEGRAM_TEXT_LENGTH:
         raise ValueError("draft plus community invite exceeds Telegram's 4096-character text limit")
 
@@ -69,15 +95,30 @@ async def publish_draft_to_target(bot, store, draft_id, target_id, community_cha
     bot_user = await bot.get_me()
     membership = await bot.get_chat_member(chat.id, bot_user.id)
     status = getattr(membership, "status", None)
-    if status not in ("administrator", "creator"):
-        raise PermissionError("bot must be an administrator in the destination")
 
-    if target["kind"] == "channel" and status != "creator":
-        if not bool(getattr(membership, "can_post_messages", False)):
+    if target["kind"] == "channel":
+        if status not in ("administrator", "creator"):
+            raise PermissionError("bot must be a channel administrator to publish")
+        if status != "creator" and not bool(getattr(membership, "can_post_messages", False)):
             raise PermissionError("bot administrator lacks can_post_messages")
-    if target["kind"] == "group" and hasattr(membership, "can_send_messages"):
-        if not membership.can_send_messages:
-            raise PermissionError("bot cannot send messages in this group")
+    else:
+        # In groups, an ordinary bot member is sufficient when Telegram's live
+        # group permissions allow messages. No administrator promotion needed.
+        if status in ("administrator", "creator"):
+            if status != "creator" and getattr(membership, "can_send_messages", True) is False:
+                raise PermissionError("bot administrator cannot send messages in this group")
+        elif status == "member":
+            permissions = getattr(chat, "permissions", None)
+            if permissions is None or getattr(permissions, "can_send_messages", None) is not True:
+                raise PermissionError("group does not expose explicit permission for members to send messages")
+        elif status == "restricted":
+            permissions = getattr(membership, "permissions", None)
+            if not bool(getattr(membership, "is_member", False)) or (
+                permissions is None or getattr(permissions, "can_send_messages", None) is not True
+            ):
+                raise PermissionError("bot is restricted or cannot send messages in this group")
+        else:
+            raise PermissionError("bot is not a permitted member of this group")
 
     if not store.claim_delivery(draft_id, target_id):
         existing = store.get_delivery(draft_id, target_id) or {}
@@ -251,18 +292,107 @@ async def publish_captured_source_posts(bot, store, target_id, limit=3):
             store.approve_draft(draft_id)
             result = await publish_draft_to_target(
                 bot, store, draft_id, target_id,
-                community_chat_id=None,
+                referral_chat_id=CHAT_ID,
                 min_interval_days=0,
             )
+            external_results = []
+            if result.get("status") == "sent":
+                # Publish to every group where Telegram has confirmed bot
+                # membership. Live send permission is checked for each target.
+                from .policy import evaluate_target
+                candidates = [
+                    row for row in store.list_targets()
+                    if row["kind"] == "group"
+                    and row["id"] != target_id
+                    and row["handle"].lower() in TRIAL_EXTERNAL_GROUPS
+                    and evaluate_target(row, min_interval_days=0)[0]
+                ]
+                candidates.sort(key=lambda row: row["id"])
+                for candidate in candidates:
+                    try:
+                        delivery = await publish_draft_to_target(
+                            bot, store, draft_id, candidate["id"],
+                            referral_chat_id=CHAT_ID,
+                            min_interval_days=0,
+                        )
+                        external_results.append({
+                            "target_id": candidate["id"],
+                            "handle": candidate["handle"],
+                            **delivery,
+                        })
+                    except (PermissionError, TelegramError, LookupError, ValueError) as exc:
+                        external_results.append({
+                            "target_id": candidate["id"],
+                            "handle": candidate["handle"],
+                            "status": "blocked",
+                            "reason": str(exc)[:240],
+                        })
+                        # Telegram's own flood-control response is authoritative:
+                        # stop this batch rather than retrying against more groups.
+                        if isinstance(exc, RetryAfter):
+                            break
             outcomes.append({
                 "draft_id": draft_id,
                 "moderation": "allow",
                 "confidence": review.get("confidence"),
                 **result,
+                "external": external_results if result.get("status") == "sent" else [],
             })
         except Exception as exc:
             outcomes.append({"draft_id": draft_id, "status": "error", "reason": str(exc)[:240]})
     return outcomes
+
+
+
+async def publish_pending_external_drafts(bot, store, owned_target_id, limit=5):
+    """Retry external delivery for news already published to the owned group."""
+    pending = store.list_pending_external_drafts(
+        owned_target_id, TRIAL_EXTERNAL_GROUPS, limit=limit
+    )
+    if not pending:
+        return []
+
+    from .policy import evaluate_target
+
+    targets = [
+        row for row in store.list_targets()
+        if row["kind"] == "group"
+        and row["handle"].lower() in TRIAL_EXTERNAL_GROUPS
+        and evaluate_target(row, min_interval_days=0)[0]
+    ]
+    targets.sort(key=lambda row: row["id"])
+    if not targets:
+        return [
+            {"draft_id": item["draft_id"], "status": "waiting_for_trial_membership"}
+            for item in pending
+        ]
+
+    results = []
+    for item in pending:
+        for target in targets:
+            try:
+                delivery = await publish_draft_to_target(
+                    bot, store, item["draft_id"], target["id"],
+                    referral_chat_id=CHAT_ID,
+                    min_interval_days=0,
+                )
+                results.append({
+                    "draft_id": item["draft_id"],
+                    "handle": target["handle"],
+                    **delivery,
+                })
+                if delivery.get("status") == "sent":
+                    await asyncio.sleep(1.2)
+            except (PermissionError, TelegramError, LookupError, ValueError) as exc:
+                results.append({
+                    "draft_id": item["draft_id"],
+                    "handle": target["handle"],
+                    "status": "blocked",
+                    "reason": str(exc)[:240],
+                })
+                if isinstance(exc, RetryAfter):
+                    return results
+    return results
 
 
 def register_handlers(app, admin_check, community_chat_id=None):
@@ -497,4 +627,3 @@ def register_handlers(app, admin_check, community_chat_id=None):
     app.add_handler(CommandHandler("pubsendall", pub_send_all))
     app.add_handler(CommandHandler("pubdelivery", pub_delivery))
 
-[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]

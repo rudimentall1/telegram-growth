@@ -7,12 +7,10 @@ Telegram-бот для учёта источников привлечения п
 - `/growthlink source_name` — создать отдельную invite-ссылку для кампании. Бот возвращает ссылку и готовый короткий текст для публикации.
 - `/growthreport` или `/growthreport all` — сводка по всей истории.
 - `/growthreport 7d` и `/growthreport 30d` — события за выбранный период плюс текущие известные активные участники по источникам.
-- `/allowpromo` — команда администратора группы, чтобы добровольно включить автоматические промопубликации CryptoPing RU в этой группе.
-- `/disablepromo` — выключить автопромо в текущей группе.
-- `/promotetargets` — показать включившие автопромо группы; доступно администраторам основной группы.
 - `/help` — краткая справка для участников.
 
-Планировщик проверяет согласившиеся группы каждые `PROMOTION_CHECK_INTERVAL_MINUTES` (по умолчанию 5 минут) и публикует в каждой группе не чаще одного раза за `PROMOTION_INTERVAL_HOURS` (по умолчанию 72 часа). Для включения администратор целевой группы должен добавить бота и вызвать `/allowpromo`; одного наличия группы в реестре недостаточно. Для публикаций используется отдельная отслеживаемая invite-ссылка. Если Telegram отклоняет публикацию из-за прав или доступа, цель автоматически отключается. Данные хранятся в SQLite.
+Периодическое самопродвижение в собственной группе отключено. Взаимный обмен каналами, требующий прав администратора у нашего бота в чужом канале, удалён.
+
 
 Команды управления привлечением доступны администраторам текущей группы; команды отчёта и управления списком целей дополнительно защищены проверкой администратора основной группы или `GROWTH_ADMIN_IDS`.
 
@@ -50,53 +48,20 @@ python -m py_compile group_bot.py growth_db.py
 Пока это исходный проект и тестовый каркас, не готовый установщик для существующего сервера. Не запускайте deployment поверх действующего бота до проверки резервной копии, конфигурации и поведения systemd.
 
 
-## Opt-in reciprocal channel cross-promotion
+## Distribution pipeline
 
-The bot now includes a cross-promotion network integrated into the existing
-`python-telegram-bot` process and the same SQLite database. It does not start
-a second poller or require an unrelated third-party bot to enter
-`@cryptoping_ru`.
+Первый проект /root/crypto-bot-farm/main.py остаётся источником RSS-новостей
+и публикует их в @cryptoping_ru. Второй проект захватывает новые посты канала,
+проводит AI-модерацию и публикует одобренные новости в @cryptoping_ru_chat.
+После этого он может отправить одну новость в одну внешнюю группу, если цель
+отдельно одобрена по актуальным правилам, бот уже состоит в ней обычным
+участником и Telegram подтверждает право писать. Администраторские права в
+чужой группе не требуются.
 
-### How it works
-
-- A channel owner adds our existing bot `@crypto_source_farm_bot` to their
-  **own public channel**, granting only the post permission required for the
-  exchange, then sends `/crosspromo_add @channel` to the bot.
-- The bot verifies the sender is that channel's administrator and checks the
-  bot has permission to publish. New channels enter a pending queue.
-- A CryptoPing RU group administrator reviews and approves or rejects each
-  submission. Approved channels receive at most one reciprocal promo post per
-  `CROSSPROMO_INTERVAL_HOURS` (default 72 hours).
-- The scheduler rotates partners, prefers channels with a comparable audience,
-  and avoids repeating a partner in the same target channel within seven days
-  when alternatives exist. CryptoPing RU uses a tracked invite link per partner
-  when Telegram permits creating it; otherwise the public link is used.
-- `/crosspromopause` pauses CryptoPing RU's participation. `/crosspromoresume`
-  resumes it. No paid placement or unsolicited posting is used.
-
-### Commands
-
-- `/crosspromo` — help and requirements.
-- `/crosspromo_add @channel` — submit a channel you administer.
-- `/crosspromopending` — review queue (CryptoPing RU administrators).
-- `/crosspromoapprove ID` / `/crosspromoreject ID` — moderate a submission.
-- `/crosspromolist` — list currently active partners.
-- `/crosspromopause` / `/crosspromoresume` — pause or resume our channel.
-
-### Important limits
-
-This creates the exchange mechanism; it does not manufacture an audience.
-Until at least one other channel owner joins and is approved, there is nobody
-to exchange posts with and the scheduler sends nothing. Results depend on real
-partner channels and their audiences. A partner can stop participation by
-removing the bot; delivery failures disable that target until its owner resolves
-permissions and registers again. Minimum channel size is configurable and
-defaults to 10 so small channels such as `@cryptoping_ru` are not excluded.
-
-The implementation adapts the cross-promotion workflow described by the
-MIT-licensed [channel-promo-bot](https://github.com/qilaidev/channel-promo-bot)
-to this repository's existing `python-telegram-bot` application and SQLite
-database; the upstream aiogram application is not launched as a second process.
+Автоматические ограничения: не более одной внешней группы на одну новость,
+не более трёх внешних публикаций за скользящие 24 часа и не чаще одной
+публикации в конкретную группу за семь дней. Неодобренные и непроверенные
+цели не используются.
 
 ## Automatic distribution
 
@@ -159,8 +124,10 @@ and delivery ledger separately in `data/publisher.db`.
 
 Operators can register candidates from the existing inventory, review explicit
 community rules, create and approve drafts, preview eligible targets, and publish
-one-by-one or as a controlled batch. Telegram destination type and bot admin
-rights are checked immediately before every send. Unknown network outcomes are
+one-by-one or as a controlled batch. Telegram destination type and live membership/send permissions are checked
+immediately before every send. For groups, ordinary bot membership plus explicit
+permission to send messages is sufficient; the bot does not need administrator
+rights. Channels still require administrator status with can_post_messages. Unknown network outcomes are
 not retried automatically, preventing duplicate posts.
 
 Commands: `/pubhelp`, `/pubtargets`, `/pubdraft`, `/pubapprove`,

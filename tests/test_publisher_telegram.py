@@ -31,6 +31,9 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
                 status="administrator", can_post_messages=True
             )),
             send_message=AsyncMock(return_value=SimpleNamespace(message_id=99)),
+            create_chat_invite_link=AsyncMock(return_value=SimpleNamespace(
+                invite_link="https://t.me/+trackedInvite"
+            )),
         )
 
     def tearDown(self):
@@ -77,6 +80,40 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Наше сообщество: https://t.me/+trackedInvite", sent_text)
         self.assertEqual(self.store.get_target_invite(self.target_id), "https://t.me/+trackedInvite")
 
+    async def test_publication_appends_and_reuses_target_specific_channel_referral(self):
+        first = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id,
+            referral_chat_id="@cryptoping_ru",
+        )
+        self.assertEqual(first["status"], "sent")
+        self.bot.create_chat_invite_link.assert_awaited_once_with(
+            chat_id="@cryptoping_ru",
+            name=f"cp-ref-{self.draft_id}-{self.target_id}",
+            creates_join_request=False,
+        )
+        sent_text = self.bot.send_message.await_args.kwargs["text"]
+        self.assertIn("CryptoPing RU: https://t.me/+trackedInvite", sent_text)
+        self.assertEqual(
+            self.store.get_target_referral_link(self.target_id),
+            "https://t.me/+trackedInvite",
+        )
+
+    async def test_referral_link_creation_failure_falls_back_to_public_channel_url(self):
+        self.bot.create_chat_invite_link.side_effect = Forbidden("not allowed")
+        result = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, self.target_id,
+            referral_chat_id="@cryptoping_ru",
+        )
+        self.assertEqual(result["status"], "sent")
+        self.assertEqual(
+            self.store.get_target_referral_link(self.target_id),
+            "https://t.me/cryptoping_ru",
+        )
+        self.assertIn(
+            "CryptoPing RU: https://t.me/cryptoping_ru",
+            self.bot.send_message.await_args.kwargs["text"],
+        )
+
     async def test_non_admin_bot_is_rejected_before_delivery_claim(self):
         self.bot.get_chat_member.return_value = SimpleNamespace(status="member")
         with self.assertRaises(PermissionError):
@@ -84,6 +121,40 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
                 self.bot, self.store, self.draft_id, self.target_id
             )
         self.assertIsNone(self.store.get_delivery(self.draft_id, self.target_id))
+        self.bot.send_message.assert_not_awaited()
+
+    async def test_group_member_can_publish_without_admin_when_group_allows_messages(self):
+        group_id = self.store.add_target("group", "@sample_group")
+        self.store.review_target(
+            group_id, "approve", "allowed",
+            "Group rules explicitly allow relevant crypto news posts and channel link once weekly",
+        )
+        self.bot.get_chat.return_value = SimpleNamespace(
+            id=-100123456789, type="supergroup", username="sample_group",
+            permissions=SimpleNamespace(can_send_messages=True),
+        )
+        self.bot.get_chat_member.return_value = SimpleNamespace(status="member")
+        result = await publish_draft_to_target(
+            self.bot, self.store, self.draft_id, group_id
+        )
+        self.assertEqual(result["status"], "sent")
+        self.bot.send_message.assert_awaited_once()
+
+    async def test_group_member_is_blocked_when_default_send_permission_is_false(self):
+        group_id = self.store.add_target("group", "@sample_group")
+        self.store.review_target(
+            group_id, "approve", "allowed",
+            "Group rules explicitly allow relevant crypto news posts and channel link once weekly",
+        )
+        self.bot.get_chat.return_value = SimpleNamespace(
+            id=-100123456789, type="supergroup", username="sample_group",
+            permissions=SimpleNamespace(can_send_messages=False),
+        )
+        self.bot.get_chat_member.return_value = SimpleNamespace(status="member")
+        with self.assertRaises(PermissionError):
+            await publish_draft_to_target(
+                self.bot, self.store, self.draft_id, group_id
+            )
         self.bot.send_message.assert_not_awaited()
 
     async def test_channel_without_post_permission_is_rejected(self):
@@ -106,7 +177,7 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
             )
         self.bot.send_message.assert_not_awaited()
 
-    async def test_stale_permission_is_skipped_without_telegram_call(self):
+    async def test_old_permission_review_does_not_block_when_live_telegram_permission_exists(self):
         old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
         with self.store.connect() as db:
             db.execute(
@@ -116,9 +187,9 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         result = await publish_draft_to_target(
             self.bot, self.store, self.draft_id, self.target_id
         )
-        self.assertEqual(result["status"], "skipped")
-        self.bot.get_chat.assert_not_awaited()
-        self.bot.send_message.assert_not_awaited()
+        self.assertEqual(result["status"], "sent")
+        self.bot.get_chat.assert_awaited_once()
+        self.bot.send_message.assert_awaited_once()
 
     async def test_network_error_becomes_unknown_and_is_never_retried(self):
         self.bot.send_message.side_effect = NetworkError("connection lost")
@@ -227,6 +298,144 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.store.get_draft(manual_draft)["status"], "draft")
         self.assertEqual(self.store.list_source_posts()[0]["moderation_decision"], "allow")
         self.bot.send_message.assert_awaited_once()
+
+    async def test_autonomous_pipeline_sends_only_to_first_two_trial_groups_without_admin_rights(self):
+        from publisher.telegram import publish_captured_source_posts
+        own_group_id = self.store.add_target("group", "@cryptoping_ru_chat")
+        self.store.review_target(
+            own_group_id, "approve", "allowed", "Owned group destination."
+        )
+        external_id = self.store.add_target("group", "@ifreepr")
+        self.store.review_target(
+            external_id, "approve", "allowed",
+            "Owner-selected first trial group; Telegram membership and send permission are checked live.",
+        )
+        external_id_2 = self.store.add_target("group", "@prchatik")
+        self.store.review_target(
+            external_id_2, "approve", "allowed",
+            "Telegram membership event confirms bot is a member; send permission checked live.",
+        )
+        source_draft = self.store.capture_source_post(
+            -100111, 58, "Own channel news", "Fresh crypto market update from our own channel.",
+            "https://t.me/cryptoping_ru/58",
+        )[0]
+        review = {
+            "provider": "gemini", "model": "test-model",
+            "decision": "allow", "confidence": 0.99, "category": "news",
+            "reason": "Relevant informational news.", "flags": [],
+            "raw_response": '{"decision":"allow"}',
+        }
+        self.bot.get_chat.side_effect = [
+            SimpleNamespace(
+                id=-1004298750600, type="supergroup", username="cryptoping_ru_chat",
+                permissions=SimpleNamespace(can_send_messages=True),
+            ),
+            SimpleNamespace(
+                id=-1009876543210, type="supergroup", username="ifreepr",
+                permissions=SimpleNamespace(can_send_messages=True),
+            ),
+            SimpleNamespace(
+                id=-1009876543220, type="supergroup", username="prchatik",
+                permissions=SimpleNamespace(can_send_messages=True),
+            ),
+        ]
+        self.bot.get_chat_member.side_effect = [
+            SimpleNamespace(status="member"),
+            SimpleNamespace(status="member"),
+            SimpleNamespace(status="member"),
+        ]
+        self.bot.send_message.side_effect = [
+            SimpleNamespace(message_id=201),
+            SimpleNamespace(message_id=202),
+            SimpleNamespace(message_id=203),
+        ]
+        with patch("publisher.telegram.moderate_source_post", new=AsyncMock(return_value=review)):
+            result = await publish_captured_source_posts(
+                self.bot, self.store, own_group_id, limit=10
+            )
+        self.assertEqual(result[0]["status"], "sent")
+        self.assertEqual(result[0]["external"][0]["status"], "sent")
+        self.assertEqual(len(result[0]["external"]), 2)
+        self.assertEqual(
+            [item["target_id"] for item in result[0]["external"]],
+            [external_id, external_id_2],
+        )
+        self.assertTrue(all(item["status"] == "sent" for item in result[0]["external"]))
+        self.assertEqual(self.bot.send_message.await_count, 3)
+        self.assertEqual(
+            self.store.count_external_deliveries_last_24h(own_group_id), 2
+        )
+
+    async def test_pending_external_drafts_wait_for_membership_then_send_once(self):
+        from publisher.telegram import publish_pending_external_drafts
+
+        own_id = self.store.add_target("group", "@cryptoping_ru_chat")
+        self.store.review_target(own_id, "approve", "allowed", "Owned community.")
+        first_id = self.store.add_target("group", "@ifreepr")
+        second_id = self.store.add_target("group", "@prchatik")
+        draft_id = self.store.capture_source_post(
+            -100111, 501, "Web3 update", "A factual Web3 news update.",
+            "https://t.me/cryptoping_ru/501",
+        )[0]
+        self.store.approve_draft(draft_id)
+        self.assertTrue(self.store.claim_delivery(draft_id, own_id))
+        self.store.mark_delivery_sent(
+            draft_id, own_id, -1004298750600, 501,
+            "https://t.me/cryptoping_ru_chat/501",
+        )
+
+        waiting = await publish_pending_external_drafts(
+            self.bot, self.store, own_id, limit=5
+        )
+        self.assertEqual(
+            waiting, [{"draft_id": draft_id, "status": "waiting_for_trial_membership"}]
+        )
+        self.bot.send_message.assert_not_awaited()
+
+        permission = (
+            "Owner selected first two test destinations; live bot membership and "
+            "ordinary send permission are verified before each post."
+        )
+        self.store.review_target(first_id, "approve", "allowed", permission)
+        self.store.review_target(second_id, "approve", "allowed", permission)
+        self.bot.get_chat.side_effect = [
+            SimpleNamespace(
+                id=-1009876543210, type="supergroup", username="ifreepr",
+                permissions=SimpleNamespace(can_send_messages=True),
+            ),
+            SimpleNamespace(
+                id=-1009876543220, type="supergroup", username="prchatik",
+                permissions=SimpleNamespace(can_send_messages=True),
+            ),
+        ]
+        self.bot.get_chat_member.side_effect = [
+            SimpleNamespace(status="member"),
+            SimpleNamespace(status="member"),
+        ]
+        self.bot.send_message.side_effect = [
+            SimpleNamespace(message_id=601),
+            SimpleNamespace(message_id=602),
+        ]
+
+        with patch("publisher.telegram.asyncio.sleep", new=AsyncMock()):
+            sent = await publish_pending_external_drafts(
+                self.bot, self.store, own_id, limit=5
+            )
+            self.assertEqual([item["status"] for item in sent], ["sent", "sent"])
+            self.assertEqual(
+                [item["handle"] for item in sent], ["@ifreepr", "@prchatik"]
+            )
+            self.assertEqual(
+                await publish_pending_external_drafts(
+                    self.bot, self.store, own_id, limit=5
+                ),
+                [],
+            )
+
+        self.bot.send_message.assert_awaited()
+        self.assertEqual(self.bot.send_message.await_count, 2)
+        self.assertEqual(self.store.get_delivery(draft_id, first_id)["status"], "sent")
+        self.assertEqual(self.store.get_delivery(draft_id, second_id)["status"], "sent")
 
     async def test_commands_are_held_but_short_informational_posts_can_be_allowed(self):
         from publisher.telegram import publish_captured_source_posts
@@ -370,4 +579,3 @@ class PublisherTelegramTests(unittest.IsolatedAsyncioTestCase):
 if __name__ == "__main__":
     unittest.main()
 
-[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]

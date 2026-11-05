@@ -1,0 +1,362 @@
+{
+  "channel": "cryptoping_ru",
+  "posts_sampled": 100,
+  "oldest_post_id": 6207,
+  "newest_post_id": 6306,
+  "time_span_hours": 55.0,
+  "estimated_posts_per_day": 43.6,
+  "view_counter_mean": 1.9,
+  "view_counter_median": 2.0,
+  "repeated_external_urls": {},
+  "similar_story_pairs": [
+    {
+      "ids": [
+        6306,
+        6264
+      ],
+      "similarity": 0.56,
+      "shared_tokens": 3,
+      "titles": [
+        "Binance hackers move 81% of stolen Solana, route funds via THORChain",
+        "Arbitrum moved stolen Binance funds. Returning them takes a vote"
+      ]
+    },
+    {
+      "ids": [
+        6306,
+        6224
+      ],
+      "similarity": 0.56,
+      "shared_tokens": 4,
+      "titles": [
+        "Binance hackers move 81% of stolen Solana, route funds via THORChain",
+        "Binance hackers begin swapping stolen Solana tokens for Bitcoin: Chainalysis"
+      ]
+    },
+    {
+      "ids": [
+        6304,
+        6284
+      ],
+      "similarity": 0.93,
+      "shared_tokens": 9,
+      "titles": [
+        "Stellar Protocol 30 Bell upgrade goes live on testnet ahead of mainnet vote",
+        "Stellar's Bell Upgrade Goes Live on Testnet Ahead of Mainnet Vote"
+      ]
+    },
+    {
+      "ids": [
+        6303,
+        6302
+      ],
+      "similarity": 0.72,
+      "shared_tokens": 6,
+      "titles": [
+        "Ethereum targets 2028 for post-quantum transition, a year early",
+        "Ethereum dev targets 2028 for quantum resistance, a year early"
+      ]
+    },
+    {
+      "ids": [
+        6303,
+        6289
+      ],
+      "similarity": 0.78,
+      "shared_tokens": 6,
+      "titles": [
+        "Ethereum targets 2028 for post-quantum transition, a year early",
+        "Justin Drake Targets December 2028 for Ethereum’s Post-Quantum Transition"
+      ]
+    },
+    {
+      "ids": [
+        6302,
+        6291
+      ],
+      "similarity": 0.58,
+      "shared_tokens": 3,
+      "titles": [
+        "Ethereum dev targets 2028 for quantum resistance, a year early",
+        "Ethereum’s leanVM clears formal verification in its push toward quantum resistance"
+      ]
+    },
+    {
+      "ids": [
+        6302,
+        6289
+      ],
+      "similarity": 0.59,
+      "shared_tokens": 4,
+      "titles": [
+        "Ethereum dev targets 2028 for quantum resistance, a year early",
+        "Justin Drake Targets December 2028 for Ethereum’s Post-Quantum Transition"
+      ]
+    },
+    {
+      "ids": [
+        6301,
+        6300
+      ],
+      "similarity": 0.68,
+      "shared_tokens": 5,
+      "titles": [
+        "Coinbase restores crypto staking in New Jersey after state drops lawsuit",
+        "Coinbase resumes crypto staking in New Jersey after order reversal"
+      ]
+    },
+    {
+      "ids": [
+        6301,
+        6256
+      ],
+      "similarity": 0.78,
+      "shared_tokens": 6,
+      "titles": [
+        "Coinbase restores crypto staking in New Jersey after state drops lawsuit",
+        "New Jersey drops Coinbase staking order ahead of crypto’s midterm test"
+      ]
+    },
+    {
+      "ids": [
+        6301,
+        6254
+      ],
+      "similarity": 0.65,
+      "shared_tokens": 4,
+      "titles": [
+        "Coinbase restores crypto staking in New Jersey after state drops lawsuit",
+        "Coinbase says New Jersey plans to lift 3-year staking order"
+      ]
+    },
+    {
+      "ids": [
+        6301,
+        6248
+      ],
+      "similarity": 0.71,
+      "shared_tokens": 6,
+      "titles": [
+        "Coinbase restores crypto staking in New Jersey after state drops lawsuit",
+        "New Jersey drops staking lawsuit against Coinbase, clearing path for users to resume"
+      ]
+    },
+    {
+      "ids": [
+        6301,
+        6247
+      ],
+      "similarity": 0.52,
+      "shared_tokens": 4,
+      "titles": [
+        "Coinbase restores crypto staking in New Jersey after state drops lawsuit",
+        "New Jersey Rescinds Coinbase Staking Order, Clearing Path for Restart"
+      ]
+    },
+    {
+      "ids": [
+        6300,
+        6256
+      ],
+      "similarity": 0.66,
+      "shared_tokens": 6,
+      "titles": [
+        "Coinbase resumes crypto staking in New Jersey after order reversal",
+        "New Jersey drops Coinbase staking order ahead of crypto’s midterm test"
+      ]
+    },
+    {
+      "ids": [
+        6300,
+        6254
+      ],
+      "similarity": 0.68,
+      "shared_tokens": 5,
+      "titles": [
+        "Coinbase resumes crypto staking in New Jersey after order reversal",
+        "Coinbase says New Jersey plans to lift 3-year staking order"
+      ]
+    },
+    {
+      "ids": [
+        6300,
+        6248
+      ],
+      "similarity": 0.57,
+      "shared_tokens": 4,
+      "titles": [
+        "Coinbase resumes crypto staking in New Jersey after order reversal",
+        "New Jersey drops staking lawsuit against Coinbase, clearing path for users to resume"
+      ]
+    },
+    {
+      "ids": [
+        6300,
+        6247
+      ],
+      "similarity": 0.69,
+      "shared_tokens": 5,
+      "titles": [
+        "Coinbase resumes crypto staking in New Jersey after order reversal",
+        "New Jersey Rescinds Coinbase Staking Order, Clearing Path for Restart"
+      ]
+    },
+    {
+      "ids": [
+        6298,
+        6278
+      ],
+      "similarity": 0.56,
+      "shared_tokens": 3,
+      "titles": [
+        "Solana co-founder Anatoly Yakovenko tells data centers to pivot to crypto",
+        "Solana’s Yakovenko calls phishing crypto’s biggest threat"
+      ]
+    },
+    {
+      "ids": [
+        6295,
+        6275
+      ],
+      "similarity": 0.56,
+      "shared_tokens": 4,
+      "titles": [
+        "BitGo launches Bitcoin staking through Stacks for institutional clients",
+        "BitGo Adds Stacks Bitcoin Staking in Qualified Custody"
+      ]
+    },
+    {
+      "ids": [
+        6289,
+        6265
+      ],
+      "similarity": 0.51,
+      "shared_tokens": 3,
+      "titles": [
+        "Justin Drake Targets December 2028 for Ethereum’s Post-Quantum Transition",
+        "Instanodes Introduces Post-Quantum Accounts for Ethereum and Solana"
+      ]
+    },
+    {
+      "ids": [
+        6271,
+        6260
+      ],
+      "similarity": 0.54,
+      "shared_tokens": 3,
+      "titles": [
+        "Binance Details Months-Long Campaign Behind $6.34 Billion Hack",
+        "Binance Says It Has Covered $6 Billion Of $6.3 Billion Stolen In Hack"
+      ]
+    },
+    {
+      "ids": [
+        6270,
+        6269
+      ],
+      "similarity": 0.52,
+      "shared_tokens": 3,
+      "titles": [
+        "Aztec Launches Tierra Upgrade With Faster Ethereum Messaging",
+        "Ethereum Privacy Network Aztec Rolls Out Major Security and Speed Upgrade"
+      ]
+    },
+    {
+      "ids": [
+        6266,
+        6261
+      ],
+      "similarity": 0.53,
+      "shared_tokens": 3,
+      "titles": [
+        "Morning Minute: Tom Lee Calls the Binance Hack Bullish for Ethereum",
+        "Binance restores withdrawals for more Ethereum, Solana tokens after $6.3B hack"
+      ]
+    },
+    {
+      "ids": [
+        6266,
+        6235
+      ],
+      "similarity": 0.75,
+      "shared_tokens": 7,
+      "titles": [
+        "Morning Minute: Tom Lee Calls the Binance Hack Bullish for Ethereum",
+        "Bitmine Buys More Ethereum as Tom Lee Calls the Binance Hack Bullish"
+      ]
+    },
+    {
+      "ids": [
+        6256,
+        6254
+      ],
+      "similarity": 0.64,
+      "shared_tokens": 5,
+      "titles": [
+        "New Jersey drops Coinbase staking order ahead of crypto’s midterm test",
+        "Coinbase says New Jersey plans to lift 3-year staking order"
+      ]
+    },
+    {
+      "ids": [
+        6256,
+        6248
+      ],
+      "similarity": 0.65,
+      "shared_tokens": 5,
+      "titles": [
+        "New Jersey drops Coinbase staking order ahead of crypto’s midterm test",
+        "New Jersey drops staking lawsuit against Coinbase, clearing path for users to resume"
+      ]
+    },
+    {
+      "ids": [
+        6256,
+        6247
+      ],
+      "similarity": 0.56,
+      "shared_tokens": 5,
+      "titles": [
+        "New Jersey drops Coinbase staking order ahead of crypto’s midterm test",
+        "New Jersey Rescinds Coinbase Staking Order, Clearing Path for Restart"
+      ]
+    },
+    {
+      "ids": [
+        6254,
+        6248
+      ],
+      "similarity": 0.58,
+      "shared_tokens": 4,
+      "titles": [
+        "Coinbase says New Jersey plans to lift 3-year staking order",
+        "New Jersey drops staking lawsuit against Coinbase, clearing path for users to resume"
+      ]
+    },
+    {
+      "ids": [
+        6254,
+        6247
+      ],
+      "similarity": 0.69,
+      "shared_tokens": 5,
+      "titles": [
+        "Coinbase says New Jersey plans to lift 3-year staking order",
+        "New Jersey Rescinds Coinbase Staking Order, Clearing Path for Restart"
+      ]
+    },
+    {
+      "ids": [
+        6248,
+        6247
+      ],
+      "similarity": 0.66,
+      "shared_tokens": 6,
+      "titles": [
+        "New Jersey drops staking lawsuit against Coinbase, clearing path for users to resume",
+        "New Jersey Rescinds Coinbase Staking Order, Clearing Path for Restart"
+      ]
+    }
+  ],
+  "errors": []
+}

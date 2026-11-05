@@ -93,6 +93,12 @@ class PublisherStore:
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS target_referral_links (
+                    target_id INTEGER PRIMARY KEY REFERENCES targets(id) ON DELETE CASCADE,
+                    invite_link TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+
                 CREATE TABLE IF NOT EXISTS publication_deliveries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     draft_id INTEGER NOT NULL REFERENCES drafts(id),
@@ -340,6 +346,17 @@ class PublisherStore:
             """, (max(1, min(int(limit), 20)),)).fetchall()
             return [dict(row) for row in rows]
 
+    def count_external_deliveries_last_24h(self, owned_target_id):
+        """Count successful deliveries to non-owned targets in the last 24 hours."""
+        with self.connect() as db:
+            row = db.execute(
+                """SELECT COUNT(*) AS n FROM publication_deliveries
+                   WHERE status='sent' AND sent_at >= datetime('now','-24 hours')
+                     AND target_id != ?""",
+                (owned_target_id,),
+            ).fetchone()
+            return int(row["n"] or 0)
+
     def list_unprocessed_source_posts(self, limit=10):
         """Return source drafts not yet reviewed or sent; transient errors retry after ten minutes."""
         with self.connect() as db:
@@ -365,6 +382,35 @@ class PublisherStore:
             """, (max(1, min(int(limit), 20)),)).fetchall()
             return [dict(row) for row in rows]
 
+    def list_pending_external_drafts(self, owned_target_id, handles, limit=5):
+        """Approved news already sent to our group but not yet delivered to trial groups."""
+        normalized = sorted({str(handle).strip().lower() for handle in handles if handle})
+        if not normalized:
+            return []
+        placeholders = ",".join("?" for _ in normalized)
+        with self.connect() as db:
+            rows = db.execute(f"""
+                SELECT s.draft_id, s.source_url, d.title, d.body
+                FROM source_posts s
+                JOIN drafts d ON d.id=s.draft_id
+                WHERE d.status='approved'
+                  AND EXISTS (
+                    SELECT 1 FROM publication_deliveries own
+                    WHERE own.draft_id=d.id AND own.target_id=? AND own.status='sent'
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM publication_deliveries ext
+                    JOIN targets t ON t.id=ext.target_id
+                    WHERE ext.draft_id=d.id
+                      AND lower(t.handle) IN ({placeholders})
+                      AND ext.status IN ('sent','unknown','sending')
+                  )
+                ORDER BY s.id DESC LIMIT ?
+            """, (int(owned_target_id), *normalized, max(1, min(int(limit), 20)))).fetchall()
+            return [dict(row) for row in rows]
+
+
     def get_or_create_target_invite(self, target_id, invite_link):
         """Persist a target-scoped community invite so retries reuse the same URL."""
         with self.connect() as db:
@@ -379,6 +425,27 @@ class PublisherStore:
                 (target_id, invite_link),
             )
             return invite_link, True
+
+    def get_target_referral_link(self, target_id):
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT invite_link FROM target_referral_links WHERE target_id=?",
+                (target_id,),
+            ).fetchone()
+            return row["invite_link"] if row else None
+
+    def get_or_create_target_referral_link(self, target_id, invite_link):
+        with self.connect() as db:
+            db.execute(
+                """INSERT OR IGNORE INTO target_referral_links(target_id, invite_link)
+                   VALUES (?, ?)""",
+                (target_id, invite_link),
+            )
+            row = db.execute(
+                "SELECT invite_link FROM target_referral_links WHERE target_id=?",
+                (target_id,),
+            ).fetchone()
+            return row["invite_link"], row["invite_link"] == invite_link
 
     def get_target_invite(self, target_id):
         with self.connect() as db:
@@ -498,4 +565,3 @@ class PublisherStore:
             ).fetchall()
             return [dict(row) for row in rows]
 
-[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]

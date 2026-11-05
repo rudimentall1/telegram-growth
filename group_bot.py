@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import config
 import re
 
 from telegram import Update
@@ -14,15 +15,15 @@ from telegram.ext import (
     filters,
 )
 
-import config
 from config import CHAT_ID, GROUP_CHAT_ID, TELEGRAM_TOKEN
 import growth_db
-import cross_promo
 from publisher.telegram import (
     register_handlers as register_publisher_handlers,
     publish_captured_source_posts,
+    publish_pending_external_drafts,
 )
 from publisher.storage import PublisherStore
+from publisher.trial_targets import TRIAL_EXTERNAL_GROUPS
 
 logging.basicConfig(level=logging.INFO)
 # httpx logs full Telegram Bot API request URLs at INFO level; those URLs contain
@@ -114,6 +115,50 @@ async def on_source_channel_post(update: Update, context: ContextTypes.DEFAULT_T
         logging.info("publisher source captured draft_id=%s message_id=%s created=%s", draft_id, post.message_id, created)
     except Exception:
         logging.exception("Unable to capture source channel post message_id=%s", post.message_id)
+
+
+async def on_bot_chat_membership(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Register public groups when the bot is added as an ordinary member."""
+    event = update.my_chat_member
+    if not event:
+        return
+    chat = event.chat
+    if chat.type not in ("group", "supergroup") or not getattr(chat, "username", None):
+        return
+
+    store = PublisherStore()
+    handle = f"@{chat.username}"
+    target_id = store.add_target("group", handle)
+    new_status = getattr(event.new_chat_member, "status", None)
+    if new_status in ("left", "kicked"):
+        target = store.get_target(target_id)
+        if target and target["status"] == "approved":
+            store.pause_target(target_id)
+        logging.info("publisher external group membership removed handle=%s target_id=%s", handle, target_id)
+        return
+
+    restricted_can_send = (
+        new_status == "restricted"
+        and bool(getattr(event.new_chat_member, "is_member", False))
+        and getattr(getattr(event.new_chat_member, "permissions", None), "can_send_messages", None) is True
+    )
+    if new_status in ("member", "administrator", "creator") or restricted_can_send:
+        store.review_target(
+            target_id,
+            "approve",
+            "allowed",
+            "Telegram my_chat_member confirms bot membership. Live send permissions are checked before each publication.",
+        )
+        logging.info(
+            "publisher external group enabled handle=%s target_id=%s bot_status=%s; live send permission will be checked per post",
+            handle, target_id, new_status,
+        )
+        return
+
+    logging.info(
+        "publisher external group discovered handle=%s target_id=%s bot_status=%s; not currently a member",
+        handle, target_id, new_status,
+    )
 
 
 async def on_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -365,160 +410,68 @@ async def track_channel_member(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 
-async def _current_chat_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Only the current group owner/admin can opt that group into scheduled promo."""
-    chat = update.effective_chat
-    message = update.effective_message
-    if chat is None or chat.type not in ("group", "supergroup"):
-        return False
+async def refresh_trial_group_memberships(context: ContextTypes.DEFAULT_TYPE):
+    """Enable only the two trial destinations after live Telegram permission checks."""
+    store = PublisherStore()
+    bot_user = await context.bot.get_me()
+    targets = {row["handle"].lower(): row for row in store.list_targets()}
 
-    sender_chat = getattr(message, "sender_chat", None) if message else None
-    if sender_chat is not None and getattr(sender_chat, "id", None) == chat.id:
-        # Telegram represents an anonymous group admin as the group itself.
-        return True
-
-    user = update.effective_user
-    if user is None:
-        return False
-    try:
-        member = await context.bot.get_chat_member(chat.id, user.id)
-        return member.status in ("administrator", "creator")
-    except Exception:
-        logging.exception(
-            "Unable to verify current-chat administrator user_id=%s chat_id=%s",
-            user.id, chat.id,
-        )
-        return False
-
-
-async def allow_promotion(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    message = update.effective_message
-    if chat is None or message is None or chat.type not in ("group", "supergroup"):
-        if message:
-            await message.reply_text("Команду /allowpromo можно включить только внутри группы.")
-        return
-    if not await _current_chat_admin(update, context):
-        await message.reply_text("Включить автопубликации может только администратор этой группы.")
-        return
-
-    source = f"promo_{abs(chat.id)}"
-    authorized_by = getattr(update.effective_user, "id", None)
-    try:
-        invite = await context.bot.create_chat_invite_link(
-            chat_id=CHAT_ID, name=source, creates_join_request=False
-        )
-        growth_db.save_link(invite.invite_link, source, authorized_by)
-        growth_db.enable_promotion_target(
-            chat_id=chat.id,
-            title=chat.title or chat.username or str(chat.id),
-            username=chat.username,
-            invite_link=invite.invite_link,
-            authorized_by=authorized_by,
-        )
-        interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
-        await message.reply_text(
-            "Автопромо включено по запросу администратора этой группы.\n"
-            f"@cryptoping_ru будет публиковаться не чаще одного раза в {interval_hours} ч.\n"
-            "Ссылка для этой группы отслеживается отдельно.\n"
-            "Отключить: /disablepromo"
-        )
-        logging.info(
-            "promotion target enabled chat_id=%s title=%s authorized_by=%s",
-            chat.id, chat.title, authorized_by,
-        )
-    except Exception:
-        logging.exception("Failed to enable promotion target chat_id=%s", chat.id)
-        await message.reply_text(
-            "Не удалось включить автопромо. Проверь, что бот — администратор "
-            "канала @cryptoping_ru и может создавать invite-ссылки."
-        )
-
-
-async def disable_promotion(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    message = update.effective_message
-    if chat is None or message is None or chat.type not in ("group", "supergroup"):
-        if message:
-            await message.reply_text("Команду /disablepromo нужно вызвать внутри группы.")
-        return
-    if not await _current_chat_admin(update, context):
-        await message.reply_text("Отключить автопубликации может только администратор этой группы.")
-        return
-
-    disabled = growth_db.disable_promotion_target(chat.id)
-    if disabled:
-        await message.reply_text("Автопромо отключено. Новые публикации в эту группу отправляться не будут.")
-    else:
-        await message.reply_text("Для этой группы автопромо уже отключено или не было включено.")
-
-
-async def promotion_targets_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await _growth_admin(update, context):
-        await update.effective_message.reply_text("Команда доступна только администраторам группы.")
-        return
-    targets = growth_db.list_promotion_targets(enabled_only=True)
-    if not targets:
-        await update.effective_message.reply_text(
-            "Нет групп, включивших автопромо. Администратор целевой группы должен вызвать /allowpromo."
-        )
-        return
-
-    lines = ["Группы с включённым автопромо:", ""]
-    for chat_id, title, username, last_post_at, last_error in targets[:40]:
-        label = f"@{username}" if username else title
-        status = f"последняя публикация: {last_post_at}" if last_post_at else "ожидает первой публикации"
-        if last_error:
-            status += f"; ошибка: {last_error[:120]}"
-        lines.append(f"• {label} ({chat_id}) — {status}")
-    if len(targets) > 40:
-        lines.append(f"...и ещё {len(targets) - 40} групп.")
-    await update.effective_message.reply_text("\n".join(lines))
-
-
-def _promotion_text(invite_link):
-    return (
-        "🛰 CryptoPing RU — новости и возможности Web3.\n"
-        "Airdrop, тестнеты, ноды и NFT. Условия и риски проверяйте по официальным источникам.\n"
-        f"Подписаться: {invite_link}"
-    )
-
-
-async def publish_due_promotions(context: ContextTypes.DEFAULT_TYPE):
-    """Publish only to groups whose own administrators explicitly opted in."""
-    interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
-    try:
-        targets = growth_db.due_promotion_targets(interval_hours)
-    except Exception:
-        logging.exception("Unable to load scheduled promotion targets")
-        return
-
-    for chat_id, title, username, invite_link in targets:
+    for handle in sorted(TRIAL_EXTERNAL_GROUPS):
+        target = targets.get(handle)
+        if not target:
+            logging.error("publisher trial target missing from registry handle=%s", handle)
+            continue
         try:
-            sent = await context.bot.send_message(
-                chat_id=chat_id,
-                text=_promotion_text(invite_link),
-                disable_web_page_preview=True,
-            )
-            growth_db.mark_promotion_sent(chat_id, sent.message_id)
-            logging.info(
-                "promotion sent chat_id=%s title=%s message_id=%s",
-                chat_id, title, sent.message_id,
-            )
-        except (Forbidden, BadRequest) as exc:
-            growth_db.mark_promotion_failed(chat_id, exc, disable=True)
-            logging.warning(
-                "promotion target disabled after Telegram rejected post chat_id=%s error=%s",
-                chat_id, exc,
-            )
-        except TelegramError as exc:
-            growth_db.mark_promotion_failed(chat_id, exc, disable=False)
-            logging.warning("temporary promotion send failure chat_id=%s error=%s", chat_id, exc)
-        except Exception as exc:
-            growth_db.mark_promotion_failed(chat_id, exc, disable=False)
-            logging.exception("Unexpected promotion send failure chat_id=%s", chat_id)
-        await asyncio.sleep(1.2)
+            chat = await context.bot.get_chat(handle)
+            if getattr(chat, "type", None) not in ("group", "supergroup"):
+                logging.warning("publisher trial target is not a group handle=%s type=%s",
+                                handle, getattr(chat, "type", None))
+                continue
 
+            member = await context.bot.get_chat_member(chat.id, bot_user.id)
+            status = getattr(member, "status", None)
+            if status in ("administrator", "creator"):
+                can_send = status == "creator" or (
+                    getattr(member, "can_send_messages", True) is not False
+                )
+            elif status == "member":
+                permissions = getattr(chat, "permissions", None)
+                can_send = getattr(permissions, "can_send_messages", None) is True
+            elif status == "restricted":
+                permissions = getattr(member, "permissions", None)
+                can_send = bool(getattr(member, "is_member", False)) and (
+                    getattr(permissions, "can_send_messages", None) is True
+                )
+            else:
+                can_send = False
+
+            if can_send:
+                if target["status"] != "approved" or target["promotion_policy"] != "allowed":
+                    evidence = (
+                        "Owner confirms this is one of the first two subscribed groups and "
+                        "authorizes CryptoPing RU news publication for the trial. Telegram "
+                        f"Bot API verified bot membership status={status}; the publisher "
+                        "rechecks live send permission before every post."
+                    )
+                    store.review_target(target["id"], "approve", "allowed", evidence)
+                    logging.info(
+                        "publisher trial target enabled handle=%s bot_status=%s pinned_rules=%s",
+                        handle, status, bool(getattr(chat, "pinned_message", None)),
+                    )
+                else:
+                    logging.info("publisher trial target ready handle=%s bot_status=%s",
+                                 handle, status)
+            else:
+                if target["status"] == "approved":
+                    store.pause_target(target["id"])
+                logging.info(
+                    "publisher trial target not ready handle=%s bot_status=%s; "
+                    "bot must be a member with ordinary send permission",
+                    handle, status,
+                )
+        except Exception as exc:
+            logging.warning("publisher trial access check failed handle=%s error=%s",
+                            handle, str(exc)[:240])
 
 
 async def publish_captured_channel_posts(context: ContextTypes.DEFAULT_TYPE):
@@ -535,6 +488,23 @@ async def publish_captured_channel_posts(context: ContextTypes.DEFAULT_TYPE):
             logging.error("publisher autonomous route disabled: owned community target is not approved")
             return
         outcomes = await publish_captured_source_posts(context.bot, store, target["id"], limit=3)
+        external_pending = await publish_pending_external_drafts(
+            context.bot, store, target["id"], limit=5
+        )
+        for item in external_pending:
+            logging.info(
+                "publisher trial fanout draft_id=%s target=%s status=%s reason=%s",
+                item.get("draft_id"), item.get("handle", "-"),
+                item.get("status"), item.get("reason", ""),
+            )
+        # Register Publisher's destination-specific channel invites in the
+        # growth ledger so subsequent joins can be attributed to the destination.
+        for publisher_target in store.list_targets():
+            invite_link = store.get_target_referral_link(publisher_target["id"])
+            if invite_link:
+                growth_db.save_link(
+                    invite_link, f"publisher_target_{publisher_target['id']}", None
+                )
         for item in outcomes:
             logging.info(
                 "publisher autonomous result draft_id=%s status=%s reason=%s",
@@ -552,30 +522,21 @@ def main():
     app.add_handler(CommandHandler("growthlink", growth_link))
     app.add_handler(CommandHandler("growthreport", growth_report))
     app.add_handler(CommandHandler("growthretention", growth_retention))
-    app.add_handler(CommandHandler("allowpromo", allow_promotion))
-    app.add_handler(CommandHandler("disablepromo", disable_promotion))
-    app.add_handler(CommandHandler("promotetargets", promotion_targets_report))
     app.add_handler(ChatMemberHandler(track_channel_member, ChatMemberHandler.CHAT_MEMBER))
+    app.add_handler(ChatMemberHandler(on_bot_chat_membership, ChatMemberHandler.MY_CHAT_MEMBER))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
-    cross_promo.register_handlers(app)
     register_publisher_handlers(app, _growth_admin, GROUP_CHAT_ID)
 
-    interval_hours = int(getattr(config, "PROMOTION_INTERVAL_HOURS", 72))
-    if not 1 <= interval_hours <= 720:
-        raise ValueError("PROMOTION_INTERVAL_HOURS must be between 1 and 720 hours")
-    check_interval_minutes = int(getattr(config, "PROMOTION_CHECK_INTERVAL_MINUTES", 5))
-    if not 1 <= check_interval_minutes <= 60:
-        raise ValueError("PROMOTION_CHECK_INTERVAL_MINUTES must be between 1 and 60 minutes")
     if app.job_queue is None:
         raise RuntimeError(
             "JobQueue is unavailable. Install dependencies from requirements.txt "
             "including the job-queue extra."
         )
     app.job_queue.run_repeating(
-        publish_due_promotions,
-        interval=check_interval_minutes * 60,
-        first=10,
-        name="opt-in-promotion-scheduler",
+        refresh_trial_group_memberships,
+        interval=300,
+        first=5,
+        name="publisher-trial-group-membership-check",
         job_kwargs={"max_instances": 1, "coalesce": True},
     )
     app.job_queue.run_repeating(
@@ -585,14 +546,9 @@ def main():
         name="publisher-own-channel-autopublish",
         job_kwargs={"max_instances": 1, "coalesce": True},
     )
-    logging.info(
-        "Opt-in promotion scheduler enabled interval_hours=%s check_interval_minutes=%s",
-        interval_hours, check_interval_minutes,
-    )
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
     main()
 
-[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]

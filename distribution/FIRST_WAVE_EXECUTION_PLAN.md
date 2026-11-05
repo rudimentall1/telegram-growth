@@ -9,7 +9,7 @@
 - `distribution/targets.json` contains 23 promotion networks, 125 communities and 26 directory candidates.
 - The 125 community records are discovery evidence, not a permission grant. The current inventory marks 16 as `discovered_not_joined`, 81 as `discovered_rules_need_review`, 18 as `needs_verification`, and the remaining records as other unverified discovery states.
 - 9 of the 125 community records have no `checked_at` date; the other 116 are dated 2026-10-28 or 2026-10-29. A date on a discovery record does not establish that current in-chat rules or posting permission were verified.
-- The main README documents the existing `/growthlink` attribution command and the opt-in reciprocal cross-promotion network. The latter still needs real partner owners to join before it can generate exchanges.
+- The main README documents the existing `/growthlink` attribution command and the opt-in reciprocal cross-promotion network. That reciprocal-channel feature has since been removed because it depended on external bot-admin rights.
 - The TGFind workflow is configured to submit and then look up `@cryptoping_ru`. A configured workflow is not proof of a successful listing; the Actions run and public lookup must be checked before claiming it is live.
 
 ## First-wave shortlist
@@ -33,7 +33,7 @@ These are candidates for a human rule check and a small, measured test. Public d
 2. No bot is added as an administrator to a third-party group as part of this plan.
 3. No posting until the current pinned rules and the exact permitted location are checked.
 4. No fake subscribers, forced subscriptions, reaction farms, view exchanges or engagement manipulation.
-5. One test post per approved destination. Respect its cooldown and stop immediately if moderators object.
+5. Publish to every eligible destination where Telegram confirms membership and send permission. Stop immediately if Telegram rejects delivery or moderators object.
 6. Use a distinct Telegram invite link per destination via the existing `/growthlink <source_name>` command where the bot can create and observe the link. If it cannot, mark attribution as unavailable rather than inventing clicks.
 7. Record baseline subscriber count, post URL/time, post views at 24h and 7d, attributed joins, observed unsubscribes and 7-day retention. Telegram does not expose invite-link clicks through the Bot API; do not report clicks unless an external analytics source provides them.
 
@@ -58,3 +58,15 @@ Before using the copy, check that the target community permits crypto/finance pr
 ## Evidence boundary
 
 This document is a prioritization and operating plan based on the public descriptions already recorded in `distribution/targets.json`. It is not evidence that current rules were inspected, that an account was connected, that a placement was accepted, or that the channel listing is live.
+
+
+## Owner decision update (2026-11-04)
+
+The active distribution path is now the existing RSS publisher -> channel capture
+-> AI moderation -> owned group -> at most one approved external group per news
+item. External Bot API delivery uses ordinary bot membership, not admin rights,
+and only when current rules explicitly allow the post and Telegram confirms
+member send permission. No project-imposed daily, per-news, or destination
+cooldown caps apply. Telegram's actual API limits and group rules govern delivery.
+Self-promotion inside our own group and reciprocal channel cross-promotion are
+disabled.

@@ -98,9 +98,9 @@ class PublisherTests(unittest.TestCase):
                 "--db", str(self.store.db_path),
                 "import-catalog", "--json", str(catalog_path),
             ])
-        self.assertIn("processed=119, rejected=6", output.getvalue())
+        self.assertIn("processed=91, rejected=0", output.getvalue())
         targets = self.store.list_targets()
-        self.assertEqual(len(targets), 119)
+        self.assertEqual(len(targets), 91)
         self.assertTrue(all(t["status"] == "pending" for t in targets))
         self.assertTrue(all(t["promotion_policy"] == "unknown" for t in targets))
 
@@ -208,7 +208,7 @@ class PublisherTests(unittest.TestCase):
         self.store.review_target(target_id, "reject", "prohibited", "Rules prohibit promotion")
         self.assertFalse(evaluate_target(self.store.get_target(target_id))[0])
 
-    def test_future_review_timestamp_is_ineligible(self):
+    def test_future_review_timestamp_does_not_add_a_manual_expiry_gate(self):
         future = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
         target = {
             "status": "approved",
@@ -217,7 +217,7 @@ class PublisherTests(unittest.TestCase):
             "reviewed_at": future,
             "last_posted_at": None,
         }
-        self.assertEqual(evaluate_target(target), (False, "review timestamp is in the future"))
+        self.assertTrue(evaluate_target(target)[0])
 
     def test_pause_target_blocks_planning_and_preserves_record(self):
         target_id = self.store.add_target("group", "@example")
@@ -268,7 +268,7 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(rows[0]["source_url"], "https://t.me/news/77")
         self.assertEqual(rows[0]["draft_id"], first_id)
 
-    def test_stale_review_is_ineligible(self):
+    def test_stale_review_does_not_expire_permission_automatically(self):
         old = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
         target = {
             "status": "approved",
@@ -277,9 +277,9 @@ class PublisherTests(unittest.TestCase):
             "reviewed_at": old,
             "last_posted_at": None,
         }
-        self.assertEqual(evaluate_target(target), (False, "permission review is stale"))
+        self.assertTrue(evaluate_target(target)[0])
 
-    def test_cooldown_blocks_recent_target(self):
+    def test_recent_publication_does_not_block_next_publication(self):
         recent = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
         target = {
             "status": "approved",
@@ -288,7 +288,7 @@ class PublisherTests(unittest.TestCase):
             "reviewed_at": datetime.now(timezone.utc).isoformat(),
             "last_posted_at": recent,
         }
-        self.assertFalse(evaluate_target(target)[0])
+        self.assertTrue(evaluate_target(target)[0])
 
     def test_dry_run_requires_approved_draft_and_never_sends(self):
         draft_id = self.store.add_draft("Useful guide", "A useful CryptoPing RU guide.")

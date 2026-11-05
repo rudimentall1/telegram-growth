@@ -27,8 +27,9 @@ python -m publisher approve-draft --id 1
 python -m publisher plan --draft-id 1
 ```
 
-Permission review expires after 30 days. A target has a seven-day cooldown
-after a successful publication. Pausing a target preserves its review history.
+A group becomes eligible when Telegram reports that the bot joined it as a
+member. Live membership and send permissions are checked immediately before
+each post. Pausing a target preserves its review history.
 
 ## Telegram operator commands
 
@@ -49,16 +50,25 @@ the existing growth administrator check:
 A draft must be approved and the target must have a fresh human approval with
 `promotion_policy=allowed` and non-empty evidence. Immediately before sending,
 the bot resolves the public destination and checks its live Telegram membership
-and administrator rights. Channels additionally require `can_post_messages`.
+and live membership/send permissions. For groups, ordinary bot membership is
+sufficient when the group's default permissions allow members to send messages;
+the bot does not need administrator rights. Channels still require
+administrator status with can_post_messages.
 A destination whose Telegram type does not match the registered target kind is
 blocked. Text-only posts are limited to Telegram's 4096-character text limit.
 
-Bulk publishing is operator-triggered, sequential, limited to 20 target
-attempts per command, and waits 1.2 seconds between attempts. If more targets
-remain, the bot returns a continuation command with the last processed target
-ID. Targets already sent are protected by the seven-day cooldown. There is no
-background mass-post scheduler, automatic joining, scraping, unsolicited direct
-messaging, or paid placement.
+Manual bulk publishing is operator-triggered, sequential, limited to 20 target
+attempts per command, and waits 1.2 seconds between attempts. The autonomous
+source pipeline appends a target-specific invite to our public channel (with
+join attribution), then sends the moderated news item to every eligible
+external group where Telegram confirms bot membership and live send permission.
+There are no project-imposed daily, per-news, or destination cooldown caps.
+Telegram's own API limits apply. Duplicate delivery protection remains per
+draft and destination. The bot must already be a member of each group; it never
+requests administrator rights or joins automatically. When Telegram reports
+that the bot joined a public group, it is automatically registered as eligible.
+If the bot is removed, the destination is paused. There is no scraping,
+unsolicited direct messaging, or paid placement.
 
 ## Delivery safety and recovery
 
@@ -73,27 +83,32 @@ Every draft/target pair has one unique delivery record:
 
 Unknown outcomes require manual inspection in the destination before any
 recovery decision. This avoids duplicate posts after ambiguous network errors.
-Successful publication timestamps update the target cooldown. Public message
-links are stored when Telegram exposes a public username.
+Successful publication timestamps are retained for reporting, not used as a
+cooldown. Public message links are stored when Telegram exposes a public username.
 
 ## Tests
 
 ```powershell
 python -m unittest discover -s tests -v
-python -m compileall -q group_bot.py growth_db.py cross_promo.py publisher scripts
+python -m compileall -q group_bot.py growth_db.py publisher scripts
 ```
 
 Telegram delivery tests use mocked Bot API responses. They verify permission
 checks, target-kind matching, draft approval, stale-review rejection,
-duplicate-send protection, cooldown behavior, manual retry of definitive
-failures, and non-retry of ambiguous network outcomes. They do not claim that a
+duplicate-send protection, no arbitrary permission expiry or destination
+cooldown, manual retry of definitive failures, and non-retry of ambiguous network outcomes. They do not claim that a
 live bot has permissions in any real community; those rights must be verified
 at runtime before the first actual post.
 
 ## Autonomous AI moderation
 
-Captured posts from `@cryptoping_ru` are checked by the moderation model before
-the bot approves or sends them to the owned community `@cryptoping_ru_chat`.
+New posts from @cryptoping_ru are captured and checked by the moderation model
+before the bot sends them to the owned community @cryptoping_ru_chat. During the
+initial external-distribution trial, the same approved item can be sent to the
+two selected destinations @ifreepr and @prchatik. Delivery remains disabled for
+each destination until Telegram confirms that the bot is a member and the
+group's ordinary member permissions allow messages. The bot does not need
+administrator rights.
 Only a high-confidence `allow` for `news`, `analysis`, or `education`
 with no risk flags can pass automatically. Promotions, referrals, uncertain
 claims, off-topic posts, and borderline cases are held. Clear phishing, wallet
@@ -105,20 +120,32 @@ fact-check.
 
 Configure the service environment using `.env.example`:
 
-- `OPENAI_API_KEY` - API Platform key.
-- `CRYPTOPING_MODERATOR_MODEL` - defaults to `gpt-6-luna`.
-- `CRYPTOPING_MODERATOR_TIMEOUT_SECONDS` - defaults to 30 seconds.
+- `CRYPTOPING_MODERATOR_PROVIDER` selects the primary provider (`gemini`, `groq`, or `openai`).
+- `GEMINI_API_KEY` and `CRYPTOPING_MODERATOR_GEMINI_MODEL` configure Gemini.
+- `GROQ_API_KEY` and `CRYPTOPING_MODERATOR_GROQ_MODEL` configure Groq.
+- `OPENAI_API_KEY` and `CRYPTOPING_MODERATOR_MODEL` are optional OpenAI fallback settings.
+- `CRYPTOPING_MODERATOR_TIMEOUT_SECONDS` defaults to 30 seconds.
 
-The API key is not included in this repository. ChatGPT subscriptions and API
-Platform billing are separate. Without a valid API key, when the API times out,
-or when the response fails schema validation, the post stays unpublished and
-the error is recorded for retry after ten minutes. Final allow/hold/block
-decisions are retained in `source_moderation_reviews` and visible to the bot
-administrator through `/pubsources`.
+The moderator tries the selected provider first, then other configured providers
+when an API request fails or the response is invalid. If no provider succeeds,
+the post stays unpublished (fail-closed). Provider keys are not included in
+this repository and must never be committed. Free-tier quotas, availability,
+and provider data-use terms are controlled by each provider and can change.
+Final allow/hold/block decisions are retained in `source_moderation_reviews`
+and visible to the bot administrator through `/pubsources`.
 
-The moderator uses the OpenAI Responses API with strict JSON-schema output.
-The classifier is not a promise of perfect fraud detection. External
-destinations remain subject to the separate permission and live-membership
-checks described above.
+The moderator uses structured JSON output and a common validation gate across
+providers. It classifies supplied text only; it does not independently verify
+facts, open links, or certify a project's claims. The classifier is not a
+promise of perfect fraud detection.
 
-[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
+## Distribution without external bot administrator rights
+
+The user has ruled out obtaining administrator rights for our bot in external
+Telegram groups. Do not design external distribution around that requirement.
+See `AGENTS.md`, `docs/SESSION-CHECKPOINT.md`, and
+`docs/DISTRIBUTION-STRATEGY.md` before making distribution changes. Preferred
+routes include free Telegram Suggested Posts, member-level posts where current
+rules allow them, editorial/directory submissions, owned web/RSS assets, and
+organic contributions that comply with community rules. Do not use unattended
+userbot mass-posting, unsolicited DMs, or repetitive link drops.
