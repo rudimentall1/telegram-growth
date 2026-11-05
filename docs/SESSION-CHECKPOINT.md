@@ -821,3 +821,16 @@ Read-only audit of Gensyn2, both existing bot paths, live SQLite state, reposito
 - The owner must add `@crypto_source_farm_bot` as an ordinary member to each of the two groups (not administrator). The running service checks membership every five minutes; once Telegram reports membership and ordinary send permission, it will enable the target and deliver eligible news automatically.
 - Do not claim external distribution has started until `publication_deliveries` records status=`sent` for these handles. No external group messages were sent during this implementation.
 - No commit, push, reset, rebase or merge was performed; the repository's pre-existing divergence and unrelated changes remain untouched.
+
+
+## GitHub repository synchronization (2026-11-05)
+
+- Repository visibility was confirmed as **public**. A staged-blob scan found no Telegram bot token, Gemini/Groq/OpenAI API key, or private-key material. Live `.env`, `config.py`, the `data` symlink and SQLite state, and local `.bak` copies were excluded by ignore rules and were not uploaded.
+- Before synchronization, local `main` was 3 commits ahead and 8 commits behind `origin/main`. Created a local safety branch `backup/pre-github-sync-20261105`, merged the 8 remote commits into local `main`, preserved the 3 local commits, restored the working changes, and committed the final project snapshot.
+- Merge commit: `45d60ab` (`Merge remote-tracking branch 'origin/main'`).
+- Project synchronization commit pushed to GitHub default branch `main`: `1ffeec40af1760791068075a01db9c39403a44ff` (`Sync Telegram growth publisher and distribution workflows`).
+- GitHub API comparison of `de7d65c` to `1ffeec40af1760791068075a01db9c39403a44ff` confirmed 5 new commits and 38 changed files. Git fetch then confirmed local `HEAD` and `origin/main` both at `1ffeec40af1760791068075a01db9c39403a44ff`, with zero ahead/behind.
+- The push includes the RSS handoff module, the first-two-group trial code and tests, the standalone RSS sender patch and application instructions, the updated distribution target catalogue, project docs/checkpoint, and the decommissioning of the legacy reciprocal cross-promotion module.
+- Verification before push: full unittest suite `Ran 130 tests ... OK`; Python compilation passed for project Python files and the external RSS sender; secret scan of staged blobs returned no matches. The GitHub API confirmed both `publisher/rss_handoff.py` and `integrations/legacy-rss-publisher/main.py.patch` on `main`.
+- The repository's existing server service remains active. This Git synchronization did not send Telegram posts, change the live databases, or add the bot to external groups. At last live Bot API check, the bot was still `left` in `@ifreepr` and `@prchatik`; external trial publication has not started.
+- The initial HTTPS push attempt stalled because no HTTPS credential helper was configured and was interrupted. The successful push used the already-configured GitHub SSH identity for `rudimentall1`. The repository's fetch URL remains HTTPS; local `main` is synchronized with `origin/main`.
