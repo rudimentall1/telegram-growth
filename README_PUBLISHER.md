@@ -120,3 +120,5 @@ The moderator uses the OpenAI Responses API with strict JSON-schema output.
 The classifier is not a promise of perfect fraud detection. External
 destinations remain subject to the separate permission and live-membership
 checks described above.
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]

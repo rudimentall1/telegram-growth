@@ -496,3 +496,5 @@ def register_handlers(app, admin_check, community_chat_id=None):
     app.add_handler(CommandHandler("pubsend", pub_send))
     app.add_handler(CommandHandler("pubsendall", pub_send_all))
     app.add_handler(CommandHandler("pubdelivery", pub_delivery))
+
+[executed on device: Gensyn2.play2go.cloud (03201713-0ab1-4309-bc64-9b0566307ce7)]
